@@ -450,6 +450,30 @@ html.ombre .sec,html.ombre .res,html.ombre .cont{background:color-mix(in srgb,va
 .fgroup.open .fg-b{display:flex}
 
 
+/* grouped series results */
+.res.grp .stack{position:relative;width:64px;height:88px;flex:none}
+.res.grp .stack img{position:absolute;top:calc(var(--j)*4px);left:calc(var(--j)*7px);width:50px;height:75px;border-radius:7px;object-fit:cover;box-shadow:0 2px 6px rgba(0,0,0,.35);border:1.5px solid var(--card)}
+.res.grp .stack img:nth-child(1){z-index:3}.res.grp .stack img:nth-child(2){z-index:2}
+.part-h{display:flex;gap:10px;align-items:center;background:var(--bg2);border-radius:12px;padding:8px;margin:2px 0 6px}
+.part-h img{width:38px;height:56px;border-radius:6px;object-fit:cover;flex:none}
+.part-h b{display:block;font-size:13.5px;line-height:1.25}.part-h span{display:block;font-size:11.5px;color:var(--mut);margin-top:2px}
+.ep.movie .et{font-weight:700}
+/* hold for quick options */
+.tile,.cont,.rcard,.res,.mini{-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}
+.tile img,.cont img,.rcard img,.res img,.mini img{-webkit-touch-callout:none;-webkit-user-drag:none;pointer-events:none}
+.quick .q-head{display:flex;gap:12px;align-items:center}
+.quick .q-head .cover{width:58px;flex:none}
+.quick .q-t{font-family:var(--font-display);font-weight:var(--display-weight);font-size:18px;line-height:1.2}
+.quick .q-s{font-size:12.5px;color:var(--mut);margin-top:3px}
+.q-st{display:flex;flex-wrap:wrap;gap:6px}
+.q-st button{border:1px solid var(--line);background:var(--bg2);color:var(--txt);border-radius:99px;padding:8px 12px;font-size:13px;font-weight:600}
+.q-st button.on{background:var(--acc);border-color:transparent;color:#fff}
+.q-rate{display:grid;grid-template-columns:repeat(10,1fr);gap:4px}
+.q-rate button{border:1px solid var(--line);background:var(--bg2);color:var(--txt);border-radius:8px;padding:8px 0;font-size:12.5px;font-weight:700}
+.q-rate button.on{color:#1a1200;border-color:transparent}
+.q-acts{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
+.ai-on{font-size:9.5px;font-weight:800;background:var(--acc);color:#fff;border-radius:5px;padding:1px 4px;margin-left:3px;vertical-align:middle}
+
 /* ================= DECOR ================= */
 :root{--acc2:#ff7eb3;--shk:1;--bw:1px}
 .sec,.res,.cont,.upd{border-width:var(--bw)}
@@ -736,6 +760,11 @@ html[data-theme=light] .fx-stars{background:var(--acc);box-shadow:none}
 .plant-opt svg{width:60px;height:70px}
 .wall-prev{height:110px;border-radius:12px;background-size:cover;background-position:center;margin:10px 0}
 .color-row{flex-wrap:wrap}
+.hol-note{font-size:12px;color:var(--mut);background:color-mix(in srgb,var(--acc) 10%,transparent);border-radius:10px;padding:8px 10px;margin:0 0 10px}
+.buddy-grid.hol .buddy-opt{background:color-mix(in srgb,var(--acc) 10%,var(--chip))}
+.mv-burst{width:4px;height:4px;border-radius:50%;animation:fxburst calc(var(--d)*.7) ease-out infinite}
+.mv-burst b{position:absolute;inset:0;border-radius:50%;box-shadow:0 -34px 0 var(--fc),24px -24px 0 var(--fc),34px 0 0 var(--fc),24px 24px 0 var(--fc),0 34px 0 var(--fc),-24px 24px 0 var(--fc),-34px 0 0 var(--fc),-24px -24px 0 var(--fc),0 -17px 0 #fff,17px 0 0 #fff,0 17px 0 #fff,-17px 0 0 #fff}
+@keyframes fxburst{0%,60%{transform:scale(.05);opacity:0}64%{opacity:1}100%{transform:scale(1.4);opacity:0}}
 </style>
 </head>
 <body>
@@ -814,12 +843,13 @@ function fromAniList(m, cat){
       chapters: m.chapters || null, volumes: m.volumes || null, duration: m.duration || null,
       studio: m.studios?.nodes?.[0]?.name || null, authors: [...new Set(authors)].slice(0,3),
       score: m.averageScore || null, ended: m.endDate?.year || null,
-    }
+    },
+    _m: m.relations ? {id:m.id, format:m.format, title:m.title, synonyms:m.synonyms, startDate:m.startDate, episodes:m.episodes, relations:m.relations} : undefined
   };
 }
 async function searchAniList(q, cat){
   const isAnime = cat==="anime";
-  const query = `query($s:String,$t:MediaType${isAnime?"":",$c:CountryCode"}){Page(perPage:20){media(search:$s,type:$t${isAnime?"":",countryOfOrigin:$c"},sort:SEARCH_MATCH${adultOn()?"":",isAdult:false"}){${AL_FIELDS}}}}`;
+  const query = `query($s:String,$t:MediaType${isAnime?"":",$c:CountryCode"}){Page(perPage:20){media(search:$s,type:$t${isAnime?"":",countryOfOrigin:$c"},sort:SEARCH_MATCH${adultOn()?"":",isAdult:false"}){${AL_FIELDS}${isAnime?" relations{edges{relationType node{id type format}}}":""}}}}`;
   const vars = {s:q, t: isAnime?"ANIME":"MANGA"}; if(!isAnime) vars.c = COUNTRY[cat];
   const d = await anilist(query, vars);
   return d.Page.media.map(m=>fromAniList(m, cat));
@@ -1020,12 +1050,13 @@ async function searchCat(cat, q, opts={}){
   const safe = p => p.catch(()=>[]);
   if(!opts.deep){
     let al = []; try{ al = await searchAniList(q, cat); }catch(e){}
-    if(al.length >= 5) return mergeResults([["AniList", al]], q);
+    if(al.length >= 5){ const m = mergeResults([["AniList", al]], q); return cat==="anime" ? groupAnime(m) : m; }
     const md = await safe(searchMangaDex(q, cat));
     const m = mergeResults([["AniList", al], ["MangaDex", md]], q); if(!m.length && !al.length) throw new Error("no results"); return m.slice(0,30);
   }
   const [al, mal, kt, md] = await Promise.all([ safe(searchAniList(q, cat)), safe(searchJikan(q, cat)), safe(searchKitsu(q, cat)), safe(searchMangaDex(q, cat)) ]);
-  return mergeResults([["AniList", al], ["MyAnimeList", mal], ["Kitsu", kt], ["MangaDex", md]], q).slice(0, 30);
+  const merged = mergeResults([["AniList", al], ["MyAnimeList", mal], ["Kitsu", kt], ["MangaDex", md]], q).slice(0, 30);
+  return cat==="anime" ? groupAnime(merged) : merged;
 }
 async function refreshItem(item){
   if(item.src?.al) return refreshAniList(item);
@@ -1033,6 +1064,7 @@ async function refreshItem(item){
   return null;
 }
 async function fetchUnits(item, onProgress){
+  if(item.franchise) return franchiseUnits(item, onProgress);
   if(item.cat==="anime") return animeEpisodes(item, onProgress);
   if(item.cat==="tv") return tvEpisodes(item);
   if(CATS[item.cat].vols) return mangaChapters(item, onProgress);
@@ -1884,6 +1916,147 @@ if(window.DEMO_CATALOG){
     return {items: l.map(x=>JSON.parse(JSON.stringify(x))), more:false}; };
   aniTags = async ()=> TAGS.map(n=>({name:n, category:"Popular", isAdult:false}));
 }
+
+/* ============ ANIME FRANCHISES: seasons, movies and specials as one series ============ */
+const FR_REL = new Set(["SEQUEL","PREQUEL","PARENT","SIDE_STORY","SUMMARY","SPIN_OFF"]);
+const FR_FIELDS = `id idMal format episodes duration status title{romaji english native} synonyms startDate{year month day} coverImage{extraLarge large} bannerImage nextAiringEpisode{episode airingAt} description(asHtml:false) genres averageScore studios(isMain:true){nodes{name}}`;
+const FR_STOP = new Set(["the","a","an","no","to","wa","ga","de","ni","of"]);
+function frWords(t){ return (t||"").toLowerCase().normalize("NFKD").replace(/[̀-ͯ]/g,"").replace(/[^a-z0-9 ]+/g," ").split(/\s+/).filter(w=>w && !FR_STOP.has(w)); }
+function frKey(m){ return [m.title?.english, m.title?.romaji, ...(m.synonyms||[])].filter(Boolean).map(t=>frWords(t)[0]).filter(Boolean); }
+function frSameName(a, b){ const A = frKey(a), B = new Set(frKey(b)); return A.some(w=>w.length>=3 && B.has(w)); }
+const frKind = f => f==="MOVIE" ? "movie" : (f==="OVA" || f==="SPECIAL") ? "special" : (f==="MUSIC" ? "skip" : "season");
+async function frFetch(ids){
+  const out = [];
+  for(let i=0;i<ids.length;i+=50){
+    const d = await anilist(`query($ids:[Int]){Page(perPage:50){media(id_in:$ids,type:ANIME){${FR_FIELDS} relations{edges{relationType node{id type format}}}}}}`, {ids: ids.slice(i,i+50)});
+    out.push(...d.Page.media);
+  }
+  return out;
+}
+// Groups search results that are seasons/movies of the same show (one AniList request)
+async function groupAnime(list){
+  const withAl = list.filter(r=>r.src?.al);
+  if(withAl.length < 2) return list;
+  let ms = withAl.map(r=>r._m).filter(Boolean); const miss = withAl.filter(r=>!r._m).map(r=>r.src.al);
+  if(miss.length){ try{ ms = ms.concat(await frFetch(miss)); }catch(e){ if(!ms.length) return list; } }
+  const byId = {}; ms.forEach(m=>byId[m.id]=m);
+  const parent = {}; const find = x => parent[x]===x ? x : (parent[x] = find(parent[x])); withAl.forEach(r=>parent[r.src.al] = r.src.al);
+  ms.forEach(m=>(m.relations?.edges||[]).forEach(e=>{ if(FR_REL.has(e.relationType) && e.node.type==="ANIME" && parent[e.node.id]!=null && byId[e.node.id] && frSameName(m, byId[e.node.id])){ parent[find(m.id)] = find(e.node.id); } }));
+  const groups = {}; withAl.forEach(r=>{ const k = find(r.src.al); (groups[k] ||= []).push(r); });
+  const out = []; const used = new Set();
+  const grouped = Object.values(groups).filter(g=>g.length>1).flat();
+  for(const r of list){
+    if(!r.src?.al){ if(grouped.some(x=>[x.title, ...(x.aka||[])].some(t=>t && similar(t, r) > 0.9))) continue; out.push(r); continue; }
+    const k = find(r.src.al); if(used.has(k)) continue; used.add(k);
+    const g = groups[k]; if(g.length === 1){ out.push(r); continue; }
+    const parts = g.map(x=>({al:x.src.al, m:byId[x.src.al], r:x})).filter(p=>p.m && frKind(p.m.format)!=="skip");
+    parts.sort((a,b)=>frDate(a.m)-frDate(b.m));
+    const rep = (parts.find(p=>frKind(p.m.format)==="season") || parts[0] || {r:g[0]}).r;
+    const seasons = parts.filter(p=>frKind(p.m.format)==="season").length, movies = parts.filter(p=>frKind(p.m.format)==="movie").length, sp = parts.filter(p=>frKind(p.m.format)==="special").length;
+    out.push({...rep, title: frSeriesTitle(rep.title), group:g.map(x=>x.src.al), groupCovers:parts.slice(0,4).map(p=>p.r.cover).filter(Boolean),
+      meta:{...rep.meta, format:"Series", episodes: parts.filter(p=>frKind(p.m.format)==="season").reduce((s,p)=>s+(p.m.episodes||0),0) || rep.meta?.episodes},
+      _groupInfo:[seasons?`${seasons} season${seasons>1?"s":""}`:"", movies?`${movies} movie${movies>1?"s":""}`:"", sp?`${sp} special${sp>1?"s":""}`:""].filter(Boolean).join(" · ")});
+  }
+  return out;
+}
+const frDate = m => { const d = m.startDate||{}; return d.year ? d.year*10000 + (d.month||12)*100 + (d.day||28) : 99999999; };
+function frSeriesTitle(t){ return String(t||"").replace(/\s*[:\-–]\s*(season|part|cour)\b.*$/i,"").replace(/\s+(season\s*\d+|\d+(st|nd|rd|th)\s+season|part\s*\d+|s\d+)\s*$/i,"").replace(/\s+(ii|iii|iv|2|3|4)$/i,"").trim() || t; }
+// Walks the AniList relation graph to collect every season, movie and special of a show
+async function buildFranchise(seedIds, onStep){
+  const seen = new Map(); let frontier = [...new Set(seedIds)]; let root = null; let rounds = 0;
+  while(frontier.length && rounds < 8 && seen.size < 120){
+    rounds++; onStep && onStep(`Looking for seasons and movies… (${seen.size} found)`);
+    const ms = await frFetch(frontier.filter(id=>!seen.has(id)));
+    ms.forEach(m=>{ if(!root) root = m; seen.set(m.id, m); });
+    const next = new Set();
+    ms.forEach(m=>(m.relations?.edges||[]).forEach(e=>{ if(FR_REL.has(e.relationType) && e.node.type==="ANIME" && e.node.format!=="MUSIC" && !seen.has(e.node.id)) next.add(e.node.id); }));
+    frontier = [...next]; if(frontier.length) await sleep(350);
+  }
+  let all = [...seen.values()].filter(m=>frKind(m.format)!=="skip");
+  const seeds = all.filter(m=>seedIds.includes(m.id));
+  all = all.filter(m=>seeds.some(s=>frSameName(s, m)) || seedIds.includes(m.id));
+  all.sort((a,b)=>frDate(a)-frDate(b));
+  let sn = 0, prevBase = null;
+  const partBase = t => String(t||"").toLowerCase().replace(/[:\s\-–]*(part|cour)\s*\d+.*$/i,"").replace(/[:\s\-–]*(2nd|second|final)\s+(cour|half)$/i,"").trim();
+  const parts = all.map(m=>{ const kind = frKind(m.format); let sub = "";
+    if(kind==="season"){ const t = m.title.english || m.title.romaji; const b = partBase(t); const isPart = /(part|cour)\s*\d+|(2nd|second)\s+(cour|half)/i.test(t);
+      if(isPart && prevBase && (b===prevBase || prevBase.startsWith(b) || b.startsWith(prevBase))){ sub = (t.match(/part\s*\d+|cour\s*\d+|(2nd|second)\s+(cour|half)/i)||["Part 2"])[0].replace(/^\w/,c=>c.toUpperCase()); } else sn++; prevBase = b; }
+    const aired = m.nextAiringEpisode ? m.nextAiringEpisode.episode-1 : null;
+    return {al:m.id, mal:m.idMal||null, kind, n: kind==="season" ? sn : null, sub, title: m.title.english || m.title.romaji, format:(m.format||"").replace(/_/g," "),
+      year:m.startDate?.year||null, status:m.status, episodes: m.episodes || null, aired, cover: m.coverImage?.extraLarge || m.coverImage?.large || "", duration:m.duration||null}; });
+  const first = all.find(m=>frKind(m.format)==="season") || all[0];
+  return {parts, first};
+}
+function franchiseItem(base, fr){
+  const f = fr.first; const anyLive = fr.parts.some(p=>/RELEASING|NOT_YET/.test(p.status||""));
+  const live = [...fr.parts].reverse().find(p=>p.kind==="season" && /RELEASING|NOT_YET/.test(p.status||"")) || [...fr.parts].reverse().find(p=>p.kind==="season") || fr.parts[0];
+  const seasons = fr.parts.filter(p=>p.kind==="season"), movies = fr.parts.filter(p=>p.kind==="movie"), sp = fr.parts.filter(p=>p.kind==="special");
+  const eng = f.title.english, rom = f.title.romaji;
+  return {...base, cat:"anime", franchise:true, parts:fr.parts, partsAt:Date.now(), trackAl: live?.al || null,
+    src:{...(base.src||{}), al:f.id, mal:f.idMal||null},
+    title: frSeriesTitle(eng || rom), alt:[eng && rom!==eng ? frSeriesTitle(rom) : null, f.title.native].filter(Boolean).join(" · "),
+    cover: f.coverImage?.extraLarge || f.coverImage?.large || base.cover, banner: f.bannerImage || base.banner || "",
+    synopsis: stripHtml(f.description) || base.synopsis, year: f.startDate?.year || base.year, genres: f.genres?.length ? f.genres : base.genres,
+    meta:{...(base.meta||{}), format:"Series", status: anyLive ? "RELEASING" : "FINISHED", episodes: seasons.reduce((s,p)=>s+(p.episodes||p.aired||0),0) + sp.reduce((s,p)=>s+(p.episodes||0),0) + movies.length,
+      seasons: new Set(seasons.map(p=>p.n)).size, movies: movies.length, specials: sp.length, studio: f.studios?.nodes?.[0]?.name || base.meta?.studio || null, score: f.averageScore || base.meta?.score || null}};
+}
+function partLabel(p){ return p.kind==="season" ? `Season ${p.n}` : p.kind==="movie" ? "Movie" : (p.format==="OVA" ? "OVA" : "Special"); }
+async function franchiseUnits(item, onProgress){
+  const out = []; const parts = item.parts || [];
+  const order = [...parts.filter(p=>p.kind==="season"), ...parts.filter(p=>p.kind==="movie"), ...parts.filter(p=>p.kind==="special")];
+  let i = 0;
+  for(const p of order){
+    i++; onProgress && onProgress(i, order.length);
+    const g = p.kind==="movie" ? "movies" : p.kind==="special" ? "specials" : "s"+p.al;
+    const gl = p.kind==="movie" ? "Movies" : p.kind==="special" ? "Specials & OVAs" : `Season ${p.n}${p.sub?" · "+p.sub:""}`;
+    if(p.kind==="movie"){ out.push({k:`${p.al}:1`, no:1, title:p.title + (p.year?` (${p.year})`:""), g, gl, kind:"movie", part:p.al, img:p.cover, date:""}); continue; }
+    const n = p.episodes || p.aired || 0;
+    let eps = [];
+    if(p.mal && n !== 1){ try{ let page = 1; while(page < 40){ const d = await getJSON(`https://api.jikan.moe/v4/anime/${p.mal}/episodes?page=${page}`); (d.data||[]).forEach(e=>eps.push({no:e.mal_id, title:e.title||e.title_romanji||"", date:e.aired?e.aired.slice(0,10):"", filler:!!e.filler, recap:!!e.recap})); if(!d.pagination?.has_next_page) break; page++; await sleep(420); } }catch(e){} await sleep(420); }
+    const max = Math.max(n, eps.length ? Math.max(...eps.map(e=>e.no)) : 0);
+    const by = {}; eps.forEach(e=>by[e.no]=e);
+    for(let k=1;k<=max;k++){ const e = by[k] || {no:k, title: n===1 && p.kind==="special" ? p.title : ""}; out.push({k:`${p.al}:${k}`, no:k, title:e.title, date:e.date||"", filler:e.filler, recap:e.recap, g, gl, kind:p.kind, part:p.al, ptitle:p.title}); }
+    if(!max && p.kind==="special") out.push({k:`${p.al}:1`, no:1, title:p.title, g, gl, kind:"special", part:p.al, img:p.cover});
+  }
+  return out;
+}
+if(window.DEMO_CATALOG){
+  frFetch = async ids => { await sleep(150); return (window.DEMO_FRM||[]).filter(m=>ids.includes(m.id)).map(m=>JSON.parse(JSON.stringify(m))); };
+  const _sc0 = searchCat; searchCat = async (cat, q, o) => { const l = await _sc0(cat, q, o); return cat==="anime" ? groupAnime(l) : l; };
+  const _fu0 = fetchUnits; fetchUnits = async (item, p) => { if(item.franchise) return franchiseUnits(item, p); return _fu0(item, p); };
+}
+
+/* ============ AI HELPER (optional, free): Chrome's built-in on-device model ============ */
+function aiCfg(){ try{ return (data && data.settings && data.settings.ai) || {}; }catch(e){ return {}; } }
+const builtinAI = () => typeof self !== "undefined" && "LanguageModel" in self;
+function aiOn(){ const c = aiCfg(); return c.mode === "builtin" && builtinAI(); }
+async function aiAsk(prompt, system){
+  const c = aiCfg();
+  if(c.mode === "builtin" && builtinAI()){
+    const s = await self.LanguageModel.create(system ? {initialPrompts:[{role:"system", content:system}]} : {});
+    try{ return await s.prompt(prompt); } finally { try{ s.destroy(); }catch(e){} }
+  }
+  throw new Error("AI is off");
+}
+function aiJSON(text){ const m = String(text||"").match(/\[[\s\S]*\]|\{[\s\S]*\}/); if(!m) return null; try{ return JSON.parse(m[0]); }catch(e){ return null; } }
+const AI_SYS = "You help people find anime, manga, manhwa, manhua, TV shows, movies, books and video games. You know titles, alternate titles, seasons and sequels very well. Reply with JSON only, no other text.";
+async function aiFind(cat, text, mode){
+  const kind = CATS[cat]?.label || cat;
+  const ask = mode === "name"
+    ? `Someone searched for the ${kind} "${text}" but the spelling may be off, it may be a nickname, abbreviation or a title in another language. Give the most likely official titles. Reply as a JSON array of up to 5 objects: {"title": English or most common title, "alt": other common title or "", "year": first release year or null, "why": a few words}.`
+    : `Someone is trying to remember a ${kind}. Their description: "${text}". Give your best guesses for which ${kind} this is. Reply as a JSON array of up to 6 objects: {"title": English or most common title, "alt": other common title or "", "year": first release year or null, "why": under 12 words on why it matches}. Most likely first.`;
+  const list = aiJSON(await aiAsk(ask, AI_SYS));
+  if(!Array.isArray(list)) return [];
+  const out = []; const seen = new Set();
+  for(const g of list.slice(0,6)){
+    if(!g || !g.title) continue;
+    for(const name of [g.title, g.alt].filter(Boolean)){
+      try{ const rs = await searchCat(cat, name); const best = pickBest(rs, name) || (rs[0] && similar(name, rs[0]) > .35 ? rs[0] : null);
+        if(best){ const k = (best.src?.al||"") + best.title; if(!seen.has(k)){ seen.add(k); out.push({...best, _why: "✨ " + (g.why || "AI pick")}); } break; } }catch(e){}
+    }
+  }
+  return out;
+}
 </script>
 <script>/* ============ STORAGE (IndexedDB, with localStorage fallback) ============ */
 const DB = (()=>{
@@ -2004,7 +2177,9 @@ function newItem(base){
 }
 function touch(it){ it.updated = Date.now(); save(); }
 function findExisting(r){
+  const als = new Set([r.src?.al, ...(r.group||[]), ...((r.parts||[]).map(p=>p.al))].filter(Boolean));
   return Object.values(lib()).find(it => it.cat===r.cat && (
+    (als.size && ((it.src?.al && als.has(it.src.al) && (it.franchise || !r.group)) || (it.parts||[]).some(p=>als.has(p.al)))) ||
     (r.src.al && it.src?.al===r.src.al) || (r.src.tvm && it.src?.tvm===r.src.tvm) ||
     (r.src.wds && it.src?.wds===r.src.wds) || (r.src.mal && it.src?.mal===r.src.mal) || (r.src.itunes && it.src?.itunes===r.src.itunes) || (r.src.gb && it.src?.gb===r.src.gb) || (r.src.ol && it.src?.ol===r.src.ol) ||
     (it.title.trim().toLowerCase()===String(r.title||"").trim().toLowerCase() && (!r.year || !it.year || Math.abs(r.year-it.year)<=1))));
@@ -2139,7 +2314,7 @@ function renderHome(){
   $("#h-set").onclick = ()=>go("#settings");
   $("#h-bell").onclick = ()=>go("#updates");
   setBell();
-  $("#h-add").onclick = ()=>go(prof().cats.length ? "#add" + (view.cat!=="all" ? "/"+view.cat : "") : "#newcat");
+  $("#h-add").onclick = ()=>{ addMemo = null; go(prof().cats.length ? "#add" + (view.cat!=="all" ? "/"+view.cat : "") : "#newcat"); };
   $("#h-q").oninput = e=>{ view.q = e.target.value; saveView(); drawGrid(); };
   $("#h-status").onchange = e=>{ view.status = e.target.value; saveView(); drawGrid(); };
   $("#h-sort").onchange = e=>{ view.sort = e.target.value; saveView(); drawGrid(); };
@@ -2188,6 +2363,7 @@ function drawGrid(){
     return head + tileHTML(it);
   }).join("");
   g.querySelectorAll(".tile").forEach(t=>t.onclick=()=>go("#item/"+t.dataset.id));
+  wireHold(g, ".tile", el=>({it: lib()[el.dataset.id]}));
 }
 function tileHTML(it){
   {
@@ -2217,6 +2393,7 @@ function drawContinue(){
   if(!cur.length || view.q || view.status!=="all" || view.mode==="chars"){ box.innerHTML = ""; return; }
   box.innerHTML = `<div class="strip-h"><h3>Continue</h3><span>${cur.length} in progress</span></div><div class="hrow">${cur.map(it=>{const c=C(it.cat);return `<div class="cont" data-id="${it.id}" style="--c:${c.color}"><div class="cover">${coverImg(it)}</div><div style="min-width:0;flex:1"><div class="ct">${esc(it.title)}</div><div class="cs">${esc(contLabel(it))}${behind(it)>0?` · <b style="color:var(--c)">${behind(it)} new</b>`:""}</div><div class="prog"><i style="width:${pct(it)}%"></i></div>${isPages(it)?"":`<button class="plus" data-id="${it.id}">+1 ${c.unit==="episode"?"episode":"chapter"}</button>`}</div></div>`}).join("")}</div>`;
   box.querySelectorAll(".cont").forEach(el=>el.onclick=e=>{ if(e.target.closest(".plus")) return; go("#item/"+el.dataset.id); });
+  wireHold(box, ".cont", el=>({it: lib()[el.dataset.id]}));
   box.querySelectorAll(".plus").forEach(b=>b.onclick=async e=>{
     e.stopPropagation(); const it = lib()[b.dataset.id];
     if(it.unitsTotal){ await loadUnits(it); const n = nextUnit(it); if(!n){ toast("You're all caught up"); return; } it.my.done[n.k]=1; toast(`Marked ${n.season!=null?"S"+n.season+" E"+n.no:"#"+n.no}${n.title?" · "+n.title:""}`, ()=>{ delete it.my.done[n.k]; touch(it); drawGrid(); }); }
@@ -2290,7 +2467,10 @@ function drawRing(host, all, opts={}){
     }
     layout(); RS.rot = rot; requestAnimationFrame(tick);
   }
-  stage.addEventListener("pointerdown", e=>{ dragging = true; target = null; vel = 0; sx = lastX = e.clientX; sRot = rot; lastT = performance.now(); moved = 0; stage.setPointerCapture(e.pointerId); });
+  let holdT = null, held = false;
+  stage.addEventListener("pointerdown", e=>{ dragging = true; target = null; vel = 0; sx = lastX = e.clientX; sRot = rot; lastT = performance.now(); moved = 0; held = false; stage.setPointerCapture(e.pointerId);
+    clearTimeout(holdT); if(!opts.open){ const px = e.clientX, py = e.clientY; holdT = setTimeout(()=>{ if(moved >= 7 || !dragging) return; const el = document.elementFromPoint(px, py); const card = el && el.closest(".rcard"); if(!card) return; const it = items[+card.dataset.i]; if(!it || !it.my) return; held = true; dragging = false; if(navigator.vibrate) try{ navigator.vibrate(25); }catch(_){} openQuick({it}); }, 560); } });
+  stage.addEventListener("contextmenu", e=>e.preventDefault());
   stage.addEventListener("pointermove", e=>{
     if(!dragging) return; const now = performance.now();
     const dx = e.clientX - sx; moved = Math.max(moved, Math.abs(dx));
@@ -2298,6 +2478,7 @@ function drawRing(host, all, opts={}){
     const dt = Math.max(1, now - lastT); vel = (e.clientX - lastX) * (n>8 ? 0.32 : 0.45) * (16/dt); lastX = e.clientX; lastT = now;
   });
   const end = e=>{
+    clearTimeout(holdT); if(held){ held = false; dragging = false; snapTo(frontIndex()); return; }
     if(!dragging) return; dragging = false; idleAt = performance.now();
     if(moved < 7){ // a tap
       const el = document.elementFromPoint(e.clientX, e.clientY); const card = el && el.closest(".rcard");
@@ -2312,10 +2493,12 @@ function drawRing(host, all, opts={}){
 }
 
 /* ============ ADD / SEARCH ============ */
-let lastResults = []; let addMode = "name";
+let lastResults = []; let addMode = "name"; let addMemo = null;
 function resHTML(r, i){
   const ex = findExisting(r); const cat = r.cat;
   const bits = [r.year, r.meta?.format, r.meta?.episodes?r.meta.episodes+" eps":null, r.meta?.chapters?r.meta.chapters+" ch":null, r.meta?.pages?r.meta.pages+" pages":null, r.meta?.network, r.meta?.runtime&&cat==="movie"?r.meta.runtime+" min":null].filter(Boolean).join(" · ");
+  if(r.group) return `<button class="res grp" data-i="${i}"><div class="stack">${(r.groupCovers||[r.cover]).slice(0,3).map((c,j)=>`<img src="${esc(c)}" style="--j:${j}" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">`).join("")}</div>
+    <div style="min-width:0"><div class="rt">${esc(r.title)}</div>${r.alt?`<div class="rs">${esc(r.alt)}</div>`:""}<div class="rs"><b style="color:var(--c,var(--acc))">Whole series</b> · ${esc(r._groupInfo||"")}${r.year?` · ${r.year}`:""}</div><div class="why">Adds every season, movie and special together, each with its own checklist.</div></div>${ex?`<span class="in">ON SHELF</span>`:""}</button>`;
   return `<button class="res" data-i="${i}">${r.cover?`<img src="${esc(r.cover)}" ${r.cover2?`data-fb="${esc(r.cover2)}"`:""} loading="lazy" referrerpolicy="no-referrer" onerror="if(this.dataset.fb){this.src=this.dataset.fb;this.removeAttribute('data-fb')}else{this.style.visibility='hidden'}">`:`<div class="noimg"></div>`}
     <div style="min-width:0"><div class="rt">${esc(r.title)}</div>${r.alt?`<div class="rs">${esc(r.alt)}</div>`:""}${r._aka?`<div class="rs">Also called: <b>${esc(r._aka)}</b></div>`:""}<div class="rs">${esc(bits)}${r._from?` · <span style="color:var(--dim)">${r._from.startsWith("found")?"✓ "+esc(r._from):"via "+esc(r._from)}</span>`:""}</div>${r._why?`<div class="why">${esc(r._why)}</div>`:""}</div>${ex?`<span class="in">ON SHELF</span>`:""}</button>`;
 }
@@ -2328,7 +2511,7 @@ function renderAdd(cat){
   const pg = page(`<div class="page-head"><button class="icon-btn" id="a-back">${IC.back}</button><h2 class="display">Add to shelf</h2></div>
   <div class="wrap">
     <div class="chips" style="padding-top:0">${scats.length>1?`<button class="chip ${ALL?"on":""}" data-cat="all">All</button>`:""}${p.cats.map(k=>`<button class="chip ${k===cat?"on":""}" data-cat="${k}" style="--c:${C(k).color}">${esc(C(k).label)}</button>`).join("")}</div>
-    ${searchable ? `<div class="seg mode-seg" style="margin-top:12px"><button data-m="name" class="${addMode==="name"?"on":""}">Search by name</button><button data-m="desc" class="${addMode==="desc"?"on":""}">✨ Describe it</button></div>
+    ${searchable ? `<div class="seg mode-seg" style="margin-top:12px"><button data-m="name" class="${addMode==="name"?"on":""}">Search by name</button><button data-m="desc" class="${addMode==="desc"?"on":""}">✨ Describe it${aiOn()?` <small class="ai-on">AI</small>`:""}</button></div>
     <form class="search ${addMode==="name"?"":"hidden"}" id="a-form" style="margin-top:12px">${IC.search}<input id="a-q" placeholder="${ALL?"Search all your categories…":"Search "+esc(c.label.toLowerCase())+"…"}" autocomplete="off" enterkeyhint="search"></form>
     <div class="${addMode==="desc"?"":"hidden"}" id="a-desc" style="margin-top:12px"><textarea id="a-dt" rows="3" placeholder="Describe what you remember, e.g. “a manhwa where a guy goes back in time and becomes the best swordsman in a martial arts sect”"></textarea>
       <div class="row-btns"><button class="btn pri" id="a-find">Find it</button></div></div>
@@ -2344,11 +2527,12 @@ function renderAdd(cat){
   const res = $("#a-res",pg), q = $("#a-q",pg);
   pg.querySelectorAll(".mode-seg button").forEach(b=>b.onclick=()=>{ addMode = b.dataset.m; route(); });
   const show = (list, head="", grouped=false) => {
-    lastResults = list; const qq = (q?.value||"").trim().toLowerCase();
+    lastResults = list; addMemo = {cat, mode:addMode, q:q?.value||"", desc:$("#a-dt",pg)?.value||"", list, head, grouped, scroll:pg.scrollTop}; const qq = (q?.value||"").trim().toLowerCase();
     list.forEach(r=>{ r._aka = ""; if(qq && !(r.title+" "+(r.alt||"")).toLowerCase().includes(qq)){ const m = (r.aka||[]).find(a=>a.toLowerCase().includes(qq) || similar(qq,{title:a})>0.7); if(m) r._aka = m; } });
     let lastCat = null;
     res.innerHTML = head + list.map((r,i)=>{ let h=""; if(grouped && r.cat!==lastCat){ lastCat=r.cat; h=`<div class="res-group" style="--c:${C(r.cat).color}">${esc(C(r.cat).label)}</div>`; } return h + resHTML(r,i); }).join("");
     res.querySelectorAll(".res").forEach(b=>b.onclick=()=>addResult(lastResults[+b.dataset.i]));
+    wireHold(res, ".res[data-i]", el=>({r: lastResults[+el.dataset.i]}));
     res.querySelectorAll("[data-alt]").forEach(b=>b.onclick=()=>{ q.value = b.dataset.alt; runName(true); });
   };
   let seq = 0;
@@ -2381,7 +2565,8 @@ function renderAdd(cat){
       if(!final) return;
       res.insertAdjacentHTML("afterbegin", `<div class="hint" id="a-dym" style="padding:10px">${list.length?"Not quite what you meant? ":""}Looking for close matches…</div>`);
       const dym = await didYouMean(cat, term); if(my!==seq) return;
-      const all = [...dym.results, ...list.filter(r=>!dym.results.some(x=>x.title===r.title))];
+      let aiRes = []; if(aiOn() && !dym.results.length){ const m = $("#a-dym",pg); if(m) m.textContent = "Asking the AI helper…"; try{ aiRes = await aiFind(cat, term, "name"); }catch(e){} if(my!==seq) return; }
+      const all = [...aiRes, ...dym.results.filter(r=>!aiRes.some(x=>x.title===r.title)), ...list.filter(r=>!dym.results.some(x=>x.title===r.title) && !aiRes.some(x=>x.title===r.title))];
       if(!all.length){ res.innerHTML = `<div class="hint">No luck with “${esc(term)}”. Try <b>✨ Describe it</b> above, or add it manually.</div>`; return; }
       const head = dym.alts.length ? `<div class="dym">Did you mean ${dym.alts.slice(0,3).map(a=>`<button class="chip sm-chip" data-alt="${esc(a)}">${esc(a)}</button>`).join(" ")}</div>` : "";
       show(all, head);
@@ -2400,29 +2585,51 @@ function renderAdd(cat){
     let t = null;
     q.oninput = ()=>{ clearTimeout(t); t = setTimeout(()=>runName(false), 450); };
     $("#a-form",pg).onsubmit = e=>{ e.preventDefault(); clearTimeout(t); q.blur(); runName(true); };
-    if(addMode==="name") setTimeout(()=>q.focus(), 100);
+    if(addMemo && addMemo.cat===cat && addMemo.mode===addMode && addMemo.list){
+      q.value = addMemo.q; const dt = $("#a-dt",pg); if(dt) dt.value = addMemo.desc || ""; const y = addMemo.scroll;
+      show(addMemo.list, addMemo.head, addMemo.grouped); pg.style.animation = "none"; requestAnimationFrame(()=>{ pg.scrollTop = y; });
+    } else if(addMode==="name") setTimeout(()=>q.focus(), 100);
+    pg.addEventListener("scroll", ()=>{ if(addMemo) addMemo.scroll = pg.scrollTop; }, {passive:true});
   }
   $("#a-find",pg).onclick = async ()=>{
     const text = $("#a-dt",pg).value.trim(); if(text.length < 8){ toast("Add a few more details"); return; }
     res.innerHTML = `<div class="spinner"></div><div class="hint" id="a-step" style="padding-top:0">Thinking…</div>`;
     try{
       const step = m=>{ const st=$("#a-step",pg); if(st) st.textContent = m; };
-      let list;
-      if(ALL){ const per = []; for(const k of scats){ step(`Checking ${C(k).label}…`); try{ per.push(...(await describeSearch(k, text)).slice(0,5)); }catch(e){} } list = per; }
-      else list = await describeSearch(cat, text, step);
+      let list = [];
+      if(aiOn()){ step("Asking the AI helper…"); try{ if(ALL){ for(const k of scats.filter(isAL).concat(scats.filter(k=>!isAL(k)))){ step(`Asking the AI helper about ${C(k).label}…`); list.push(...(await aiFind(k, text, "desc")).slice(0,3)); } } else list = await aiFind(cat, text, "desc"); }catch(e){ toast("AI helper: " + (e.message||"couldn't answer")); } }
+      if(list.length < 3){ let more;
+        if(ALL){ const per = []; for(const k of scats){ step(`Checking ${C(k).label}…`); try{ per.push(...(await describeSearch(k, text)).slice(0,5)); }catch(e){} } more = per; }
+        else more = await describeSearch(cat, text, step);
+        more.forEach(r=>{ if(!list.some(x=>x.title===r.title)) list.push(r); }); }
       if(!list.length){ res.innerHTML = `<div class="hint">Couldn't pin it down. Try adding a character name, a plot detail, or roughly when it came out.</div>`; return; }
       show(list, `<div class="hint" style="text-align:left;padding:4px 2px 2px">Best guesses, most likely first:</div>`, ALL);
     }catch(e){ res.innerHTML = `<div class="hint">Couldn't search right now. Check your connection and try again.</div>`; }
   };
 }
-async function addResult(r){
+const RES_JUNK = ["_m","_sites","_from","_why","_aka","_score","_groupInfo","group","groupCovers","_rel"];
+async function prepareBase(r, onStep){
+  const base = JSON.parse(JSON.stringify(r)); const seeds = r.group || (r.src?.al ? [r.src.al] : []);
+  RES_JUNK.forEach(k=>delete base[k]);
+  if(r.cat==="anime" && seeds.length){
+    try{ const fr = await buildFranchise(seeds, onStep); if(fr.parts.length > 1) return franchiseItem(base, fr); }catch(e){}
+  }
+  return base;
+}
+let adding = false;
+async function addResult(r, status){
   const ex = findExisting(r);
-  if(ex){ history.replaceState(null,"","#item/"+ex.id); route(); return; }
-  const it = newItem(r);
-  lib()[it.id] = it; autoFollow(it); save();
+  if(ex){ go("#item/"+ex.id); return; }
+  if(adding) return; adding = true;
+  if(r.cat==="anime") toast("Gathering every season and movie…");
+  let base; try{ base = await prepareBase(r); } finally { adding = false; }
+  const ex2 = findExisting(base); if(ex2){ go("#item/"+ex2.id); toast("This series is already on your shelf"); return; }
+  const it = newItem(base);
+  lib()[it.id] = it; autoFollow(it); if(status) setStatus(it, status); save();
   if(isPages(it) && !it.synopsis && it.src.ol){ olDescription(it.src.ol).then(d=>{ if(d){ it.synopsis = d; save(); if(location.hash==="#item/"+it.id) route(); } }); }
-  history.replaceState(null,"","#item/"+it.id); route();
-  toast("Added to your shelf");
+  go("#item/"+it.id);
+  toast(it.franchise ? `Added the whole series: ${it.meta.seasons} season${it.meta.seasons===1?"":"s"}${it.meta.movies?`, ${it.meta.movies} movie${it.meta.movies>1?"s":""}`:""}${it.meta.specials?`, ${it.meta.specials} special${it.meta.specials>1?"s":""}`:""}` : "Added to your shelf");
+  return it;
 }
 
 /* ============ DETAIL ============ */
@@ -2433,7 +2640,7 @@ function renderDetail(id){
   const c = C(it.cat);
   const m = it.meta || {};
   const facts = [
-    ["Type", m.format], ["Year", it.year ? (m.ended && m.ended!==it.year ? `${it.year}–${m.ended}` : it.year) : null], ["Status", m.status],
+    ["Type", m.format], ["Seasons", it.franchise ? m.seasons : null], ["Movies", it.franchise ? m.movies : null], ["Specials & OVAs", it.franchise ? m.specials : null], ["Year", it.year ? (m.ended && m.ended!==it.year ? `${it.year}–${m.ended}` : it.year) : null], ["Status", m.status],
     ["Episodes", it.cat==="anime"||it.cat==="tv" ? (it.unitsTotal||m.episodes) : null],
     ["Chapters", c.vols ? (it.unitsTotal||m.chapters||null) : null], ["Volumes", c.vols ? m.volumes : null],
     ["Pages", isPages(it) ? m.pages : null], ["Runtime", m.runtime ? m.runtime+" min" : (m.duration ? m.duration+" min/ep" : null)],
@@ -2528,9 +2735,25 @@ function setStatus(it, s){
     if(!it.my.started) it.my.started = today();
     if(prev!=="completed") it.my.finished = today();
     if(isPages(it) && it.meta?.pages) it.my.pages = it.meta.pages;
+    fillAll(it);
   }
   if(s!=="completed" && prev==="completed" && isOnce(it)) it.my.finished = "";
   touch(it);
+}
+function fillAll(it){
+  if(it.isSeries){ it.my.books ||= {}; (it.books||[]).forEach(b=>{ const m = (it.my.books[b.id] ||= {}); m.status = "completed"; }); return; }
+  if(isOnce(it) || isPages(it) || it.cat==="game") return;
+  const L = units[it.id];
+  if(L) L.forEach(x=>it.my.done[x.k]=1);
+  else if(["anime","tv"].includes(it.cat) || C(it.cat)?.vols){ it.my.fillOnLoad = 1; loadUnits(it).then(L2=>{ if(L2 && it.my.status==="completed"){ L2.forEach(x=>it.my.done[x.k]=1); delete it.my.fillOnLoad; touch(it); } }); }
+  const t = totalOf(it); if(t) it.my.count = t;
+}
+function applyPending(it, L){
+  let ch = false;
+  if(it.my.fillOnLoad){ if(it.my.status==="completed") L.forEach(x=>it.my.done[x.k]=1); delete it.my.fillOnLoad; ch = true; }
+  if(it.my.pendingParts?.length){ L.forEach(x=>{ if(it.my.pendingParts.includes(x.part)) it.my.done[x.k]=1; }); delete it.my.pendingParts; ch = true; }
+  if(it.my.pendingCount){ const pc = it.my.pendingCount; L.filter(x=>x.part===pc.al).slice(0, pc.n).forEach(x=>it.my.done[x.k]=1); delete it.my.pendingCount; ch = true; }
+  return ch;
 }
 function autoStatus(it){
   const t = totalOf(it), d = doneOf(it);
@@ -2545,6 +2768,7 @@ function openMenu(pg, it){
   const canRefresh = it.src?.al || it.src?.tvm;
   m.innerHTML = `${canRefresh?`<button data-a="refresh">Refresh info</button>`:""}<button data-a="edit">Edit details</button>
     ${it.my.status==="completed"&&!isPages(it)?`<button data-a="rewatch">${C(it.cat).verb==="Watching"?"Start a rewatch":"Start a reread"}</button>`:""}
+    ${it.cat==="anime" && !it.franchise && it.src?.al ? `<button data-a="group">Group all seasons & movies</button>` : ""}${it.franchise ? `<button data-a="regroup">Check for new seasons</button>` : ""}
     <button data-a="del" style="color:var(--bad)">Remove from shelf</button>`;
   pg.appendChild(m);
   const close = ()=>{ m.remove(); document.removeEventListener("click", close); };
@@ -2552,6 +2776,7 @@ function openMenu(pg, it){
   m.querySelectorAll("button").forEach(b=>b.onclick=async()=>{
     close(); const a = b.dataset.a;
     if(a==="edit") go("#edit/"+it.id);
+    if(a==="group" || a==="regroup") combineFranchise(it, a==="regroup");
     if(a==="rewatch"){ it.my.rewatch=(it.my.rewatch||0)+1; it.my.done={}; it.my.count=0; it.my.finished=""; it.my.status="current"; touch(it); route(); toast("Progress reset for your "+(C(it.cat).verb==="Watching"?"rewatch":"reread")); }
     if(a==="del"){ const copy = it; delete lib()[it.id]; await DB.del("units:"+it.id); save(); back(); toast("Removed "+copy.title, ()=>{ lib()[copy.id]=copy; save(); route(); }); }
     if(a==="refresh"){
@@ -2620,8 +2845,9 @@ function renderProgress(pg, it, after){
   }
 }
 function fmtTime(x){ x=Math.round(x||0); const h=Math.floor(x/3600), m=Math.floor(x%3600/60), s=x%60; return (h?h+':'+String(m).padStart(2,'0'):m)+':'+String(s).padStart(2,'0'); }
-function nextUnit(it){ const L = units[it.id]; return L ? L.find(x=>!it.my.done[x.k]) : null; }
-function nextLabel(it){ const n = nextUnit(it); if(!n) return "All caught up"; return "Next: " + (n.season!=null?`S${n.season} E${n.no}`:(C(it.cat).unit==="episode"?"Ep ":"Ch ")+n.no); }
+function nextUnit(it){ const L = units[it.id]; if(!L) return null; return L.find(x=>!it.my.done[x.k] && (!x.kind || x.kind==="season")) || L.find(x=>!it.my.done[x.k]); }
+const unitName = n => n.kind==="movie" ? `Movie: ${n.title}` : n.g ? `${n.gl.replace("Specials & OVAs","Special")} E${n.no}` : n.season!=null ? `S${n.season} E${n.no}` : "#"+n.no;
+function nextLabel(it){ const n = nextUnit(it); if(!n) return "All caught up"; return "Next: " + (n.g || n.season!=null ? unitName(n) : (C(it.cat).unit==="episode"?"Ep ":"Ch ")+n.no); }
 
 /* ----- owned block ----- */
 function renderOwn(pg, it){
@@ -2668,14 +2894,20 @@ function renderUnits(pg, it, after){
     if(!L){ return; }
     // groups: seasons for TV, blocks of 100 otherwise
     const groups = [];
-    if(it.cat==="tv"){ [...new Set(L.map(x=>x.season))].forEach(s=>groups.push({id:"s"+s, label: s===0?"Specials":"Season "+s, list:L.filter(x=>x.season===s)})); }
+    if(L.some(x=>x.g)){ const order = []; L.forEach(x=>{ if(!order.includes(x.g)) order.push(x.g); });
+      order.forEach(g=>{ const list = L.filter(x=>x.g===g); const part = (it.parts||[]).find(p=>p.al===list[0].part);
+        const head = list[0].kind==="season" && part ? `<div class="part-h">${part.cover?`<img src="${esc(part.cover)}" referrerpolicy="no-referrer" alt="" onerror="this.remove()">`:""}<div><b>${esc(part.title)}</b><span>${[part.year, part.format, (part.episodes||list.length)+" episodes", /RELEASING/.test(part.status||"")?"airing now":/NOT_YET/.test(part.status||"")?"coming soon":""].filter(Boolean).join(" · ")}</span></div></div>` : list[0].kind==="movie" ? `<div class="part-h"><div><b>Movies</b><span>${list.length} movie${list.length>1?"s":""} in this series. Check off the ones you've seen.</span></div></div>` : `<div class="part-h"><div><b>Specials & OVAs</b><span>Extra episodes from across the series</span></div></div>`;
+        const lab = list[0].kind==="movie" ? "🎬 Movies" : list[0].kind==="special" ? "✦ Specials" : list[0].gl;
+        if(list.length > 120){ for(let i=0;i<list.length;i+=100){ const sl = list.slice(i,i+100); groups.push({id:g+":"+i, label:`${lab} · ${sl[0].no}–${sl[sl.length-1].no}`, list:sl, head}); } }
+        else groups.push({id:g, label:lab, list, head}); }); }
+    else if(it.cat==="tv"){ [...new Set(L.map(x=>x.season))].forEach(s=>groups.push({id:"s"+s, label: s===0?"Specials":"Season "+s, list:L.filter(x=>x.season===s)})); }
     else for(let i=0;i<L.length;i+=100){ const sl=L.slice(i,i+100); groups.push({id:"g"+i, label:`${sl[0].no}–${sl[sl.length-1].no}`, list:sl}); }
     if(!group || !groups.find(g=>g.id===group)){ const n = L.findIndex(x=>!it.my.done[x.k]); const gi = groups.findIndex(g=>g.list.includes(L[n<0?L.length-1:n])); group = groups[Math.max(0,gi)].id; }
     const G = groups.find(g=>g.id===group);
     const gDone = G.list.filter(x=>it.my.done[x.k]).length;
     box.innerHTML = `<h3>${U} <span class="r">${Object.keys(it.my.done).length}/${L.length} · hold to mark all before</span></h3>
       ${groups.length>1?`<div class="seasons">${groups.map(g=>{const dn=g.list.every(x=>it.my.done[x.k]);return `<button data-g="${g.id}" class="${g.id===group?"on":""}">${g.label}${dn?" ✓":""}</button>`}).join("")}</div>`:""}
-      <div id="u-list">${G.list.map(x=>`<div class="ep ${it.my.done[x.k]?"done":""}" data-k="${esc(x.k)}"><span class="ck"></span>${unitThumb(it,x)}<span class="no">${x.season!=null?"E"+x.no:"#"+x.no}</span><span class="et">${x.title?esc(x.title):`<span style="color:var(--dim)">${c.unit==="episode"?"Episode":"Chapter"} ${x.no}</span>`}${x.filler?`<span class="fl">FILLER</span>`:""}${x.recap?`<span class="fl">RECAP</span>`:""}${x.date?`<span class="ed">${x.date>today()?"Airs ":""}${fmtDate(x.date)}${x.vol?" · Vol. "+esc(x.vol):""}</span>`:""}${(it.my.unotes||{})[x.k]?`<span class="un">${esc(it.my.unotes[x.k])}</span>`:""}</span><button class="nb ${(it.my.unotes||{})[x.k]?"has":""}" aria-label="Note">${IC.note}</button></div>`).join("")}</div>
+      ${G.head||""}<div id="u-list">${G.list.map(x=>`<div class="ep ${it.my.done[x.k]?"done":""} ${x.kind==="movie"?"movie":""}" data-k="${esc(x.k)}"><span class="ck"></span>${unitThumb(it,x)}<span class="no">${x.kind==="movie"?"🎬":x.season!=null||x.g?"E"+x.no:"#"+x.no}</span><span class="et">${x.title?esc(x.title):`<span style="color:var(--dim)">${x.kind==="special"&&x.ptitle?esc(x.ptitle)+" · ":""}${c.unit==="episode"?"Episode":"Chapter"} ${x.no}</span>`}${x.filler?`<span class="fl">FILLER</span>`:""}${x.recap?`<span class="fl">RECAP</span>`:""}${x.date?`<span class="ed">${x.date>today()?"Airs ":""}${fmtDate(x.date)}${x.vol?" · Vol. "+esc(x.vol):""}</span>`:""}${(it.my.unotes||{})[x.k]?`<span class="un">${esc(it.my.unotes[x.k])}</span>`:""}</span><button class="nb ${(it.my.unotes||{})[x.k]?"has":""}" aria-label="Note">${IC.note}</button></div>`).join("")}</div>
       <div class="row-btns"><button class="btn" id="u-all">${gDone===G.list.length?"Uncheck":"Check"} all in ${groups.length>1?G.label:"list"}</button><button class="btn" id="u-ref">Reload list</button></div>`;
     box.querySelectorAll(".seasons button").forEach(b=>b.onclick=()=>{ group=b.dataset.g; draw(); });
     $("#u-all",box).onclick = ()=>{
@@ -2710,10 +2942,10 @@ function renderUnits(pg, it, after){
   const updateHead = ()=>{ const L=units[it.id]; const r=$("h3 .r",box); if(r) r.textContent = `${Object.keys(it.my.done).length}/${L.length} · hold to mark all before`; };
   const markUpTo = k=>{
     const L = units[it.id]; const idx = L.findIndex(x=>x.k===k); const before = {...it.my.done};
-    for(let i=0;i<=idx;i++) it.my.done[L[i].k]=1;
+    for(let i=0;i<=idx;i++){ if(L[idx].kind && L[i].kind !== L[idx].kind) continue; if(L[idx].kind==="special" && L[i].part!==L[idx].part) continue; it.my.done[L[i].k]=1; }
     if(navigator.vibrate) try{ navigator.vibrate(30); }catch(e){}
     autoStatus(it); touch(it); draw(); after();
-    toast(`Marked everything through ${L[idx].season!=null?"S"+L[idx].season+" E"+L[idx].no:"#"+L[idx].no}`, ()=>{ it.my.done=before; touch(it); draw(); after(); });
+    toast(`Marked everything through ${L[idx].g||L[idx].season!=null?unitName(L[idx]):"#"+L[idx].no}`, ()=>{ it.my.done=before; touch(it); draw(); after(); });
   };
   async function fetchList(force){
     box.innerHTML = `<h3>${U}</h3><div class="spinner" style="margin:16px auto"></div><div class="hint" id="u-msg" style="padding:6px">Getting the ${U.toLowerCase()} list…</div>`;
@@ -2722,7 +2954,8 @@ function renderUnits(pg, it, after){
       if(!L || !L.length) throw new Error("empty");
       units[it.id] = L; it.unitsTotal = L.length; await DB.set("units:"+it.id, {at:Date.now(), list:L});
       // carry over a number-only count into checkmarks
-      if(it.my.count && !Object.keys(it.my.done).length){ L.slice(0,it.my.count).forEach(x=>it.my.done[x.k]=1); }
+      if(it.my.count && !Object.keys(it.my.done).length && !it.franchise){ L.slice(0,it.my.count).forEach(x=>it.my.done[x.k]=1); }
+      applyPending(it, L);
       touch(it); draw(); after();
     }catch(e){
       if(force && units[it.id]){ draw(); toast("Couldn't reload right now"); return; }
@@ -2739,7 +2972,7 @@ function renderUnits(pg, it, after){
     }
   }
   pg.addEventListener("units-refresh", draw);
-  loadUnits(it).then(L=>{ if(L){ draw(); } else fetchList(false); });
+  loadUnits(it).then(L=>{ if(L){ if(applyPending(it, L)){ touch(it); after(); } draw(); } else fetchList(false); });
 }
 
 /* ============ MANUAL ADD / EDIT ============ */
@@ -2795,6 +3028,11 @@ function renderSettings(){
     <div class="sec"><h3>Profile</h3>
       <div class="field"><label>Name</label><input id="s-name" value="${esc(p.name)}" maxlength="30"></div>
       <button class="btn pri" id="s-save">Save name</button></div>
+    <div class="sec"><h3>AI helper <span class="r">${aiOn()?"On":"Off"}</span></h3>
+      <div style="color:var(--mut);font-size:13px;margin-bottom:8px">Lets ✨ Describe it and misspelled searches ask an AI what you mean. It uses the free AI built into Chrome and runs on your phone, so it never costs anything. Seasons and movies are grouped either way.</div>
+      <div class="seg" id="s-ai"><button data-v="" class="${S().ai?.mode!=="builtin"?"on":""}">Off</button><button data-v="builtin" class="${S().ai?.mode==="builtin"?"on":""}">On</button></div>
+      ${S().ai?.mode==="builtin" ? `<div style="font-size:12.5px;color:${builtinAI()?"var(--good)":"var(--warn)"};margin-top:8px">${builtinAI()?"Chrome's built-in AI is ready on this phone.":"Chrome's built-in AI isn't available on this phone yet. It'll start working on its own once Chrome adds it, and searching works normally until then."}</div>` : ""}
+    </div>
     <div class="sec"><h3>My categories <span class="r">${p.cats.length}</span></h3>
       <div style="color:var(--mut);font-size:13px;margin-bottom:6px">Rename them, change colors, or remove ones you don't use. Removing a category hides it but keeps what's in it.</div>
       <div id="s-cats"></div>
@@ -2840,6 +3078,7 @@ function renderSettings(){
   pg.querySelectorAll("[data-au]").forEach(b=>b.onclick=()=>{ const f=FOL().authors[b.dataset.au]; f.on=!f.on; save(); b.classList.toggle("pri",f.on); b.textContent=f.on?"On":"Off"; });
   $("#s-save",pg).onclick = ()=>{ p.name = $("#s-name",pg).value.trim() || p.name; saveNow(); toast("Saved"); };
   drawCatManager(pg, p);
+  pg.querySelectorAll("#s-ai button").forEach(b=>b.onclick=()=>{ S().ai = {...(S().ai||{}), mode:b.dataset.v}; saveNow(); const y = pg.scrollTop; route(); const n = document.querySelector(".page"); if(n){ n.style.animation="none"; n.scrollTop = y; } });
   $("#s-addcat",pg).onclick = ()=>go("#newcat");
   pg.querySelectorAll("[data-unhide]").forEach(b=>b.onclick=()=>{ p.cats.push(b.dataset.unhide); saveNow(); route(); });
   pg.querySelectorAll("[data-purge]").forEach(b=>b.onclick=async()=>{ const k = b.dataset.purge; const its = Object.values(lib()).filter(i=>i.cat===k);
@@ -2866,7 +3105,8 @@ function renderSettings(){
 }
 async function downloadBackup(){
   const u = {}; for(const k of await DB.keys()) if(String(k).startsWith("units:")) u[k] = await DB.get(k);
-  const blob = new Blob([JSON.stringify({app:"shelf", v:1, at:new Date().toISOString(), data, units:u})], {type:"application/json"});
+  const d2 = data;
+  const blob = new Blob([JSON.stringify({app:"shelf", v:1, at:new Date().toISOString(), data:d2, units:u})], {type:"application/json"});
   const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = `shelf-life-backup-${today()}.json`;
   document.body.appendChild(a); a.click(); a.remove(); toast("Backup saved to your Downloads");
 }
@@ -2889,7 +3129,7 @@ function miniHTML(r, why){
   const ex = findExisting(r);
   return `<div class="mini" data-k="${pooled(r)}"><div class="cover">${coverImg(r)}${ex?`<span class="onshelf" style="position:absolute;bottom:6px;left:6px;font-size:9.5px;font-weight:800;padding:2px 5px;border-radius:5px;background:rgba(0,0,0,.7);color:var(--good)">ON SHELF</span>`:""}</div><div class="t">${esc(r.title)}</div>${why?`<div class="s">${esc(why)}</div>`:""}</div>`;
 }
-function wireMinis(root){ root.querySelectorAll(".mini").forEach(m=>m.onclick=()=>openResult(pool[m.dataset.k])); }
+function wireMinis(root){ root.querySelectorAll(".mini").forEach(m=>m.onclick=()=>openResult(pool[m.dataset.k])); wireHold(root, ".mini", el=>({r: pool[el.dataset.k]})); }
 function openResult(r){ const ex = findExisting(r); if(ex) go("#item/"+ex.id); else go("#preview/"+Object.keys(pool).find(k=>pool[k]===r)); }
 function renderPreview(k){
   const r = pool[k]; if(!r){ back(); return; }
@@ -2910,10 +3150,14 @@ function renderPreview(k){
   startCarousels(pg);
   pg.style.setProperty("--c", c.color);
   $("#v-back",pg).onclick = back;
-  pg.querySelectorAll(".add-row .btn").forEach(b=>b.onclick=()=>{
-    const it = newItem(JSON.parse(JSON.stringify(r))); delete it._score; lib()[it.id] = it; autoFollow(it); setStatus(it, b.dataset.s);
+  pg.querySelectorAll(".add-row .btn").forEach(b=>b.onclick=async()=>{
+    if(adding) return; adding = true; pg.querySelectorAll(".add-row .btn").forEach(x=>x.disabled = true);
+    if(r.cat==="anime") toast("Gathering every season and movie…");
+    let base; try{ base = await prepareBase(r); } finally { adding = false; }
+    const ex = findExisting(base); if(ex){ history.replaceState(null,"","#item/"+ex.id); route(); toast("This series is already on your shelf"); return; }
+    const it = newItem(base); lib()[it.id] = it; autoFollow(it); setStatus(it, b.dataset.s);
     if(isPages(it) && !it.synopsis && it.src.ol){ olDescription(it.src.ol).then(d=>{ if(d){ it.synopsis=d; save(); } }); }
-    save(); history.replaceState(null,"","#item/"+it.id); route(); toast("Added to your shelf");
+    save(); history.replaceState(null,"","#item/"+it.id); route(); toast(it.franchise ? "Added the whole series" : "Added to your shelf");
   });
   loadMoreLike(r, $("#v-more",pg));
 }
@@ -2968,7 +3212,7 @@ async function renderBrowse(){
   const at = $("#b-alltags"); if(at) at.onclick = openTagPicker;
   const cl = $("#b-clear"); if(cl) cl.onclick = ()=>{ bstate.sel=[]; bstate.rawTags=[]; bstate.level="all"; reload(); };
   $("#b-sort").onchange = e=>{ bstate.sort=e.target.value; reload(); };
-  $("#b-search").onclick = ()=>go("#add/"+cat);
+  $("#b-search").onclick = ()=>{ addMemo = null; go("#add/"+cat); };
   app.querySelectorAll(".top .chips").forEach(row=>{ const on=row.querySelector(".chip.on"); if(on) row.scrollLeft = on.offsetLeft - 16; });
   if(!bstate.items.length && !bstate.err) loadBrowse(1); else drawBrowse();
 }
@@ -3016,6 +3260,7 @@ function drawBrowse(){
     return `<div class="tile" data-k="${k}"><div class="cover">${coverImg(r)}${r.meta?.score?`<span class="rate" style="background:#fff;color:#111">${r.meta.score}%</span>`:""}${ex?`<span class="onshelf">ON SHELF</span>`:""}</div><div class="t">${esc(r.title)}</div><div class="s">${esc(sub)}</div></div>`; }).join("")
     + (bstate.more ? `<button class="btn load-more" id="b-more">${bstate.loading?"Loading…":"Load more"}</button>` : "");
   g.querySelectorAll(".tile").forEach(t=>t.onclick=()=>openResult(pool[t.dataset.k]));
+  wireHold(g, ".tile", el=>({r: pool[el.dataset.k]}));
   const m = $("#b-more"); if(m) m.onclick = ()=>{ if(!bstate.loading) loadBrowse(bstate.page+1); };
 }
 
@@ -3095,6 +3340,7 @@ function autoFollow(it){ linkAniList(it); enrichGame(it); if(!isPages(it)) retur
 function maxDoneNo(it){ const ks = Object.keys(it.my.done||{}).map(parseFloat).filter(n=>!isNaN(n)); return ks.length ? Math.max(...ks) : (it.my.count||0); }
 function behind(it){
   const t = it.track; if(!t || !/RELEASING|Running|NOT YET/i.test(it.meta?.status||"")) return 0;
+  if(it.franchise && t.aired!=null) return Math.max(0, t.aired - Object.keys(it.my.done||{}).filter(k=>k.startsWith(it.trackAl+":")).length);
   if(it.cat==="anime" && t.aired!=null) return Math.max(0, t.aired - (it.unitsTotal ? Object.keys(it.my.done).length : (it.my.count||0)));
   if(C(it.cat)?.vols && t.latest!=null) return Math.max(0, Math.floor(t.latest) - Math.floor(maxDoneNo(it)));
   if(it.cat==="tv" && t.airedCount!=null) return Math.max(0, t.airedCount - Object.keys(it.my.done||{}).length);
@@ -3111,8 +3357,14 @@ function setBell(){
   if(d){ d.classList.toggle("hidden", !n); d.textContent = n>9 ? "9+" : n; }
   const b = $("#h-bell"); if(b) b.classList.toggle("spin", checking);
 }
+function trackId(it){ return it.trackAl || it.src.al; }
 async function extendUnits(it, upto){
   if(!upto) return; let L = await loadUnits(it); if(!L) return;
+  if(it.franchise){ const al = it.trackAl; const mine = L.filter(x=>x.part===al); const mx = mine.length ? Math.max(...mine.map(x=>x.no)) : 0; if(upto <= mx) return;
+    const tpl = mine[0] || {g:"s"+al, gl:"Season "+((it.parts||[]).find(p=>p.al===al)?.n||""), kind:"season"};
+    const add = Array.from({length: upto-mx}, (_,i)=>({k:`${al}:${mx+i+1}`, no:mx+i+1, title:"", date:"", g:tpl.g, gl:tpl.gl, kind:"season", part:al}));
+    const at = mine.length ? L.indexOf(mine[mine.length-1]) + 1 : L.findIndex(x=>x.kind!=="season"); const pos = at < 0 ? L.length : at;
+    L = [...L.slice(0,pos), ...add, ...L.slice(pos)]; units[it.id] = L; it.unitsTotal = L.length; await DB.set("units:"+it.id, {at:Date.now(), list:L}); return; }
   const max = L.length ? Math.max(...L.map(x=>x.no)) : 0;
   if(upto <= max) return;
   L = L.concat(Array.from({length: upto-max}, (_,i)=>({k:String(max+i+1), no:max+i+1, title:"", date:""})));
@@ -3131,18 +3383,25 @@ async function checkUpdates(force){
   const alItems = tracked.filter(i=>i.src?.al);
   if(alItems.length){
     try{
-      const t = await alTrack(alItems.map(i=>i.src.al));
+      const t = await alTrack(alItems.map(trackId));
       for(const it of alItems){
-        const r = t[it.src.al]; if(!r) continue; const tr = (it.track ||= {});
+        const r = t[trackId(it)]; if(!r) continue; const tr = (it.track ||= {});
         if(r.status) it.meta.status = r.status.replace(/_/g," ");
         if(it.cat==="anime"){
-          const prev = tr.aired; if(r.aired!=null) tr.aired = r.aired; tr.nextEp = r.nextEp; tr.nextAt = r.nextAt; if(r.total){ tr.total = r.total; it.meta.episodes = r.total; }
+          const prev = tr.aired; if(r.aired!=null) tr.aired = r.aired; tr.nextEp = r.nextEp; tr.nextAt = r.nextAt; if(r.total){ tr.total = r.total; if(!it.franchise) it.meta.episodes = r.total; }
           if(prev!=null && tr.aired>prev && it.my.status!=="dropped") fresh.push(mk(it, tr.aired-prev>1 ? `Episodes ${prev+1}–${tr.aired} are out` : `Episode ${tr.aired} is out`, {src:"AniList airing schedule"}));
           if(tr.aired) await extendUnits(it, tr.aired);
         } else { if(r.chapters) it.meta.chapters = r.chapters; if(r.volumes) it.meta.volumes = r.volumes; }
         tr.checked = Date.now();
       }
     }catch(e){}
+  }
+  // New seasons or movies added to a grouped series
+  for(const it of Object.values(lib()).filter(i=>i.franchise && p.cats.includes("anime") && Date.now() - (i.partsAt||0) > 5*86400e3)){
+    try{ const fr = await buildFranchise([it.src.al]); const old = new Set((it.parts||[]).map(x=>x.al)); const added = fr.parts.filter(x=>!old.has(x.al));
+      const nb = franchiseItem(it, fr); it.parts = nb.parts; it.trackAl = nb.trackAl; it.meta = {...it.meta, ...nb.meta}; it.partsAt = Date.now();
+      if(added.length){ delete units[it.id]; await DB.del("units:"+it.id); it.unitsTotal = 0; added.forEach(x=>fresh.push(mk(it, `New ${partLabel(x).toLowerCase()} added: ${x.title}`, {src:"AniList"}))); }
+    }catch(e){} await sleep(400);
   }
   // Release status across sites (hiatus, season breaks, finished)
   for(const it of tracked.filter(i=>isAL(i.cat))){
@@ -3699,6 +3958,7 @@ function wireStatus(box, pg, it){
 
 /* ============ COVER SLIDESHOW + BOOK SERIES ============ */
 function coverList(it){
+  if(it.franchise && (it.parts||[]).length > 1) return it.parts.filter(p=>p.cover).map(p=>({src:p.cover, cap:p.kind==="season"?`Season ${p.n} · ${p.title}`:`${partLabel(p)} · ${p.title}`}));
   if(it.isSeries) return (it.books||[]).filter(b=>b.cover).map(b=>({src:b.cover, cap:`Book ${b.n} · ${b.title}`}));
   if(it.volCovers){ const ks = Object.keys(it.volCovers).map(Number).filter(n=>!isNaN(n)).sort((a,b)=>a-b);
     if(ks.length > 1) return [{src:it.cover, cap:it.title}, ...ks.slice(0,80).map(k=>({src:it.volCovers[String(k)], cap:`Volume ${k}`}))]; }
@@ -3772,12 +4032,96 @@ function openBookSheet(pg, it, b, onChange){
   if(window.DEMO_UNITS) Object.assign(units, window.DEMO_UNITS);
   if(data.profiles.length && !prof()) data.active = data.profiles[0].id;
   try{ navigator.storage && navigator.storage.persist && navigator.storage.persist(); }catch(e){}
+  if(data.settings?.ai && (data.settings.ai.key || data.settings.ai.mode==="claude")) data.settings.ai = {};
   applyTheme();
   route();
   setTimeout(()=>checkUpdates(false), 1500);
   document.addEventListener("visibilitychange", ()=>{ if(!document.hidden) checkUpdates(false); });
   if("serviceWorker" in navigator && location.protocol==="https:") navigator.serviceWorker.register("sw.js").catch(()=>{});
 })();
+
+/* ============ GROUP SEASONS OF AN ANIME ALREADY ON THE SHELF ============ */
+async function combineFranchise(it, refresh){
+  toast(refresh ? "Checking for new seasons and movies…" : "Finding every season and movie…");
+  let fr; try{ fr = await buildFranchise(refresh ? (it.parts||[]).map(p=>p.al) : [it.src.al]); }catch(e){ toast("Couldn't reach AniList right now. Try again in a minute."); return; }
+  if(fr.parts.length < 2){ toast("No other seasons or movies found for this one"); return; }
+  const nb = franchiseItem(it, fr);
+  if(refresh){ const had = new Set((it.parts||[]).map(p=>p.al)); const added = fr.parts.filter(p=>!had.has(p.al)); Object.assign(it, {parts:nb.parts, trackAl:nb.trackAl, partsAt:Date.now(), meta:{...it.meta, ...nb.meta}}); if(added.length){ delete units[it.id]; await DB.del("units:"+it.id); it.unitsTotal = 0; } touch(it); route(); toast(added.length ? `Added ${added.length} new part${added.length>1?"s":""}: ${added.map(p=>p.title).join(", ")}` : "You're up to date"); return; }
+  const myAl = it.src.al; const done = {}; const pend = []; let pc = null;
+  Object.keys(it.my.done||{}).forEach(k=>done[`${myAl}:${k}`]=1);
+  if(!Object.keys(it.my.done||{}).length){ if(it.my.status==="completed") pend.push(myAl); else if(it.my.count) pc = {al:myAl, n:it.my.count}; }
+  const others = Object.values(lib()).filter(o=>o.id!==it.id && o.cat==="anime" && !o.franchise && fr.parts.some(p=>p.al===o.src?.al));
+  for(const o of others){
+    Object.keys(o.my.done||{}).forEach(k=>done[`${o.src.al}:${k}`]=1);
+    if(!Object.keys(o.my.done||{}).length && o.my.status==="completed") pend.push(o.src.al);
+    if((o.my.rating||0) > (it.my.rating||0)) it.my.rating = o.my.rating;
+    it.my.notes = [...(it.my.notes||[]), ...(o.my.notes||[])];
+    it.my.unotes = {...(it.my.unotes||{})}; Object.entries(o.my.unotes||{}).forEach(([k,v])=>it.my.unotes[`${o.src.al}:${k}`]=v);
+    if(o.my.chars?.list?.length && !it.my.chars?.list?.length) it.my.chars = o.my.chars;
+    delete lib()[o.id]; await DB.del("units:"+o.id);
+  }
+  const keepMy = it.my; const keep = {id:it.id, added:it.added, my:keepMy, charWiki:it.charWiki};
+  Object.assign(it, nb, keep); it.my.done = done; if(pend.length) it.my.pendingParts = pend; if(pc) it.my.pendingCount = pc;
+  const un = {}; Object.entries(keepMy.unotes||{}).forEach(([k,v])=>un[k.includes(":")?k:`${myAl}:${k}`]=v); it.my.unotes = un;
+  it.unitsTotal = 0; delete units[it.id]; await DB.del("units:"+it.id); delete it.track;
+  touch(it); route();
+  toast(`Grouped ${fr.parts.length} parts into one series${others.length?` and merged ${others.length} from your shelf`:""}`);
+}
+
+/* ============ HOLD A COVER FOR QUICK OPTIONS ============ */
+function wireHold(root, sel, resolve){
+  root.querySelectorAll(sel).forEach(el=>{
+    if(el._hold) return; el._hold = 1;
+    let t = null, sx = 0, sy = 0, fired = false;
+    const fire = ()=>{ if(fired) return; fired = true; el._held = Date.now(); if(navigator.vibrate) try{ navigator.vibrate(25); }catch(e){} const x = resolve(el); if(x) openQuick(x); };
+    el.addEventListener("pointerdown", e=>{ fired = false; sx = e.clientX; sy = e.clientY; clearTimeout(t); t = setTimeout(fire, 520); });
+    el.addEventListener("pointermove", e=>{ if(Math.hypot(e.clientX-sx, e.clientY-sy) > 9) clearTimeout(t); });
+    ["pointerup","pointercancel","pointerleave"].forEach(ev=>el.addEventListener(ev, ()=>clearTimeout(t)));
+    el.addEventListener("contextmenu", e=>{ e.preventDefault(); clearTimeout(t); fire(); });
+    el.addEventListener("click", e=>{ if(el._held && Date.now() - el._held < 900){ e.stopImmediatePropagation(); e.preventDefault(); } }, true);
+  });
+}
+function openQuick(x){
+  document.querySelectorAll(".quick-wrap").forEach(q=>q.remove());
+  const it = x.it || (x.r ? findExisting(x.r) : null), r = x.r;
+  const obj = it || r; const c = C(obj.cat);
+  const w = document.createElement("div"); w.className = "sheet-wrap quick-wrap";
+  const draw = ()=>{
+    const cur = it && lib()[it.id];
+    w.innerHTML = `<div class="sheet quick"><div class="sh-grab"></div>
+      <div class="q-head"><div class="cover">${coverImg(obj)}</div><div style="min-width:0"><div class="q-t">${esc(obj.title)}</div><div class="q-s"><span style="color:${c.color}">●</span> ${esc(c.label)}${cur?` · ${esc(statusLabel(cur.my.status, cur.cat))}`:" · not on your shelf"}${cur && pct(cur)?` · ${pct(cur)}%`:""}</div></div></div>
+      ${cur ? `<div class="b-label">Status</div><div class="q-st">${STATUSES.map(s=>`<button data-s="${s}" class="${cur.my.status===s?"on":""}">${esc(statusLabel(s, cur.cat))}</button>`).join("")}</div>
+        <div class="b-label">Rating</div><div class="q-rate">${[1,2,3,4,5,6,7,8,9,10].map(n=>`<button data-n="${n}" class="${cur.my.rating>=n?"on":""}" style="${cur.my.rating>=n?`background:${ratingColor(cur.my.rating)}`:""}">${n}</button>`).join("")}</div>
+        <div class="q-acts"><button class="btn pri" id="q-open">Open</button>${!isOnce(cur) && cur.cat!=="game" && cur.my.status!=="completed" ? `<button class="btn" id="q-done">Mark all done</button>`:""}<button class="btn danger" id="q-del">Remove from shelf</button></div>`
+      : `<div class="b-label">Add to my shelf as</div><div class="q-st">${["planned","current","completed"].map(s=>`<button data-add="${s}">${esc(statusLabel(s, obj.cat))}</button>`).join("")}</div><div class="q-acts"><button class="btn" id="q-prev">See details</button></div>`}
+    </div>`;
+    const done = ()=>{ refreshUnder(); draw(); };
+    if(cur){
+      w.querySelectorAll("[data-s]").forEach(b=>b.onclick=()=>{ setStatus(cur, b.dataset.s); done(); toast(`Marked as ${statusLabel(b.dataset.s, cur.cat).toLowerCase()}`); });
+      w.querySelectorAll("[data-n]").forEach(b=>b.onclick=()=>{ const n = +b.dataset.n; cur.my.rating = cur.my.rating===n ? 0 : n; touch(cur); done(); });
+      $("#q-open",w).onclick = ()=>{ close(); go("#item/"+cur.id); };
+      const md = $("#q-done",w); if(md) md.onclick = ()=>{ setStatus(cur, "completed"); done(); toast("All marked as done"); };
+      const del = $("#q-del",w); del.onclick = async()=>{ if(del.dataset.c!=="1"){ del.dataset.c="1"; del.textContent = "Tap again to remove"; return; }
+        const copy = cur; const un = await DB.get("units:"+cur.id); delete lib()[cur.id]; await DB.del("units:"+cur.id); save(); close(); refreshUnder();
+        toast("Removed "+copy.title, async()=>{ lib()[copy.id] = copy; if(un) await DB.set("units:"+copy.id, un); save(); refreshUnder(); }); };
+    } else {
+      w.querySelectorAll("[data-add]").forEach(b=>b.onclick=async()=>{ w.querySelectorAll("button").forEach(x=>x.disabled=true); b.textContent = "Adding…"; const s = b.dataset.add;
+        let base; try{ base = await prepareBase(r); }catch(e){ base = r; } const ex = findExisting(base); if(ex){ close(); go("#item/"+ex.id); return; }
+        const n = newItem(base); lib()[n.id] = n; autoFollow(n); setStatus(n, s); save(); close(); refreshUnder(); toast(n.franchise ? "Added the whole series" : "Added to your shelf"); });
+      $("#q-prev",w).onclick = ()=>{ close(); openResult(r); };
+    }
+  };
+  const close = ()=>{ w.classList.add("out"); setTimeout(()=>w.remove(), 180); };
+  w.onclick = e=>{ if(e.target===w) close(); };
+  document.body.appendChild(w); draw();
+}
+function refreshUnder(){
+  const h = location.hash.slice(1);
+  if(!h){ drawGrid(); return; }
+  if(h.startsWith("add")){ const res = document.querySelector("#a-res"); if(res && lastResults.length){ res.querySelectorAll(".res").forEach(b=>{ const r = lastResults[+b.dataset.i]; const on = !!findExisting(r); const tag = b.querySelector(".in"); if(on && !tag) b.insertAdjacentHTML("beforeend", `<span class="in">ON SHELF</span>`); if(!on && tag) tag.remove(); }); } return; }
+  if(h==="browse" || h==="foryou") return;
+  route();
+}
 
 /* ================= DECOR: THEMES, FRAMES, EFFECTS, BUDDIES, PLANT ================= */
 Object.assign(FONTS, {
@@ -4320,6 +4664,208 @@ function buddySVG(species, coatKey, opt = {}){
   }
   return `<svg viewBox="-12 -18 144 140" xmlns="http://www.w3.org/2000/svg" class="bd sp-${species}">${body}${acc}</svg>`;
 }
+/* ---------- US HOLIDAYS: critters, accessories and themes that come and go ---------- */
+function easterDate(y){ const a=y%19,b=Math.floor(y/100),c=y%100,d=Math.floor(b/4),e=b%4,f=Math.floor((b+8)/25),g=Math.floor((b-f+1)/3),h=(19*a+b-d-g+15)%30,i=Math.floor(c/4),k=c%4,l=(32+2*e+2*i-h-k)%7,m=Math.floor((a+11*h+22*l)/451); const mo=Math.floor((h+l-7*m+114)/31), da=((h+l-7*m+114)%31)+1; return new Date(y, mo-1, da); }
+function today0(){ try{ const f = localStorage.getItem("shelf:fakeDate"); if(f) return new Date(f+"T12:00"); }catch(e){} return new Date(); }
+const HOLIDAYS = {
+  newyear:{name:"New Year's", icon:"🎆", month:1, until:"Jan 31"},
+  valentine:{name:"Valentine's Day", icon:"💘", month:2, until:"Feb 28"},
+  stpatricks:{name:"St. Patrick's Day", icon:"🍀", month:3, until:"Mar 31"},
+  easter:{name:"Easter", icon:"🐣", month:"easter"},
+  july4:{name:"Fourth of July", icon:"🎇", month:7, until:"Jul 31"},
+  halloween:{name:"Halloween", icon:"🎃", month:10, until:"Oct 31"},
+  thanksgiving:{name:"Thanksgiving", icon:"🦃", month:11, until:"Nov 30"},
+  christmas:{name:"Christmas", icon:"🎄", month:12, until:"Dec 31"},
+};
+const SEASONS = {winter:[12,1,2], spring:[3,4,5], summer:[6,7,8], autumn:[9,10,11]};
+function holidayOn(k, d = today0()){
+  const h = HOLIDAYS[k]; if(!h) return true;
+  if(h.month === "easter"){ const e = easterDate(d.getFullYear()); return d.getMonth() === e.getMonth(); }
+  return d.getMonth()+1 === h.month;
+}
+function holidayUntil(k){ const h = HOLIDAYS[k]; if(h.month === "easter"){ const e = easterDate(today0().getFullYear()); const last = new Date(e.getFullYear(), e.getMonth()+1, 0); return last.toLocaleDateString(undefined,{month:"short", day:"numeric"}); } return h.until; }
+const activeHolidays = () => Object.keys(HOLIDAYS).filter(k=>holidayOn(k));
+function seasonOn(s){ return !s || (SEASONS[s]||[]).includes(today0().getMonth()+1); }
+const availNow = o => !o || ((!o.holiday || holidayOn(o.holiday)) && (!o.season || seasonOn(o.season)));
+
+/* holiday critters */
+Object.assign(CUSTOM, {
+  turkey:(c,o,id)=>{ let fan = ""; const cols = [c.f1||"#b5523b", c.f2||"#e8823a", c.f3||"#f2c14e", c.f2||"#e8823a", c.f1||"#b5523b"];
+    for(let i=0;i<9;i++){ const a = -160 + i*17.5; const col = [c.f1||"#b5523b", c.f2||"#e8823a", c.f3||"#f2c14e"][i%3]; fan += `<ellipse cx="60" cy="40" rx="9" ry="30" transform="rotate(${a+90} 60 76)" fill="${col}" ${c.sw}/><ellipse cx="60" cy="18" rx="3.5" ry="8" transform="rotate(${a+90} 60 76)" fill="${shade(col,.3)}"/>`; }
+    return `<defs>${grad("h"+id,c.main)}</defs><ellipse cx="60" cy="116" rx="30" ry="4.5" fill="#000" opacity=".16"/><g class="bd-tail">${fan}</g>
+    <path d="M50 108 l-4 8 M50 108 l0 8 M50 108 l4 8 M70 108 l-4 8 M70 108 l0 8 M70 108 l4 8" stroke="#e8a33d" stroke-width="2.6" stroke-linecap="round"/>
+    <ellipse cx="60" cy="88" rx="29" ry="24" fill="url(#h${id})" ${c.sw}/><ellipse cx="60" cy="94" rx="17" ry="14" fill="${c.second}"/>
+    <g class="bd-wingL"><ellipse cx="34" cy="90" rx="8" ry="15" transform="rotate(15 34 90)" fill="${shade(c.main,-.12)}" ${c.sw}/></g><g class="bd-wingR"><g ${MIRROR}><ellipse cx="34" cy="90" rx="8" ry="15" transform="rotate(15 34 90)" fill="${shade(c.main,-.12)}" ${c.sw}/></g></g>
+    <circle cx="60" cy="56" r="18" fill="${c.head||"#c9a27a"}" ${c.sw}/>${eyePair(53,67,53,4.4,c,o)}
+    <path d="M56 59 L64 59 L60 66Z" fill="#f2c14e" ${c.sw}/><path d="M61 62 C66 64 66 72 62 74 C59 72 59 66 61 62Z" fill="#e0343c" ${c.sw}/>${blush(46,74,60,4,o)}`; },
+  acorn:(c,o,id)=>`<defs>${grad("h"+id,c.main,.2)}</defs><ellipse cx="60" cy="116" rx="26" ry="4" fill="#000" opacity=".16"/>
+    <ellipse cx="50" cy="112" rx="7" ry="4" fill="${shade(c.main,-.15)}" ${c.sw}/><ellipse cx="70" cy="112" rx="7" ry="4" fill="${shade(c.main,-.15)}" ${c.sw}/>
+    <path d="M30 56 C28 86 40 112 60 112 C80 112 92 86 90 56Z" fill="url(#h${id})" ${c.sw}/>
+    <path d="M24 58 C22 36 40 26 60 26 C80 26 98 36 96 58 C80 64 40 64 24 58Z" fill="${c.cap||"#7a5034"}" ${c.sw}/>
+    <path d="M32 40 L88 54 M30 50 L80 34 M44 30 L94 48 M26 56 L64 28 M56 60 L90 40" stroke="${shade(c.cap||"#7a5034",-.3)}" stroke-width="1.2" opacity=".6"/>
+    <path d="M60 26 Q58 16 64 12" stroke="${shade(c.cap||"#7a5034",-.2)}" stroke-width="4" fill="none" stroke-linecap="round"/>
+    <g class="bd-arm"><ellipse cx="30" cy="84" rx="5" ry="8" fill="${c.main}" ${c.sw}/><ellipse cx="90" cy="84" rx="5" ry="8" fill="${c.main}" ${c.sw}/></g>
+    ${eyePair(49,71,80,5.8,c,o)}<path d="M55 91 Q60 95 65 91" stroke="${c.ol}" stroke-width="1.8" fill="none" stroke-linecap="round"/>${blush(40,80,89,5,o)}`,
+  gingerbread:(c,o,id)=>`<defs>${grad("h"+id,c.main,.15)}</defs><ellipse cx="60" cy="116" rx="28" ry="4" fill="#000" opacity=".16"/>
+    <path d="M60 22 C74 22 80 32 78 44 C76 52 72 56 70 58 L94 64 C102 66 102 78 94 78 L76 76 L80 108 C82 116 72 118 68 112 L60 96 L52 112 C48 118 38 116 40 108 L44 76 L26 78 C18 78 18 66 26 64 L50 58 C48 56 44 52 42 44 C40 32 46 22 60 22Z" fill="url(#h${id})" ${c.sw}/>
+    <path d="M28 70 q3 -3 6 0 q3 3 6 0 M80 70 q3 -3 6 0 q3 3 6 0 M44 106 q3 -3 6 0 M70 106 q3 -3 6 0" stroke="${c.icing||"#fff"}" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+    <circle cx="60" cy="68" r="3.5" fill="${c.b1||"#e0343c"}" ${c.sw}/><circle cx="60" cy="80" r="3.5" fill="${c.b2||"#2f9e55"}" ${c.sw}/>
+    ${eyePair(53,67,40,4.4,c,o)}<path d="M53 48 Q60 54 67 48" stroke="${c.icing||"#fff"}" stroke-width="2.4" fill="none" stroke-linecap="round"/>${blush(47,73,46,3.6,o)}`,
+  egg:(c,o,id)=>`<defs>${grad("h"+id,c.main,.25)}<clipPath id="ec${id}"><path d="M60 18 C82 18 96 54 96 76 C96 100 80 114 60 114 C40 114 24 100 24 76 C24 54 38 18 60 18Z"/></clipPath></defs><ellipse cx="60" cy="117" rx="26" ry="4" fill="#000" opacity=".16"/>
+    <ellipse cx="50" cy="113" rx="7" ry="3.6" fill="#f4a261" ${c.sw}/><ellipse cx="70" cy="113" rx="7" ry="3.6" fill="#f4a261" ${c.sw}/>
+    <path d="M60 18 C82 18 96 54 96 76 C96 100 80 114 60 114 C40 114 24 100 24 76 C24 54 38 18 60 18Z" fill="url(#h${id})"/>
+    <g clip-path="url(#ec${id})"><path d="M20 46 L30 40 L40 46 L50 40 L60 46 L70 40 L80 46 L90 40 L100 46 L100 52 L90 46 L80 52 L70 46 L60 52 L50 46 L40 52 L30 46 L20 52Z" fill="${c.s1||"#ffffff"}" opacity=".9"/><rect x="18" y="92" width="90" height="6" fill="${c.s2||"#ffffff"}" opacity=".8"/>${[30,46,62,78,94].map((x,i)=>`<circle cx="${x}" cy="${i%2?104:100}" r="2.6" fill="${c.s1||"#fff"}"/>`).join("")}</g>
+    <path d="M60 18 C82 18 96 54 96 76 C96 100 80 114 60 114 C40 114 24 100 24 76 C24 54 38 18 60 18Z" fill="none" ${c.sw}/>
+    <ellipse cx="44" cy="40" rx="6" ry="10" transform="rotate(25 44 40)" fill="#fff" opacity=".35"/>
+    ${eyePair(49,71,72,5.8,c,o)}<path d="M55 83 Q60 87 65 83" stroke="${c.ol}" stroke-width="1.8" fill="none" stroke-linecap="round"/>${blush(40,80,80,5,o)}`,
+  heart:(c,o,id)=>`<defs>${grad("h"+id,c.main,.25)}</defs><ellipse cx="60" cy="117" rx="24" ry="4" fill="#000" opacity=".16"/>
+    <ellipse cx="50" cy="113" rx="7" ry="4" fill="${shade(c.main,-.15)}" ${c.sw}/><ellipse cx="70" cy="113" rx="7" ry="4" fill="${shade(c.main,-.15)}" ${c.sw}/>
+    <g class="bd-arm"><ellipse cx="20" cy="66" rx="5" ry="8" transform="rotate(-30 20 66)" fill="${c.main}" ${c.sw}/><ellipse cx="100" cy="66" rx="5" ry="8" transform="rotate(30 100 66)" fill="${c.main}" ${c.sw}/></g>
+    <g class="bd-squish"><path d="M60 110 C36 94 16 78 18 54 C20 34 42 26 60 44 C78 26 100 34 102 54 C104 78 84 94 60 110Z" fill="url(#h${id})" ${c.sw}/>
+    <ellipse cx="38" cy="46" rx="7" ry="4" transform="rotate(-35 38 46)" fill="#fff" opacity=".45"/>
+    ${eyePair(48,72,66,6,c,o)}<path d="M55 78 Q60 82 65 78" stroke="${c.ol}" stroke-width="1.8" fill="none" stroke-linecap="round"/>${blush(38,82,74,5.5,{...o, blush: c.blushC===false?false:o.blush})}</g>`,
+  clover:(c,o,id)=>{ const lf = (r)=>`<path d="M60 64 C52 54 40 52 36 40 C33 30 44 22 52 28 C56 20 68 22 66 32 C66 44 62 54 60 64Z" transform="rotate(${r} 60 64)" fill="url(#h${id})" ${c.sw}/>`;
+    return `<defs>${grad("h"+id,c.main,.2)}</defs><ellipse cx="60" cy="116" rx="22" ry="4" fill="#000" opacity=".16"/>
+    <path d="M60 70 Q58 96 68 114" stroke="${shade(c.main,-.25)}" stroke-width="5" fill="none" stroke-linecap="round"/>
+    <g class="bd-leaves">${lf(-45)}${lf(45)}${lf(135)}${lf(-135)}<circle cx="60" cy="64" r="20" fill="url(#h${id})" ${c.sw}/></g>
+    ${eyePair(53,67,62,4.6,c,o)}<path d="M56 70 Q60 73 64 70" stroke="${c.ol}" stroke-width="1.6" fill="none" stroke-linecap="round"/>${blush(47,73,68,3.6,o)}`; },
+  potogold:(c,o,id)=>`<defs>${grad("h"+id,c.main,.18)}</defs><ellipse cx="60" cy="117" rx="32" ry="4" fill="#000" opacity=".16"/>
+    <g opacity=".85">${["#ff5d73","#ffb347","#ffe066","#5ee08a","#4fc3f7","#9b7cff"].map((col,i)=>`<path d="M${10+i*4} 78 A${50-i*4} ${50-i*4} 0 0 1 ${110-i*4} 78" stroke="${col}" stroke-width="4" fill="none"/>`).join("")}</g>
+    <g>${[[40,52],[50,46],[60,44],[70,46],[80,52],[46,56],[58,52],[72,54],[64,48],[54,58],[66,58]].map(([x,y])=>`<ellipse cx="${x}" cy="${y}" rx="7" ry="4" fill="#f2c14e" stroke="#9a7020" stroke-width="1.2"/>`).join("")}</g>
+    <path d="M24 62 C22 96 38 112 60 112 C82 112 98 96 96 62Z" fill="url(#h${id})" ${c.sw}/><ellipse cx="60" cy="61" rx="38" ry="7" fill="${shade(c.main,.15)}" ${c.sw}/>
+    <ellipse cx="36" cy="80" rx="3" ry="10" fill="#fff" opacity=".15"/>
+    ${eyePair(49,71,84,5.6,{...c, eyes:c.eyes||"#2f9e55"},o)}<path d="M55 95 Q60 99 65 95" stroke="#cfd8e6" stroke-width="1.8" fill="none" stroke-linecap="round"/>${blush(40,80,92,5,o)}`,
+  eagle:(c,o,id)=>`<defs>${grad("h"+id,c.main,.15)}</defs><ellipse cx="60" cy="116" rx="28" ry="4.5" fill="#000" opacity=".16"/>
+    <path d="M50 110 l-4 6 M52 111 l0 6 M68 111 l0 6 M70 110 l4 6" stroke="#f2c14e" stroke-width="3" stroke-linecap="round"/>
+    <g class="bd-wingL"><path d="M34 70 C14 66 4 80 6 98 C16 92 22 96 26 100 C30 94 34 96 38 98Z" fill="${shade(c.main,-.1)}" ${c.sw}/><path d="M12 90 l10 4 M16 82 l12 4" stroke="${c.ol}" stroke-width="1.2" opacity=".5"/></g>
+    <g class="bd-wingR"><g ${MIRROR}><path d="M34 70 C14 66 4 80 6 98 C16 92 22 96 26 100 C30 94 34 96 38 98Z" fill="${shade(c.main,-.1)}" ${c.sw}/><path d="M12 90 l10 4 M16 82 l12 4" stroke="${c.ol}" stroke-width="1.2" opacity=".5"/></g></g>
+    <path d="M60 44 C84 44 92 64 90 84 C88 104 76 112 60 112 C44 112 32 104 30 84 C28 64 36 44 60 44Z" fill="url(#h${id})" ${c.sw}/>
+    <path d="M60 22 C80 22 88 36 86 52 C84 64 74 70 60 70 C46 70 36 64 34 52 C32 36 40 22 60 22Z" fill="${c.head||"#ffffff"}" ${c.sw}/>
+    <path d="M38 56 L30 62 L40 62Z M82 56 L90 62 L80 62Z" fill="${c.head||"#ffffff"}" ${c.sw}/>
+    ${eyePair(51,69,46,5,c,o)}<path d="M52 54 Q60 50 68 54 Q68 62 60 66 Q63 60 58 58 Q54 58 52 54Z" fill="#f2c14e" ${c.sw}/>${blush(43,77,57,4,o)}`,
+  firework:(c,o,id)=>{ let sp = ""; for(let i=0;i<10;i++){ const a = i*36*Math.PI/180; const x1 = 60+Math.cos(a)*40, y1 = 64+Math.sin(a)*40, x2 = 60+Math.cos(a)*52, y2 = 64+Math.sin(a)*52; sp += `<path d="M${x1.toFixed(1)} ${y1.toFixed(1)} L${x2.toFixed(1)} ${y2.toFixed(1)}" stroke="${[c.main,c.second,c.accent][i%3]}" stroke-width="3" stroke-linecap="round"/><circle cx="${x2.toFixed(1)}" cy="${y2.toFixed(1)}" r="2.2" fill="${[c.second,c.accent,c.main][i%3]}"/>`; }
+    return `<defs>${grad("h"+id,c.main,.3)}</defs><g class="bd-leaves">${sp}</g>
+    <path d="M60 28 L69 50 L93 52 L75 68 L80 92 L60 80 L40 92 L45 68 L27 52 L51 50Z" fill="url(#h${id})" ${c.sw} stroke-linejoin="round"/>
+    ${eyePair(53,67,62,4.6,c,o)}<path d="M56 70 Q60 74 64 70" stroke="${c.ol}" stroke-width="1.6" fill="none" stroke-linecap="round"/>${blush(47,73,68,3.6,o)}`; },
+  discoball:(c,o,id)=>`<defs><radialGradient id="h${id}" cx=".35" cy=".3" r=".9"><stop offset="0" stop-color="#ffffff"/><stop offset=".5" stop-color="${c.main}"/><stop offset="1" stroke-color="${shade(c.main,-.35)}" stop-color="${shade(c.main,-.35)}"/></radialGradient><clipPath id="dc${id}"><circle cx="60" cy="66" r="36"/></clipPath></defs>
+    <path d="M60 30 V8" stroke="#888" stroke-width="2"/><ellipse cx="60" cy="116" rx="26" ry="4" fill="#000" opacity=".16"/>
+    <circle cx="60" cy="66" r="36" fill="url(#h${id})"/><g clip-path="url(#dc${id})" stroke="${shade(c.main,-.4)}" stroke-width=".8" fill="none" opacity=".7">${[36,44,52,60,68,76,84,92].map(y=>`<path d="M20 ${y} Q60 ${y+(y-66)*.15} 100 ${y}"/>`).join("")}${[30,40,50,60,70,80,90].map(x=>`<path d="M${x} 28 Q${x+(x-60)*.3} 66 ${x} 104"/>`).join("")}</g>
+    <g fill="#fff">${[[44,48],[70,44],[52,82],[80,70],[38,70]].map(([x,y])=>`<rect x="${x}" y="${y}" width="6" height="6" opacity=".85"/>`).join("")}</g>
+    <circle cx="60" cy="66" r="36" fill="none" ${c.sw}/><path d="M42 38 l2 -6 l2 6 l6 2 l-6 2 l-2 6 l-2 -6 l-6 -2Z" fill="#fff"/>
+    ${eyePair(50,70,66,5.4,c,o)}<path d="M55 77 Q60 81 65 77" stroke="${c.ol}" stroke-width="1.8" fill="none" stroke-linecap="round"/>${blush(41,79,74,5,o)}`,
+});
+CUSTOM.hatchling = (c,o,id)=>CUSTOM.chick({...c, shell:true}, o, id);
+CUSTOM.lovebird = (c,o,id)=>CUSTOM.chick({...c, crest:c.crest||shade(c.main,-.15)}, o, id).replace("</svg>","") + `<path d="M86 62 C82 56 76 58 78 63 C79 66 84 68 86 70 C88 68 93 66 94 63 C96 58 90 56 86 62Z" fill="#ff5d8f" stroke="#a8204f" stroke-width="1"/>`;
+
+/* move the spooky and wintry critters to their holidays, add the new ones */
+["pumpkin","ghost","mummy","bat","spider"].forEach(k=>{ BUDDY_SPECIES[k].holiday = "halloween"; BUDDY_SPECIES[k].g = "Holiday"; });
+BUDDY_SPECIES.snowman.holiday = "christmas"; BUDDY_SPECIES.snowman.g = "Holiday";
+delete BUDDY_SPECIES.chick.coats.hatch;
+Object.assign(BUDDY_SPECIES, {
+  turkey:{kind:"c", name:"Turkey", g:"Holiday", holiday:"thanksgiving", top:[60,38], eye:53, neck:72, dx:7, hw:18,
+    coats:{classic:{n:"Turkey", main:"#8a5a3b", second:"#c99a6b", eyes:"#2b1a14", head:"#c9a27a"}, harvest:{n:"Harvest", main:"#a0522d", second:"#e8c39e", eyes:"#2b1a14", head:"#d9b38c", f1:"#d9622b", f2:"#f2c14e", f3:"#7a8f3a"}, white:{n:"Heritage", main:"#efe6da", second:"#ffffff", eyes:"#2b1a14", head:"#f2d9c9", f1:"#c9b8a0", f2:"#efe6da", f3:"#a08870"}}},
+  acorn:{kind:"c", name:"Acorn", g:"Holiday", holiday:"thanksgiving", top:[60,24], eye:80, neck:100, dx:11, hw:38,
+    coats:{classic:{n:"Acorn", main:"#d9a066", eyes:"#2b1a14", cap:"#7a5034"}, golden:{n:"Golden", main:"#f2c14e", eyes:"#5a3a0a", cap:"#8a6a3a"}}},
+  reindeer:M({name:"Reindeer", g:"Holiday", holiday:"christmas", ears:"fawn", tail:"flag", snout:"bear", face:"muzzle", extras:["antlers"], top:[60,27],
+    coats:{rudolph:{n:"Red nose", main:"#a0704a", second:"#f2dcc0", accent:"#e8b8a0", eyes:"#2b1a14", nose:"#e0343c", horn:"#e8cfa8"}, snow:{n:"Snow reindeer", main:"#f4f1ec", second:"#ffffff", accent:"#ffd6e0", eyes:"#4a6fa5", nose:"#ff7a90", horn:"#d9c7a8"}, frost:{n:"Frost", main:"#9cc3e8", second:"#eaf4ff", accent:"#d6e8ff", eyes:"#1a3a6a", nose:"#7fd6ff", horn:"#ffffff"}}}),
+  gingerbread:{kind:"c", name:"Gingerbread", g:"Holiday", holiday:"christmas", top:[60,24], eye:40, neck:58, dx:7, hw:18,
+    coats:{classic:{n:"Gingerbread", main:"#c47a3e", eyes:"#2b1a14", icing:"#ffffff"}, pink:{n:"Pink icing", main:"#c47a3e", eyes:"#2b1a14", icing:"#ffb3c9", b1:"#ff5d8f", b2:"#7fd6ff"}, dark:{n:"Molasses", main:"#7a4a24", eyes:"#1a0f0a", icing:"#fff4e0"}}},
+  egg:{kind:"c", name:"Easter egg", g:"Holiday", holiday:"easter", top:[60,22], eye:72, neck:96, dx:11, hw:34,
+    coats:{pink:{n:"Pink", main:"#ffc2d9", eyes:"#5a1a3a", s1:"#ffffff", s2:"#b5e8ff"}, blue:{n:"Blue", main:"#b5dcff", eyes:"#1a2a4a", s1:"#fff3a8", s2:"#ffffff"}, yellow:{n:"Yellow", main:"#fff0a0", eyes:"#5a3a0a", s1:"#ffb3c9", s2:"#c8f2c2"}, mint:{n:"Mint", main:"#c8f2e1", eyes:"#1a4a3a", s1:"#d7c4ff", s2:"#ffffff"}, lilac:{n:"Lilac", main:"#d7c4ff", eyes:"#3b2a4a", s1:"#fff3a8", s2:"#ffc2d9"}}},
+  hatchling:{kind:"c", name:"Hatchling", g:"Holiday", holiday:"easter", top:[60,44], eye:72, neck:96, dx:12, hw:30,
+    coats:{yellow:{n:"Hatchling", main:"#fff07a", eyes:"#2b2b2b"}, pink:{n:"Pink peep", main:"#ffc2d9", eyes:"#5a1a3a"}, blue:{n:"Blue peep", main:"#bfe3ff", eyes:"#1a2a4a"}}},
+  heart:{kind:"c", name:"Heart", g:"Holiday", holiday:"valentine", top:[60,32], eye:66, neck:92, dx:12, hw:36,
+    coats:{red:{n:"Red", main:"#ff4d6d", eyes:"#3a0a14"}, pink:{n:"Pink", main:"#ff9ec4", eyes:"#5a1a3a"}, lilac:{n:"Lilac", main:"#c9a3ff", eyes:"#3b2a4a"}, candy:{n:"Candy heart", main:"#ffe0ea", eyes:"#a8204f"}}},
+  lovebird:{kind:"c", name:"Lovebird", g:"Holiday", holiday:"valentine", top:[60,44], eye:72, neck:96, dx:12, hw:30,
+    coats:{peach:{n:"Peach-faced", main:"#7fd08a", eyes:"#2b2b2b", crest:"#ff8a65"}, pink:{n:"Pink", main:"#ffb3c9", eyes:"#5a1a3a"}, blue:{n:"Blue", main:"#8fc9ff", eyes:"#1a2a4a"}}},
+  clover:{kind:"c", name:"Lucky clover", g:"Holiday", holiday:"stpatricks", top:[60,30], eye:62, neck:84, dx:7, hw:22,
+    coats:{green:{n:"Clover", main:"#5fbf6a", eyes:"#1a3a1a"}, gold:{n:"Golden clover", main:"#f2c14e", eyes:"#5a3a0a"}, mint:{n:"Mint", main:"#9be7c4", eyes:"#1a4a3a"}}},
+  potogold:{kind:"c", name:"Pot of gold", g:"Holiday", holiday:"stpatricks", top:[60,46], eye:84, neck:104, dx:11, hw:38,
+    coats:{classic:{n:"Pot of gold", main:"#2b2433", eyes:"#5fbf6a"}, green:{n:"Emerald pot", main:"#1f6b3a", eyes:"#f2c14e"}}},
+  eagle:{kind:"c", name:"Bald eagle", g:"Holiday", holiday:"july4", top:[60,24], eye:46, neck:70, dx:9, hw:26,
+    coats:{classic:{n:"Bald eagle", main:"#6b4a2e", eyes:"#f2c14e", head:"#ffffff"}, golden:{n:"Golden eagle", main:"#a0704a", eyes:"#5a3a0a", head:"#e8b86a"}}},
+  firework:{kind:"c", name:"Firework", g:"Holiday", holiday:"july4", top:[60,32], eye:62, neck:84, dx:7, hw:24,
+    coats:{usa:{n:"Red, white & blue", main:"#ffffff", second:"#e0343c", accent:"#3b6fd1", eyes:"#1a2a4a"}, gold:{n:"Gold sparkler", main:"#ffd34d", second:"#ff8a3c", accent:"#ffffff", eyes:"#5a3a0a"}, rainbow:{n:"Rainbow", main:"#ff9ec4", second:"#7fd6ff", accent:"#fff07a", eyes:"#5a1a3a"}}},
+  discoball:{kind:"c", name:"Disco ball", g:"Holiday", holiday:"newyear", top:[60,30], eye:66, neck:100, dx:10, hw:36,
+    coats:{silver:{n:"Silver", main:"#cfd8e6", eyes:"#2b2b3a"}, gold:{n:"Gold", main:"#f2d27a", eyes:"#5a3a0a"}, pink:{n:"Pink", main:"#ffc2e0", eyes:"#5a1a3a"}}},
+  newyearowl:{kind:"c", draw:"owl", name:"Night owl", g:"Holiday", holiday:"newyear", top:[60,30], eye:58, neck:88, dx:13,
+    coats:{midnight:{n:"Midnight", main:"#2b2f5a", second:"#c9d6ff", eyes:"#ffe680", face:"#5a5fa0"}, gold:{n:"Champagne", main:"#d9b45a", second:"#fff3c4", eyes:"#2b2b3a", face:"#f2e0a8"}}},
+});
+
+/* accessories: only during their holidays */
+const ACC_HOLIDAY = {witchhat:"halloween", horns:"halloween", cape:"halloween", halo:"halloween", santahat:"christmas", beanie:"christmas", bell:"christmas", antlers:"christmas", scarf:"thanksgiving", pilgrim:"thanksgiving", leafcrown:"thanksgiving",
+  bow:"valentine", heartband:"valentine", flowercrown:"easter", bunnyears:"easter", flower:"easter", sprout:"easter", tophat:"stpatricks", shamrock:"stpatricks", starhat:"july4", bandana:"july4", sunglasses:"july4",
+  partyhat:"newyear", crown:"newyear", tiara:"newyear", bowtie:"newyear", monocle:"newyear"};
+Object.assign(BUDDY_ACC, {antlers:{n:"Reindeer antlers", c:"#a0704a"}, pilgrim:{n:"Pilgrim hat", c:"#2b2b2b"}, leafcrown:{n:"Leaf crown", c:"#d9622b"}, heartband:{n:"Heart headband", c:"#ff4d6d"}, bunnyears:{n:"Bunny ears", c:"#ffffff"}, tophat:{n:"Leprechaun hat", c:"#2f9e55"}, shamrock:{n:"Shamrock clip", c:"#5fbf6a"}, starhat:{n:"Stars & stripes hat", c:"#3b4fa8"}});
+delete BUDDY_ACC.glasses; delete BUDDY_ACC.headphones;
+Object.keys(BUDDY_ACC).forEach(k=>{ if(k!=="none") BUDDY_ACC[k].holiday = ACC_HOLIDAY[k] || "never"; });
+HOLIDAYS.never = {name:"", month:13};
+const _accSVG = accSVG;
+accSVG = function(kind, C, a){
+  const k = a.hw/34, [tx, ty] = a.top, ol = shade(C,-.45), sw = `stroke="${ol}" stroke-width="${2/k}" stroke-linejoin="round" stroke-linecap="round"`;
+  const g = inner => `<g class="bd-acc" transform="translate(${tx} ${ty}) scale(${k})">${inner}</g>`;
+  switch(kind){
+    case "antlers": return g(`<g stroke="${ol}" stroke-width="5.5" stroke-linecap="round" fill="none"><path d="M-14 4 C-18 -8 -22 -16 -18 -26 M-19 -14 C-26 -16 -30 -20 -30 -26 M-18 -22 C-14 -26 -12 -30 -12 -34 M14 4 C18 -8 22 -16 18 -26 M19 -14 C26 -16 30 -20 30 -26 M18 -22 C14 -26 12 -30 12 -34"/></g><g stroke="${C}" stroke-width="3" stroke-linecap="round" fill="none"><path d="M-14 4 C-18 -8 -22 -16 -18 -26 M-19 -14 C-26 -16 -30 -20 -30 -26 M-18 -22 C-14 -26 -12 -30 -12 -34 M14 4 C18 -8 22 -16 18 -26 M19 -14 C26 -16 30 -20 30 -26 M18 -22 C14 -26 12 -30 12 -34"/></g><path d="M-26 6 Q0 -4 26 6" stroke="#e0343c" stroke-width="3.5" fill="none"/>`);
+    case "pilgrim": return g(`<ellipse cx="0" cy="4" rx="30" ry="6" fill="${C}" ${sw}/><path d="M-17 4 L-14 -24 L14 -24 L17 4Z" fill="${C}" ${sw}/><rect x="-15.5" y="-6" width="31" height="6" fill="#f4ead8"/><rect x="-5" y="-8" width="10" height="10" rx="1" fill="none" stroke="#f2c14e" stroke-width="2.4"/>`);
+    case "leafcrown": return g(`<path d="M-30 9 Q0 -1 30 9" stroke="#7a5034" stroke-width="2.4" fill="none"/>${[-26,-15,-4,7,18,28].map((x,i)=>{ const y = 8 - (1 - Math.abs(x)/30)*8; const col = ["#d9622b","#f2c14e","#a63d2a","#e8823a","#7a8f3a","#d9622b"][i]; return `<path d="M0 0 C-4 -6 -2 -12 4 -14 C6 -8 6 -4 0 0Z" transform="translate(${x} ${y.toFixed(1)}) rotate(${(i-2.5)*14})" fill="${i===0?C:col}" stroke="${shade(col,-.35)}" stroke-width=".8"/>`; }).join("")}`);
+    case "heartband": return g(`<path d="M-28 10 Q-30 -10 0 -12 Q30 -10 28 10" stroke="${shade(C,-.2)}" stroke-width="3" fill="none"/><path d="M-10 -11 Q-14 -22 -16 -28 M10 -11 Q14 -22 16 -28" stroke="#888" stroke-width="1.2" fill="none"/>${[-16,16].map(x=>`<path d="M${x} -24 C${x-8} -30 ${x-7} -38 ${x-2} -37 C${x} -37 ${x} -35 ${x} -34 C${x} -35 ${x+1} -37 ${x+2} -37 C${x+7} -38 ${x+8} -30 ${x} -24Z" fill="${C}" ${sw}/>`).join("")}`);
+    case "bunnyears": return g(`<path d="M-26 10 Q-28 -8 0 -10 Q28 -8 26 10" stroke="#ff9ec4" stroke-width="3.4" fill="none"/>${[-1,1].map(s=>`<path d="M${s*12} -8 C${s*4} -20 ${s*6} -46 ${s*14} -48 C${s*22} -46 ${s*22} -20 ${s*16} -8Z" fill="${C}" ${sw}/><path d="M${s*13} -12 C${s*9} -22 ${s*10} -40 ${s*14} -42 C${s*18} -40 ${s*18} -22 ${s*15.5} -12Z" fill="#ffc2d9"/>`).join("")}`);
+    case "tophat": case "starhat": { const band = kind==="starhat" ? `<rect x="-14" y="-12" width="28" height="9" fill="#ffffff"/><path d="M-14 -9 H14 M-14 -5.5 H14" stroke="#e0343c" stroke-width="2"/>${[-8,0,8].map(x=>`<path d="M${x} -24 l1.2 2.6 2.8 .3 -2.1 1.9 .6 2.8 -2.5 -1.4 -2.5 1.4 .6 -2.8 -2.1 -1.9 2.8 -.3Z" fill="#fff"/>`).join("")}` : `<rect x="-14" y="-10" width="28" height="7" fill="#2b2b2b"/><rect x="-5" y="-11.5" width="10" height="10" rx="1" fill="none" stroke="#f2c14e" stroke-width="2.4"/>`;
+      return g(`<g transform="translate(6 2) rotate(10)"><ellipse cx="0" cy="0" rx="26" ry="5.5" fill="${C}" ${sw}/><path d="M-14 -2 L-15 -34 L15 -34 L14 -2Z" fill="${C}" ${sw}/><ellipse cx="0" cy="-34" rx="15" ry="3.5" fill="${shade(C,.12)}" ${sw}/>${band}${kind==="tophat"?`<path d="M14 -20 C22 -26 28 -18 22 -14 C26 -10 18 -6 16 -12" fill="#5fbf6a" stroke="#2f6b35" stroke-width=".8"/>`:""}</g>`); }
+    case "shamrock": return g(`<g transform="translate(22 8)">${[0,120,240].map(r=>`<path d="M0 0 C-6 -4 -8 -10 -4 -12 C-1 -13 0 -10 0 -9 C0 -10 1 -13 4 -12 C8 -10 6 -4 0 0Z" transform="rotate(${r})" fill="${C}" ${sw}/>`).join("")}<path d="M0 0 Q2 6 6 9" stroke="${ol}" stroke-width="1.4" fill="none"/></g>`);
+  }
+  return _accSVG(kind, C, a);
+};
+
+/* buddy options respect the calendar */
+const _buddyOpts = buddyOpts;
+buddyOpts = function(L){
+  let LL = L; const sp = BUDDY_SPECIES[L.buddy];
+  if(sp && !availNow(sp)){ const base = L.budBase || {}; LL = {...L, buddy: BUDDY_SPECIES[base.buddy] && availNow(BUDDY_SPECIES[base.buddy]) ? base.buddy : "cat", bud:{...(base.bud||{}), acc:(L.bud||{}).acc, accC:(L.bud||{}).accC}}; }
+  const O = _buddyOpts(LL);
+  if(O.acc !== "none" && (!BUDDY_ACC[O.acc] || !holidayOn(BUDDY_ACC[O.acc].holiday))) O.acc = "none";
+  O.species = LL.buddy; return O;
+};
+function effBuddy(L){ const sp = BUDDY_SPECIES[L.buddy]; if(!L.buddy || L.buddy==="none" || !sp) return L.buddy; if(availNow(sp)) return L.buddy; const b = (L.budBase||{}).buddy; return b && BUDDY_SPECIES[b] && availNow(BUDDY_SPECIES[b]) ? b : "cat"; }
+CUSTOM.newyearowl = CUSTOM.owl;
+BUDDY_GROUPS.length = 0; BUDDY_GROUPS.push("Cuddly","Wild","Fantasy","Nature","Winter","Cozy");
+
+/* holiday + seasonal themes */
+Object.assign(PRESETS, {
+  ny_midnight:{g:"Holiday", holiday:"newyear", name:"Midnight sparkle", desc:"Black and gold, glitter and a disco ball", look:{mode:"dark",bg:"#07070c",accent:"#e3c06b",acc2:"#c9d6ff",font:"deco",card:"glass",frame:"stars",fcol:"gold",pattern:"confetti",palpha:18,fx:"glitter",fx2:"fireworks",buddy:"discoball",bud:{coat:"gold",acc:"partyhat",accC:"#e3c06b"},btn:"gradient",bar:"gradient"}},
+  ny_confetti:{g:"Holiday", holiday:"newyear", name:"Countdown", desc:"Confetti, bunting and a party hat", look:{mode:"light",bg:"#fffaf0",accent:"#7b5cff",acc2:"#ff5fb7",font:"playful",card:"sticker",frame:"bunting",fcol:"rainbow",pattern:"confetti",palpha:30,fx:"confetti",buddy:"shiba",bud:{coat:"red",acc:"partyhat"},bar:"rainbow"}},
+  ny_owl:{g:"Holiday", holiday:"newyear", name:"New year, new books", desc:"Midnight blue with a night owl", look:{mode:"dark",bg:"#0b0f2a",accent:"#9fb7ff",acc2:"#ffe680",ombre:"twilight",font:"elegant",card:"frosted",frame:"pearls",fcol:"silver",pattern:"stars",fx:"stars",fx2:"fireworks",buddy:"newyearowl",bud:{coat:"midnight",acc:"bowtie",accC:"#e3c06b"}}},
+  valentine:{g:"Holiday", holiday:"valentine", name:"Valentine", desc:"Love letters and floating hearts", look:{mode:"light",bg:"#fff0f3",accent:"#e63962",acc2:"#ff8fab",ombre:"cherry",font:"script",card:"sticker",frame:"hearts",fcol:"berry",pattern:"hearts",fx:"hearts",buddy:"heart",bud:{coat:"red",acc:"bow"},plant:true,ptype:"rose",pot:"ceramic",flowerC:"red",btn:"pill"}},
+  val_letters:{g:"Holiday", holiday:"valentine", name:"Love letters", desc:"Cream paper, red wax and handwriting", look:{mode:"light",bg:"#fbf3ea",accent:"#b3122f",acc2:"#e8a39b",font:"handwritten",card:"paper",frame:"stitched",fcol:"berry",pattern:"hearts",pcol:"accent",palpha:10,fx:"hearts",buddy:"lovebird",bud:{coat:"peach"},plant:true,ptype:"rose",pot:"bookpot",flowerC:"red"}},
+  val_cupid:{g:"Holiday", holiday:"valentine", name:"Cupid's clouds", desc:"Pink sky, clouds and a heart headband", look:{mode:"light",bg:"#fff4fa",accent:"#ff5d8f",acc2:"#b5dcff",ombre:"candy",font:"bubbly",card:"bubble",frame:"clouds",fcol:"pastel",pattern:"none",fx:"hearts",fx2:"sparkles",buddy:"bunny",bud:{coat:"pink",acc:"heartband"},btn:"pill",bar:"striped"}},
+  sp_lucky:{g:"Holiday", holiday:"stpatricks", name:"Lucky clover", desc:"Shamrock green and a leprechaun hat", look:{mode:"light",bg:"#f1fbf1",accent:"#2f9e55",acc2:"#f2c14e",font:"storybook",card:"round",frame:"leaves",fcol:"forest",pattern:"leaves",pcol:"accent",palpha:12,fx:"clovers",buddy:"clover",bud:{coat:"green",acc:"tophat"}}},
+  sp_gold:{g:"Holiday", holiday:"stpatricks", name:"Pot of gold", desc:"Rainbows and treasure at the end", look:{mode:"dark",bg:"#06180f",accent:"#f2c14e",acc2:"#5fbf6a",ombre:"matcha",font:"fairytale",card:"glass",frame:"rainbow",fcol:"rainbow",pattern:"none",fx:"glitter",fx2:"clovers",buddy:"potogold",bud:{coat:"classic"},bar:"rainbow"}},
+  ea_pastel:{g:"Holiday", holiday:"easter", name:"Easter pastels", desc:"Painted eggs and soft colors", look:{mode:"light",bg:"#fffaf2",accent:"#b07cff",acc2:"#7fd6c4",ombre:"rainbow",font:"soft",card:"bubble",frame:"scallop",fcol:"pastel",pattern:"dots",pcol:"accent",palpha:14,fx:"petals",buddy:"egg",bud:{coat:"pink"},plant:true,ptype:"tulip",pot:"basket",flowerC:"mix",btn:"pill"}},
+  ea_bunny:{g:"Holiday", holiday:"easter", name:"Bunny meadow", desc:"Green grass, tulips and bunny ears", look:{mode:"light",bg:"#f4fbef",accent:"#4fa95a",acc2:"#ff9fc0",font:"cute",card:"round",frame:"flowers",fcol:"pastel",pattern:"flowers",pcol:"accent",palpha:12,fx:"butterflies",buddy:"bunny",bud:{coat:"white",acc:"flowercrown"},plant:true,ptype:"tulip",pot:"terracotta",flowerC:"mix"}},
+  ea_hatch:{g:"Holiday", holiday:"easter", name:"Spring basket", desc:"A fresh little hatchling", look:{mode:"light",bg:"#fffbe6",accent:"#e0a100",acc2:"#8fc9ff",font:"bubbly",card:"sticker",frame:"washi",fcol:"pastel",pattern:"checker",pcol:"accent",palpha:10,fx:"petals",buddy:"hatchling",bud:{coat:"yellow",acc:"bunnyears"},plant:true,ptype:"flower",pot:"basket"}},
+  jl_stars:{g:"Holiday", holiday:"july4", name:"Stars & stripes", desc:"Red, white, blue and a bald eagle", look:{mode:"light",bg:"#f7f9ff",accent:"#b3263a",acc2:"#2b4aa8",font:"blocky",card:"sticker",frame:"bunting",fcol:"custom",fc1:"#b3263a",fc2:"#ffffff",fc3:"#2b4aa8",pattern:"stars",pcol:"acc2",palpha:12,fx:"confetti",buddy:"eagle",bud:{coat:"classic",acc:"starhat"},bar:"striped"}},
+  jl_fireworks:{g:"Holiday", holiday:"july4", name:"Fireworks night", desc:"A dark sky full of fireworks", look:{mode:"dark",bg:"#050814",accent:"#ff4d6d",acc2:"#4fc3f7",ombre:"twilight",font:"retro",card:"glass",frame:"none",pattern:"none",fx:"fireworks",fx2:"stars",buddy:"firework",bud:{coat:"usa"},bar:"gradient"}},
+  jl_picnic:{g:"Holiday", holiday:"july4", name:"Backyard picnic", desc:"Red gingham and summer sunglasses", look:{mode:"light",bg:"#fffaf3",accent:"#d6323a",acc2:"#3b6fd1",font:"cozy",card:"paper",frame:"bunting",fcol:"custom",fc1:"#d6323a",fc2:"#ffffff",fc3:"#3b6fd1",pattern:"checker",pcol:"accent",palpha:14,fx:"butterflies",buddy:"dog",bud:{coat:"golden",acc:"bandana",accC:"#d6323a"}}},
+  tg_harvest:{g:"Holiday", holiday:"thanksgiving", name:"Harvest table", desc:"Warm wood, autumn leaves and a turkey", look:{mode:"dark",bg:"#1c0f08",accent:"#e8823a",acc2:"#a63d2a",ombre:"ember",font:"rustic",card:"paper",frame:"leaves",fcol:"autumn",pattern:"wood",fx:"leaves",buddy:"turkey",bud:{coat:"harvest",acc:"pilgrim"},plant:true,ptype:"pumpkin",pot:"crate"}},
+  tg_pie:{g:"Holiday", holiday:"thanksgiving", name:"Pumpkin pie", desc:"Cream, cinnamon and a little acorn", look:{mode:"light",bg:"#fbf3e6",accent:"#c9682a",acc2:"#8a5a3b",font:"cozy",card:"embossed",frame:"stitched",fcol:"autumn",pattern:"plaid",pcol:"accent",palpha:10,fx:"leaves",buddy:"acorn",bud:{coat:"classic",acc:"leafcrown"},plant:true,ptype:"pumpkin",pot:"basket"}},
+  tg_grateful:{g:"Holiday", holiday:"thanksgiving", name:"Grateful", desc:"Golden hour and a cozy scarf", look:{mode:"dark",bg:"#1a1208",accent:"#f2c14e",acc2:"#d9622b",ombre:"golden",font:"academia",card:"glass",frame:"vines",fcol:"autumn",pattern:"leaves",pcol:"accent",palpha:8,fx:"leaves",fx2:"fireflies",buddy:"fox",bud:{coat:"red",acc:"scarf",accC:"#e8a33d"}}},
+  holiday:{g:"Holiday", holiday:"christmas", name:"Holiday", desc:"Red, green, gold and twinkle lights", look:{mode:"dark",bg:"#0d1a12",accent:"#e0343c",acc2:"#2f9e55",font:"storybook",card:"paper",frame:"lights",fcol:"christmas",pattern:"snowflakes",pcol:"accent",palpha:10,fx:"snowflakes",buddy:"reindeer",bud:{coat:"rudolph",acc:"bell"},plant:true,ptype:"cherry",pot:"glazed",potC:"#b3262e",flowerC:"red",bar:"striped"}},
+  xm_candycane:{g:"Holiday", holiday:"christmas", name:"Candy cane", desc:"Peppermint stripes and a gingerbread friend", look:{mode:"light",bg:"#fff7f7",accent:"#d6323a",acc2:"#2f9e55",font:"bubbly",card:"sticker",frame:"candy",fcol:"christmas",pattern:"stripes",pcol:"accent",palpha:8,fx:"snow",buddy:"gingerbread",bud:{coat:"classic",acc:"santahat"},btn:"pill",bar:"striped"}},
+  xm_silent:{g:"Holiday", holiday:"christmas", name:"Silent night", desc:"Navy sky, falling snow and a snowman", look:{mode:"dark",bg:"#081226",accent:"#cfe0ff",acc2:"#f2c14e",ombre:"frost",font:"elegant",card:"frosted",frame:"snow",fcol:"silver",pattern:"stars",fx:"snow",fx2:"stars",buddy:"snowman",bud:{coat:"classic",acc:"beanie",accC:"#b3262e"}}},
+});
+["halloween","pastelgoth","witchy","graveyard","vampire"].forEach(k=>{ if(PRESETS[k]){ PRESETS[k].g = "Holiday"; PRESETS[k].holiday = "halloween"; } });
+PRESETS.halloween.look.fx2 = "embers";
+({winter:"winter", spring:"spring", sakura:"spring", summer:"summer", autumn:"autumn"}) && Object.entries({winter:"winter", spring:"spring", sakura:"spring", summer:"summer", autumn:"autumn"}).forEach(([k,s])=>{ if(PRESETS[k]){ PRESETS[k].season = s; PRESETS[k].g = "Seasonal"; } });
+Object.values(PRESETS).forEach(p=>{ if(!p.holiday && p.look.bud) p.look.bud = {...p.look.bud, acc:"none"}; if(!p.holiday && BUDDY_SPECIES[p.look.buddy]?.holiday) p.look.buddy = "cat"; });
+PRESETS.forest.look.buddy = "mushroom"; PRESETS.fairy.look.buddy = "mushroom";
+const _pg = PRESET_GROUPS.slice(); PRESET_GROUPS.length = 0; PRESET_GROUPS.push("Holiday", ..._pg.filter(g=>g!=="Spooky"));
+
+/* holiday-only effects, patterns and frames */
+EFFECTS.fireworks = "Fireworks";
+const FX_HOLIDAY = {bats:"halloween", ghosts:"halloween", pumpkins:"halloween", fireworks:["july4","newyear"]};
+const PAT_HOLIDAY = {bats:"halloween", cobweb:"halloween"};
+const FRAME_HOLIDAY = {cobweb:"halloween"};
+const onAny = h => !h || (Array.isArray(h) ? h.some(x=>holidayOn(x)) : holidayOn(h));
 /* ---------- THE SHELF PLANT: grows with the days you water it ---------- */
 const PLANT_STAGES = [["Seed",0],["Sprout",1],["Seedling",3],["Little plant",5],["Growing",8],["Leafy",12],["Bushy",16],["Budding",21],["First bloom",28],["Blooming",36],["Full bloom",45],["Bouquet",60],["Overflowing",80],["Legendary",100]];
 const PLANT_TYPES = {flower:"Daisies", rose:"Roses", tulip:"Tulips", sunflower:"Sunflowers", lavender:"Lavender", cherry:"Cherry blossom bonsai", succulent:"Succulent", cactus:"Cactus", fern:"Fern", monstera:"Monstera", moonflower:"Moonflower", pumpkin:"Pumpkin vine"};
@@ -4459,14 +5005,27 @@ let WALL = {pid:null, src:null, out:null, key:""};
 function seasonNow(){ const d = new Date(), m = d.getMonth()+1, day = d.getDate(); if(m===10) return "halloween"; if(m===12) return "winter"; if(m===2 && day<=14) return "valentine"; if(m===11) return "autumn"; if(m===3 || m===4) return "spring"; return ""; }
 function effLook(){
   const L = look(), E = {...L, bud:{...(L.bud||{})}};
-  if(L.seasonal){ const s = seasonNow();
-    if(s==="halloween"){ if(E.fx2==="none" && E.fx!=="bats") E.fx2 = "bats"; if(E.buddy!=="none" && (!E.bud.acc || E.bud.acc==="none") && new Date().getDate()>=20) E.bud.acc = "witchhat"; }
-    if(s==="winter"){ if(E.fx2==="none" && !["snow","snowflakes"].includes(E.fx)) E.fx2 = "snow"; if(E.buddy!=="none" && (!E.bud.acc || E.bud.acc==="none") && new Date().getDate()>=15) E.bud.acc = "santahat"; }
-    if(s==="valentine" && E.fx2==="none" && E.fx!=="hearts") E.fx2 = "hearts";
+  ["fx","fx2"].forEach(k=>{ if(!onAny(FX_HOLIDAY[E[k]])) E[k] = "none"; });
+  if(!onAny(PAT_HOLIDAY[E.pattern])) E.pattern = "none";
+  if(!onAny(FRAME_HOLIDAY[E.frame])) E.frame = "none";
+  if(L.seasonal && E.fx2 === "none"){
+    const auto = {halloween:"bats", christmas:"snow", valentine:"hearts", stpatricks:"clovers", july4:"fireworks", newyear:"fireworks", thanksgiving:"leaves", easter:"petals"};
+    const h = activeHolidays().find(k=>auto[k] && E.fx !== auto[k]); if(h) E.fx2 = auto[h];
   }
   return E;
 }
+function holidayRevert(){
+  const p = prof(); if(!p) return; const L = look(); const pr = PRESETS[L.preset];
+  if(pr && pr.holiday && !holidayOn(pr.holiday)){
+    const back = p.lookBeforeHoliday ? {...p.lookBeforeHoliday, preset:""} : {...presetLook(PRESETS.classic.look), preset:"classic"};
+    p.look = back; delete p.lookBeforeHoliday; saveNow(); setTimeout(()=>toast(`${HOLIDAYS[pr.holiday].name} is over, so your usual look is back`), 1500); return true;
+  }
+  const sp = BUDDY_SPECIES[L.buddy];
+  if(sp && sp.holiday && !holidayOn(sp.holiday)){ const base = L.budBase && BUDDY_SPECIES[L.budBase.buddy] && !BUDDY_SPECIES[L.budBase.buddy].holiday ? L.budBase : {buddy:"cat", bud:{}}; p.look = {...L, buddy:base.buddy, bud:{...(base.bud||{})}}; delete p.look.budBase; saveNow(); return true; }
+  return false;
+}
 function applyDecor(){
+  if(holidayRevert()){ applyTheme(); return; }
   const L = look(), E = effLook(), R = document.documentElement, st = R.style;
   const v = k => st.getPropertyValue(k).trim();
   const bg = v("--bg"), dark = R.dataset.theme === "dark";
@@ -4604,8 +5163,8 @@ function layer(id){ let el = document.getElementById(id); if(!el){ el = document
 /* ---- moving effects ---- */
 const FX_EMOJI = {petals:["🌸","🌸","💮"], leaves:["🍂","🍁","🍃"], hearts:["💗","💕","🤍","💖"], butterflies:["🦋"], feathers:["🪶"], bats:["🦇"], ghosts:["👻"], pumpkins:["🎃"], candy:["🍬","🍭","🍫"], clovers:["🍀","☘️"], books:["📚","📖","📕"]};
 const FX_GLYPH = {notes:["♪","♫","♬"], snowflakes:["❄","❅","❆"], sparkles:["✦","✧","⋆"]};
-const FX_MOVE = {petals:"fall", leaves:"fall", snow:"fall", snowflakes:"fall", rain:"rain", hearts:"rise", bubbles:"rise", embers:"rise", notes:"rise", ghosts:"rise", stars:"twinkle", glitter:"twinkle", sparkles:"twinkle", fireflies:"drift", butterflies:"flutter", bats:"flutter", feathers:"fall", dandelion:"float", confetti:"fall", pumpkins:"fall", candy:"fall", clovers:"fall", books:"flutter", shooting:"shoot", aurora:"aurora", fog:"fog"};
-const FX_N = {petals:16, leaves:14, snow:42, snowflakes:16, stars:40, shooting:3, fireflies:18, sparkles:22, glitter:46, hearts:14, rain:55, bubbles:18, confetti:40, butterflies:7, dandelion:12, feathers:9, embers:26, notes:14, bats:8, ghosts:7, pumpkins:10, candy:12, clovers:12, aurora:3, fog:4, books:6};
+const FX_MOVE = {fireworks:"burst", petals:"fall", leaves:"fall", snow:"fall", snowflakes:"fall", rain:"rain", hearts:"rise", bubbles:"rise", embers:"rise", notes:"rise", ghosts:"rise", stars:"twinkle", glitter:"twinkle", sparkles:"twinkle", fireflies:"drift", butterflies:"flutter", bats:"flutter", feathers:"fall", dandelion:"float", confetti:"fall", pumpkins:"fall", candy:"fall", clovers:"fall", books:"flutter", shooting:"shoot", aurora:"aurora", fog:"fog"};
+const FX_N = {fireworks:7, petals:16, leaves:14, snow:42, snowflakes:16, stars:40, shooting:3, fireflies:18, sparkles:22, glitter:46, hearts:14, rain:55, bubbles:18, confetti:40, butterflies:7, dandelion:12, feathers:9, embers:26, notes:14, bats:8, ghosts:7, pumpkins:10, candy:12, clovers:12, aurora:3, fog:4, books:6};
 function drawFx(L){
   const el = layer("fx-layer");
   const sig = JSON.stringify([L.fx, L.fx2, L.fxn, L.fxs, reduceMotion()]); if(el.dataset.sig === sig) return; el.dataset.sig = sig;
@@ -4622,6 +5181,7 @@ function drawFx(L){
       if(FX_EMOJI[kind]) ch = FX_EMOJI[kind][i % FX_EMOJI[kind].length];
       else if(FX_GLYPH[kind]) { ch = FX_GLYPH[kind][i % FX_GLYPH[kind].length]; style += `;color:${kind==="snowflakes"?"#dff1ff":cols[i%2]}`; }
       else if(kind === "confetti" || kind === "glitter") style += `;background:${cols[i % cols.length]}`;
+      else if(kind === "fireworks"){ const fc = ["#ff4d6d","#ffd34d","#4fc3f7","#ffffff","#9b7cff","#5ee08a"][i%6]; style += `;--fc:${fc};top:${8+Math.random()*45}%`; ch = "<b></b>"; }
       else if(kind === "aurora") style += `;--c1:${cols[i%2]};--c2:${cols[(i+3)%cols.length]};top:${-10 + i*12}%;left:-20%`;
       else if(kind === "dandelion") ch = `<svg viewBox="0 0 20 30" width="16" height="24"><path d="M10 12 V29" stroke="currentColor" stroke-width="1"/>${[...Array(9)].map((_,j)=>`<path d="M10 12 L${10+Math.cos(j/9*Math.PI*2)*8} ${12+Math.sin(j/9*Math.PI*2)*8}" stroke="currentColor" stroke-width=".7"/>`).join("")}</svg>`;
       html += `<i class="fx fx-${kind} mv-${mv}" style="${style}">${ch}</i>`;
@@ -4648,7 +5208,7 @@ function buddyLine(){
     favs.length ? `${favs[Math.floor(Math.random()*favs.length)].c.name} is one of your favorites, right?` : null,
     st && !st.days.includes(dayKey()) ? `Don't forget to water ${st.name||"the plant"} today! 💧` : null,
     st && plantStreak(st) >= 3 ? `${plantStreak(st)} days of watering in a row. The plant loves you!` : null,
-    season==="halloween" ? "Boo! Did I scare you? 🎃" : null, season==="winter" ? "Brr! Perfect weather for a blanket and a book." : null, season==="valentine" ? "Happy almost Valentine's! 💌" : null,
+    ...activeHolidays().map(h=>({halloween:"Boo! Did I scare you? 🎃", christmas:"Cozy blanket, hot cocoa and a good book. Perfect December. 🎄", valentine:"Happy Valentine's month! Who's your favorite couple on the shelf? 💌", thanksgiving:"I'm thankful for you (and your shelf)! 🦃", easter:"Happy Easter season! Found any eggs yet? 🐣", stpatricks:"Feeling lucky? 🍀", july4:"Happy Fourth! Fireworks and a good story tonight? 🎆", newyear:"New year, new stories to start! 🎉"})[h]),
     "Remember to drink some water between chapters!", "That cover over there is really pretty.", me ? `${me} is here for you!` : null,
   ].filter(Boolean);
   return opts[Math.floor(Math.random()*opts.length)];
@@ -4657,13 +5217,13 @@ function budAsleep(){ const h = new Date().getHours(); return (h >= 23 || h < 6)
 function drawBuddy(L){
   let el = document.getElementById("buddy");
   if(!L.buddy || L.buddy === "none" || !BUDDY_SPECIES[L.buddy]){ if(el){ clearInterval(el._idle); el.remove(); } return; }
-  const O = buddyOpts(L), size = BUD_SIZES[(L.bud||{}).size] || BUD_SIZES.m;
+  const O = buddyOpts(L), size = BUD_SIZES[(L.bud||{}).size] || BUD_SIZES.m, SP = O.species;
   const mood = budState.mood || (budAsleep() ? "sleep" : "");
-  const sig = JSON.stringify([L.buddy, O.coatKey, O.c, O.eyes, O.acc, O.accC, O.blush, size, mood]);
+  const sig = JSON.stringify([SP, O.coatKey, O.c, O.eyes, O.acc, O.accC, O.blush, size, mood]);
   if(!el){ el = document.createElement("div"); el.id = "buddy"; document.body.appendChild(el); el.innerHTML = `<div class="bud-say"></div><div class="bud-body"></div><div class="bud-name"></div>`; wireBuddy(el); }
-  el.className = `buddy b-${L.buddy} ${mood==="sleep"?"asleep":""}`; el.style.width = el.style.height = size + "px";
+  el.className = `buddy b-${SP} ${mood==="sleep"?"asleep":""}`; el.style.width = el.style.height = size + "px";
   el.querySelector(".bud-name").textContent = (L.bud||{}).showName ? budName() : "";
-  if(el.dataset.sig !== sig){ el.dataset.sig = sig; el.querySelector(".bud-body").innerHTML = buddySVG(L.buddy, O.coatKey, {colors:(L.bud||{}).custom, eyes:O.eyes, acc:O.acc, accC:O.accC, blush:O.blush, mood}) + (mood==="sleep" ? `<span class="zzz">z<b>z</b><i>z</i></span>` : ""); }
+  if(el.dataset.sig !== sig){ el.dataset.sig = sig; el.querySelector(".bud-body").innerHTML = buddySVG(SP, O.coatKey, {colors:(L.bud||{}).custom, eyes:O.eyes, acc:O.acc, accC:O.accC, blush:O.blush, mood}) + (mood==="sleep" ? `<span class="zzz">z<b>z</b><i>z</i></span>` : ""); }
   const pos = (()=>{ try{ return JSON.parse(localStorage.getItem("shelf:buddy")||"null"); }catch(e){ return null; } })();
   if(pos){ el.style.left = Math.min(innerWidth-size, pos.x)+"px"; el.style.top = Math.min(innerHeight-size-20, pos.y)+"px"; el.style.right = "auto"; el.style.bottom = "auto"; }
   clearInterval(el._idle);
@@ -4780,17 +5340,24 @@ function renderLook(){
   const slider = (id, min, max, val, lab, unit="") => `<label class="sl"><span>${lab}</span><input type="range" id="${id}" min="${min}" max="${max}" value="${val}"><b id="${id}-v">${val}${unit}</b></label>`;
   const sw = (key, list, cur) => `<div class="swatch-row">${Object.entries(list).filter(([k])=>k!=="custom").map(([k,v])=>`<button class="pal ${k===cur?"on":""}" data-k="${key}" data-v="${k}" title="${esc(v.name)}"><span class="pal-c" style="background:${v.bg ? `linear-gradient(135deg, ${v.bg} 55%, ${v.acc} 55%)` : v.d ? `linear-gradient(135deg, ${(look().mode==="light"?v.l:v.d).join(",")})` : "var(--bg2)"}"></span><span class="pal-n">${esc(v.name)}</span></button>`).join("")}</div>`;
   const mine = p.myThemes || [];
-  const sp = BUDDY_SPECIES[L.buddy];
-  const O = sp ? buddyOpts(L) : null;
+  const O = BUDDY_SPECIES[L.buddy] ? buddyOpts(L) : null;
+  const sp = O ? BUDDY_SPECIES[O.species] : null, SPK = O ? O.species : "none";
+  const hol = activeHolidays().filter(h=>h!=="never");
+  const holLabel = hol.map(h=>`${HOLIDAYS[h].icon} ${HOLIDAYS[h].name}`).join(" + ");
+  const okP = x => availNow(x);
+  const avail = (obj, map) => Object.fromEntries(Object.entries(obj).filter(([k])=>onAny(map[k])));
+  const FXA = avail(EFFECTS, FX_HOLIDAY), PATA = avail(PATTERNS, PAT_HOLIDAY), FRA = avail(FRAMES, FRAME_HOLIDAY);
+  const accA = Object.entries(BUDDY_ACC).filter(([k,a])=>k==="none" || holidayOn(a.holiday));
 
   const pg = page(`<div class="page-head"><button class="icon-btn" id="lk-back">${IC.back}</button><h2 class="display">Appearance</h2></div>
   <div class="wrap lk">
   ${grp("presets", "Theme presets", ()=>`
     <div class="lk-tools"><button class="btn" id="lk-rand">🎲 Surprise me</button><button class="btn" id="lk-save">＋ Save this look</button><button class="btn" id="lk-share">Share code</button><button class="btn" id="lk-use">Use a code</button></div>
     <label class="lk-check"><input type="checkbox" id="lk-keep" ${L.keepBud?"checked":""}> Keep my buddy and plant when I pick a preset</label>
-    <div class="chips lk-filter">${["All", ...(mine.length?["My themes"]:[]), ...PRESET_GROUPS].map(g=>`<button class="chip ${presetFilter===g?"on":""}" data-pf="${g}">${g}</button>`).join("")}</div>
+    <div class="chips lk-filter">${["All", ...(mine.length?["My themes"]:[]), ...PRESET_GROUPS.filter(g=>Object.values(PRESETS).some(x=>x.g===g && okP(x)))].map(g=>`<button class="chip ${presetFilter===g?"on":""}" data-pf="${g}">${g==="Holiday" ? (hol.map(h=>HOLIDAYS[h].icon).join("")+" "+(hol.length===1?HOLIDAYS[hol[0]].name:"Holiday")) : g}</button>`).join("")}</div>
+    ${hol.length ? `<div class="hol-note">${holLabel} themes, critters and accessories are here until ${holidayUntil(hol[hol.length-1])}. When the holiday ends, your usual look comes back on its own.</div>` : ""}
     <div class="preset-grid">${presetFilter==="My themes" || (presetFilter==="All" && mine.length) ? mine.map((t,i)=>presetCard("my:"+i, t.name, "Your saved look", t.look, false).replace("</button>",`<span class="pv-x" data-del="${i}">✕</span></button>`)).join("") : ""}
-    ${presetFilter==="My themes" ? "" : Object.entries(PRESETS).filter(([,x])=>presetFilter==="All" || x.g===presetFilter).map(([k,x])=>presetCard(k, x.name, x.desc, {...LOOK_DEFAULT, ...x.look}, L.preset===k)).join("")}</div>`, `${Object.keys(PRESETS).length} looks`)}
+    ${presetFilter==="My themes" ? "" : Object.entries(PRESETS).filter(([,x])=>okP(x) && (presetFilter==="All" || x.g===presetFilter)).sort((a,b)=>(b[1].holiday?1:0)-(a[1].holiday?1:0)).map(([k,x])=>presetCard(k, x.name, x.desc, {...LOOK_DEFAULT, ...x.look}, L.preset===k)).join("")}</div>`, `${Object.keys(PRESETS).length} looks`)}
 
   ${grp("colors", "Colors", ()=>`
     <div class="b-label" style="margin-top:0">Mode</div>${seg("lk-mode", {dark:"Dark", light:"Light", auto:"Match my phone"}, L.mode)}
@@ -4824,36 +5391,37 @@ function renderLook(){
     <div class="b-label">Progress bars</div>${seg("lk-bar", BAR_STYLES, L.bar)}`, CARD_STYLES[L.card])}
 
   ${grp("frame", "Frame & borders", ()=>`
-    ${seg("lk-frame", FRAMES, L.frame)}
+    ${seg("lk-frame", FRA, L.frame)}
     <div class="b-label">Frame colors</div><div class="fcol-grid">${Object.entries(FRAME_COLORS).map(([k,v])=>{ const cs = k==="theme" ? [getComputedStyle(document.documentElement).getPropertyValue("--acc"), getComputedStyle(document.documentElement).getPropertyValue("--acc2")] : k==="custom" ? [L.fc1||"#ff7eb3", L.fc2||"#7fd6ff", L.fc3||"#ffd34d"] : v.c; return `<button class="fcol ${L.fcol===k?"on":""}" data-v="${k}"><span>${cs.map(c=>`<i style="background:${c}"></i>`).join("")}</span>${v.name}</button>`; }).join("")}</div>
     ${L.fcol==="custom"?`<div class="color-row"><label>Color 1<input type="color" id="lk-fc1" value="${L.fc1||"#ff7eb3"}"></label><label>Color 2<input type="color" id="lk-fc2" value="${L.fc2||"#7fd6ff"}"></label><label>Color 3<input type="color" id="lk-fc3" value="${L.fc3||"#ffd34d"}"></label></div>`:""}
     <div class="b-label">Thickness</div>${seg("lk-fthick", {sm:"Thin", md:"Normal", lg:"Bold"}, L.fthick)}`, FRAMES[L.frame])}
 
   ${grp("pattern", "Background pattern", ()=>`
-    ${seg("lk-pattern", PATTERNS, L.pattern)}
+    ${seg("lk-pattern", PATA, L.pattern)}
     <div class="b-label">Pattern color</div>${seg("lk-pcol", {line:"Soft", accent:"Accent", acc2:"Second accent", custom:"My own"}, L.pcol)}
     ${L.pcol==="custom"?`<div class="color-row"><label>Pattern<input type="color" id="lk-pHex" value="${L.pHex||"#ff7eb3"}"></label></div>`:""}
     ${slider("lk-palpha", 5, 100, L.palpha, "Strength", "%")}
     <div class="b-label">Size</div>${seg("lk-psize", {sm:"Small", md:"Medium", lg:"Large"}, L.psize)}`, PATTERNS[L.pattern])}
 
   ${grp("fx", "Moving effects", ()=>`
-    ${seg("lk-fx", EFFECTS, L.fx)}
-    <div class="b-label">Add a second effect</div>${seg("lk-fx2", EFFECTS, L.fx2)}
+    ${seg("lk-fx", FXA, L.fx)}
+    <div class="b-label">Add a second effect</div>${seg("lk-fx2", FXA, L.fx2)}
     <div class="b-label">How many</div>${seg("lk-fxn", {few:"A few", some:"Some", lots:"Lots"}, L.fxn)}
     <div class="b-label">Speed</div>${seg("lk-fxs", {slow:"Slow", md:"Normal", fast:"Fast"}, L.fxs)}
     <div style="color:var(--dim);font-size:12px;margin-top:8px">Effects float in the background and never get in the way of tapping.</div>`, [EFFECTS[L.fx], L.fx2!=="none"?EFFECTS[L.fx2]:""].filter(x=>x&&x!=="None").join(" + ") || "None")}
 
   ${grp("buddy", "Shelf buddy", ()=>`
-    ${sp ? `<div class="bud-hero"><div class="bud-hero-art">${buddySVG(L.buddy, O.coatKey, {colors:B.custom, eyes:O.eyes, acc:O.acc, accC:O.accC, blush:O.blush})}</div><div><div class="bud-hero-n">${esc(B.name || sp.name)}</div><div style="font-size:12px;color:var(--dim)">${esc(sp.name)} · ${esc(sp.coats[O.coatKey].n)}</div><div style="font-size:12px;color:var(--mut);margin-top:6px">Tap to say hi, double tap to spin, hold for a pat, drag to move.</div></div></div>` : ""}
+    ${sp ? `<div class="bud-hero"><div class="bud-hero-art">${buddySVG(SPK, O.coatKey, {colors:B.custom, eyes:O.eyes, acc:O.acc, accC:O.accC, blush:O.blush})}</div><div><div class="bud-hero-n">${esc(B.name || sp.name)}</div><div style="font-size:12px;color:var(--dim)">${esc(sp.name)} · ${esc(sp.coats[O.coatKey].n)}</div><div style="font-size:12px;color:var(--mut);margin-top:6px">Tap to say hi, double tap to spin, hold for a pat, drag to move.</div></div></div>` : ""}
+    ${Object.values(BUDDY_SPECIES).some(s=>s.holiday && availNow(s)) ? `<div class="b-label">${holLabel} friends <span style="font-weight:500;text-transform:none;letter-spacing:0">· here until ${holidayUntil(hol[hol.length-1])}</span></div><div class="buddy-grid hol">${Object.entries(BUDDY_SPECIES).filter(([,s])=>s.holiday && availNow(s)).map(([k,s])=>`<button class="buddy-opt ${SPK===k?"on":""}" data-v="${k}">${buddySVG(k, Object.keys(s.coats)[0])}<span>${s.name}</span></button>`).join("")}</div><div class="b-label">Everyday friends</div>` : ""}
     <div class="chips lk-filter">${["All", ...BUDDY_GROUPS].map(g=>`<button class="chip ${budFilter===g?"on":""}" data-bf="${g}">${g}</button>`).join("")}</div>
-    <div class="buddy-grid"><button class="buddy-opt ${L.buddy==="none"?"on":""}" data-v="none"><span class="bo-none">—</span><span>None</span></button>${Object.entries(BUDDY_SPECIES).filter(([,s])=>budFilter==="All"||s.g===budFilter).map(([k,s])=>`<button class="buddy-opt ${L.buddy===k?"on":""}" data-v="${k}">${buddySVG(k, Object.keys(s.coats)[0])}<span>${s.name}</span></button>`).join("")}</div>
+    <div class="buddy-grid"><button class="buddy-opt ${L.buddy==="none"?"on":""}" data-v="none"><span class="bo-none">—</span><span>None</span></button>${Object.entries(BUDDY_SPECIES).filter(([,s])=>!s.holiday && (budFilter==="All"||s.g===budFilter)).map(([k,s])=>`<button class="buddy-opt ${SPK===k?"on":""}" data-v="${k}">${buddySVG(k, Object.keys(s.coats)[0])}<span>${s.name}</span></button>`).join("")}</div>
     ${sp ? `
-    <div class="b-label">Look</div><div class="coat-grid">${Object.entries(sp.coats).map(([k,c])=>`<button class="coat ${O.coatKey===k&&!B.custom?"on":""}" data-coat="${k}">${buddySVG(L.buddy, k, {})}<span>${esc(c.n)}</span></button>`).join("")}</div>
+    <div class="b-label">Look</div><div class="coat-grid">${Object.entries(sp.coats).map(([k,c])=>`<button class="coat ${O.coatKey===k&&!B.custom?"on":""}" data-coat="${k}">${buddySVG(SPK, k, {})}<span>${esc(c.n)}</span></button>`).join("")}</div>
     <div class="b-label">Mix your own colors</div>
     <div class="color-row"><label>Main<input type="color" data-cc="main" value="${O.c.main}"></label><label>Second<input type="color" data-cc="second" value="${O.c.second||"#ffffff"}"></label><label>Details<input type="color" data-cc="accent" value="${O.c.accent||"#ffb3c7"}"></label><label>Eyes<input type="color" data-cc="eyes" value="${O.c.eyes||"#3a2a4a"}"></label></div>
     ${B.custom?`<div class="row-btns"><button class="btn" id="bd-cc-x">Back to the original colors</button></div>`:""}
     <div class="b-label">Eyes</div>${seg("bd-eyes", {round:"Round", sparkle:"Sparkly", lashes:"Lashes", sleepy:"Sleepy", dot:"Tiny dots", happy:"Smiley"}, O.eyes)}
-    <div class="b-label">Accessory</div><div class="acc-grid">${Object.entries(BUDDY_ACC).map(([k,a])=>`<button class="acc-opt ${O.acc===k?"on":""}" data-acc="${k}">${k==="none"?`<span class="bo-none">—</span>`:buddySVG(L.buddy, O.coatKey, {colors:B.custom, acc:k, accC: O.acc===k ? O.accC : a.c})}<span>${a.n}</span></button>`).join("")}</div>
+    ${accA.length > 1 ? `<div class="b-label">${holLabel} accessories</div><div class="acc-grid">${accA.map(([k,a])=>`<button class="acc-opt ${O.acc===k?"on":""}" data-acc="${k}">${k==="none"?`<span class="bo-none">—</span>`:buddySVG(SPK, O.coatKey, {colors:B.custom, acc:k, accC: O.acc===k ? O.accC : a.c})}<span>${a.n}</span></button>`).join("")}</div><div style="color:var(--dim);font-size:12px;margin-top:6px">Holiday accessories only stay for the holiday, then your buddy goes back to normal.</div>` : `<div style="color:var(--dim);font-size:12px;margin-top:10px">Holiday accessories show up on their own during holidays, like a witch hat in October or a Santa hat in December.</div>`}
     ${O.acc!=="none"?`<div class="color-row"><label>Accessory color<input type="color" id="bd-accC" value="${O.accC}"></label></div>`:""}
     <div class="b-label">Name</div><input class="lk-input" id="bd-name" value="${esc(B.name||"")}" placeholder="Give your buddy a name" maxlength="20">
     <label class="lk-check"><input type="checkbox" id="bd-showName" ${B.showName?"checked":""}> Show the name under your buddy</label>
@@ -4899,12 +5467,14 @@ function renderLook(){
     if(e.target.dataset.del !== undefined){ p.myThemes.splice(+e.target.dataset.del, 1); saveNow(); redo(); return; }
     const k = b.dataset.p; let nl, nm;
     if(k.startsWith("my:")){ const t = mine[+k.slice(3)]; nl = presetLook(t.look); nm = t.name; }
-    else { nl = presetLook(PRESETS[k].look); nl.preset = k; nm = PRESETS[k].name; }
+    else { nl = presetLook(PRESETS[k].look); nl.preset = k; nm = PRESETS[k].name;
+      if(PRESETS[k].holiday){ if(!PRESETS[look().preset]?.holiday) p.lookBeforeHoliday = {...look()}; if(BUDDY_SPECIES[nl.buddy]?.holiday && !BUDDY_SPECIES[look().buddy]?.holiday) nl.budBase = {buddy:look().buddy, bud:look().bud}; }
+      else delete p.lookBeforeHoliday; }
     p.look = nl; S().theme = nl.mode; saveNow(); applyTheme(); redo(); toast(`${nm} applied`); });
   const kp = $("#lk-keep",pg); if(kp) kp.onchange = e=>setLook("keepBud", e.target.checked);
   const rnd = a => a[Math.floor(Math.random()*a.length)];
-  const rb = $("#lk-rand",pg); if(rb) rb.onclick = ()=>{ const base = PRESETS[rnd(Object.keys(PRESETS))].look; const sps = Object.keys(BUDDY_SPECIES), spk = rnd(sps);
-    const nl = presetLook({...base, frame:rnd(Object.keys(FRAMES)), fcol:rnd(Object.keys(FRAME_COLORS).filter(x=>x!=="custom")), pattern:rnd(Object.keys(PATTERNS)), palpha:20+Math.floor(Math.random()*40), fx:rnd(Object.keys(EFFECTS)), card:rnd(Object.keys(CARD_STYLES)), font:rnd(Object.keys(FONTS)), btn:rnd(Object.keys(BUTTON_STYLES)), bar:rnd(Object.keys(BAR_STYLES)), buddy:spk, bud:{coat:rnd(Object.keys(BUDDY_SPECIES[spk].coats)), acc:Math.random()<.6?rnd(Object.keys(BUDDY_ACC)):"none"}, ptype:rnd(Object.keys(PLANT_TYPES)), pot:rnd(Object.keys(PLANT_POTS))});
+  const rb = $("#lk-rand",pg); if(rb) rb.onclick = ()=>{ const base = PRESETS[rnd(Object.keys(PRESETS).filter(k=>!PRESETS[k].holiday && okP(PRESETS[k])))].look; const sps = Object.keys(BUDDY_SPECIES).filter(k=>!BUDDY_SPECIES[k].holiday), spk = rnd(sps);
+    const nl = presetLook({...base, frame:rnd(Object.keys(FRA)), fcol:rnd(Object.keys(FRAME_COLORS).filter(x=>x!=="custom")), pattern:rnd(Object.keys(PATA)), palpha:20+Math.floor(Math.random()*40), fx:rnd(Object.keys(FXA)), card:rnd(Object.keys(CARD_STYLES)), font:rnd(Object.keys(FONTS)), btn:rnd(Object.keys(BUTTON_STYLES)), bar:rnd(Object.keys(BAR_STYLES)), buddy:spk, bud:{coat:rnd(Object.keys(BUDDY_SPECIES[spk].coats)), acc:"none"}, ptype:rnd(Object.keys(PLANT_TYPES)), pot:rnd(Object.keys(PLANT_POTS))});
     nl.preset = ""; p.look = nl; S().theme = nl.mode; saveNow(); applyTheme(); redo(); toast("🎲 Surprise! Tap again for another"); };
   const sv = $("#lk-save",pg); if(sv) sv.onclick = ()=>{ openTextSheet("Save this look", "Name it", "", "Save", name=>{ (p.myThemes ||= []).unshift({name:name||"My theme", look:{...look()}}); saveNow(); presetFilter = "My themes"; redo(); toast("Saved to My themes"); }); };
   const sh = $("#lk-share",pg); if(sh) sh.onclick = ()=>{ const code = themeCode(look()); try{ navigator.clipboard.writeText(code); toast("Theme code copied. Paste it to share your look!"); }catch(e){} openTextSheet("Your theme code", "Copy this and send it to someone. They tap Use a code and paste it in.", code, "Done", ()=>{}, true); };
@@ -4942,9 +5512,11 @@ function renderLook(){
   segSet("#lk-fx", "fx"); segSet("#lk-fx2", "fx2"); segSet("#lk-fxn", "fxn"); segSet("#lk-fxs", "fxs");
   /* buddy */
   Q("[data-bf]").forEach(b=>b.onclick=()=>{ budFilter = b.dataset.bf; redo(); });
-  Q(".buddy-opt").forEach(b=>b.onclick=()=>{ const v = b.dataset.v; const keepAcc = (look().bud||{}); p.look = {...look(), buddy:v, bud:{...keepAcc, coat:"", custom:null}}; saveNow(); budState.mood = ""; const old = document.getElementById("buddy"); if(old) old._greeted = 0; applyTheme(); redo(); if(v!=="none") setTimeout(()=>budTalk(`Hi! I'm ${(look().bud||{}).name || "your new " + BUDDY_SPECIES[v].name.toLowerCase()}!`), 400); });
+  Q(".buddy-opt").forEach(b=>b.onclick=()=>{ const v = b.dataset.v; const cur = look(); const keepAcc = (cur.bud||{}); const nl = {...cur, buddy:v, bud:{...keepAcc, coat:"", custom:null}};
+    if(BUDDY_SPECIES[v]?.holiday){ if(!BUDDY_SPECIES[cur.buddy]?.holiday) nl.budBase = {buddy:cur.buddy, bud:cur.bud}; } else delete nl.budBase;
+    p.look = nl; saveNow(); budState.mood = ""; const old = document.getElementById("buddy"); if(old) old._greeted = 0; applyTheme(); redo(); if(v!=="none") setTimeout(()=>budTalk(`Hi! I'm ${(look().bud||{}).name || "your new " + BUDDY_SPECIES[v].name.toLowerCase()}!`), 400); });
   Q(".coat").forEach(b=>b.onclick=()=>{ p.look = {...look(), bud:{...(look().bud||{}), coat:b.dataset.coat, custom:null}}; saveNow(); applyTheme(); redo(); });
-  Q("[data-cc]").forEach(inp=>{ inp.oninput = e=>{ const B2 = look().bud||{}; setBud("custom", {...(B2.custom||{}), [inp.dataset.cc]:e.target.value}); const art = pg.querySelector(".bud-hero-art"); const O2 = buddyOpts(look()); if(art) art.innerHTML = buddySVG(look().buddy, O2.coatKey, {colors:(look().bud||{}).custom, eyes:O2.eyes, acc:O2.acc, accC:O2.accC, blush:O2.blush}); }; inp.onchange = redo; });
+  Q("[data-cc]").forEach(inp=>{ inp.oninput = e=>{ const B2 = look().bud||{}; setBud("custom", {...(B2.custom||{}), [inp.dataset.cc]:e.target.value}); const art = pg.querySelector(".bud-hero-art"); const O2 = buddyOpts(look()); if(art) art.innerHTML = buddySVG(O2.species, O2.coatKey, {colors:(look().bud||{}).custom, eyes:O2.eyes, acc:O2.acc, accC:O2.accC, blush:O2.blush}); }; inp.onchange = redo; });
   const ccx = $("#bd-cc-x",pg); if(ccx) ccx.onclick = ()=>{ setBud("custom", null); redo(); };
   Q("#bd-eyes button").forEach(b=>b.onclick=()=>{ setBud("eyes", b.dataset.v); redo(); });
   Q(".acc-opt").forEach(b=>b.onclick=()=>{ const k = b.dataset.acc; p.look = {...look(), bud:{...(look().bud||{}), acc:k, accC:BUDDY_ACC[k].c}}; saveNow(); applyTheme(); redo(); });
