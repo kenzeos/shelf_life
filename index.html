@@ -1882,7 +1882,7 @@ function renderWelcome(){
     ${window.LOGO?`<img class="logo" src="${window.LOGO}" alt="">`:""}
     <h1 class="display">Shelf Life</h1>
     <p>Track what you watch, read and own, with covers, episode lists and notes.</p>
-    <div class="field"><label>Your name</label><input id="w-name" placeholder="e.g. Makenzie" maxlength="30"></div>
+    <div class="field"><label>Your name</label><input id="w-name" maxlength="30"></div>
     <div class="field"><label>Pick a few categories to start with, or skip and make your own later</label>${catPicker(sel)}</div>
     <button class="big-btn" id="w-go">Start my shelf</button>
     <button class="link-btn" id="w-restore" style="margin-top:10px">Restore from a backup file</button>
