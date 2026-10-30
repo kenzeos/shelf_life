@@ -1,6 +1,6 @@
 {
-  "name": "Shelf",
-  "short_name": "Shelf",
+  "name": "Shelf Life",
+  "short_name": "Shelf Life",
   "description": "Track anime, manga, manhwa, TV, movies and books.",
   "start_url": "./index.html",
   "scope": "./",

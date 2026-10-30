@@ -1,4 +1,4 @@
-const CACHE = "shelf-v4";
+const CACHE = "shelf-v5";
 const IMG = "shelf-img-v1";
 const FILES = ["./", "./index.html", "./manifest.json", "./icon-192.png", "./icon-512.png", "./apple-touch-icon.png", "./favicon.png"];
 

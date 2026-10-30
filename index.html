@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Shelf</title>
+<title>Shelf Life</title>
 <meta name="theme-color" content="#070a1a">
 <link rel="manifest" href="manifest.json">
 <link rel="icon" href="favicon.png">
@@ -297,6 +297,47 @@ html,body{overflow-x:hidden}
 
 .welcome .logo{width:84px;height:84px;border-radius:22px;box-shadow:0 12px 34px rgba(90,110,255,.35);margin-bottom:18px}
 .fab{background:linear-gradient(135deg,#5b8cff,#9a7cff)}
+.r18{font-size:9.5px;font-weight:800;color:#fff;background:var(--bad);border-radius:4px;padding:1px 4px;margin-left:3px}
+.wrap-chips{flex-wrap:wrap;overflow:visible}
+
+/* chapter / episode pictures */
+.uth{position:relative;width:34px;height:48px;border-radius:5px;overflow:hidden;flex:none;background:var(--bg2);cursor:pointer;margin-top:-2px}
+.uth.wide{width:68px;height:40px}
+.uth img{width:100%;height:100%;object-fit:cover;display:block}
+.uth b{position:absolute;left:0;right:0;bottom:0;font-size:8.5px;font-weight:800;color:#fff;background:rgba(0,0,0,.6);text-align:center}
+.sheet-wrap{position:fixed;inset:0;z-index:80;background:rgba(0,0,0,.5);display:flex;align-items:flex-end;animation:fade .18s ease}
+.sheet-wrap.out{opacity:0;transition:opacity .18s}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+.sheet{width:100%;max-width:640px;margin:0 auto;background:var(--card);border-radius:20px 20px 0 0;padding:10px 16px calc(18px + var(--safe-b));max-height:88vh;overflow-y:auto;animation:up .22s ease}
+@keyframes up{from{transform:translateY(30px)}to{transform:none}}
+.sheet .grab{width:40px;height:4px;border-radius:2px;background:var(--line);margin:0 auto 12px}
+.sh-top{display:flex;gap:14px;align-items:flex-end}
+.sh-img{width:110px;aspect-ratio:2/3;border-radius:10px;overflow:hidden;flex:none;background:var(--bg2);box-shadow:0 8px 22px var(--shadow)}
+.sh-img.wide{width:170px;aspect-ratio:16/9}
+.sh-img img{width:100%;height:100%;object-fit:cover;display:block}
+.sh-l{font-size:12px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;color:var(--c,var(--acc))}
+.sh-t{font-family:Fraunces,Georgia,serif;font-size:19px;font-weight:700;line-height:1.2;margin-top:3px}
+.sh-d{font-size:12.5px;color:var(--mut);margin-top:4px}
+.sheet textarea{width:100%;min-height:90px;background:var(--bg2);border:1px solid var(--line);border-radius:10px;padding:10px;outline:0;resize:vertical;margin-top:6px}
+.vols.has-covers{grid-template-columns:repeat(auto-fill,minmax(70px,1fr))}
+.vol.cv{aspect-ratio:2/3;overflow:hidden;padding:0;justify-content:flex-end;color:#fff}
+.vol.cv img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.45}
+.vol.cv.own img,.vol.cv.read img{opacity:1}
+.vol.cv small,.vol.cv{text-shadow:0 1px 3px rgba(0,0,0,.8)}
+.vol.cv{font-size:12px}
+.vol .vr{position:absolute;top:4px;right:4px;font-style:normal;font-size:10px;background:var(--c,var(--acc));color:#fff;border-radius:50%;width:16px;height:16px;display:grid;place-items:center;text-shadow:none}
+.res-group{font-size:12px;font-weight:800;letter-spacing:.7px;text-transform:uppercase;color:var(--c);margin:10px 2px -2px}
+.chars-off{display:flex;align-items:center;gap:12px}
+.chars{display:grid;grid-template-columns:repeat(auto-fill,minmax(92px,1fr));gap:12px}
+.char{background:none;border:0;padding:0;text-align:center;cursor:pointer}
+.char .ci{position:relative;aspect-ratio:3/4;border-radius:12px;overflow:hidden;background:var(--bg2);display:grid;place-items:center;font-family:Fraunces,Georgia,serif;font-size:28px;color:var(--mut);box-shadow:0 6px 16px var(--shadow)}
+.char .ci img{width:100%;height:100%;object-fit:cover}
+.char .cr{position:absolute;top:5px;right:5px;min-width:22px;height:22px;border-radius:7px;font-size:12px;font-weight:800;color:#1a1200;display:grid;place-items:center}
+.char .cn{font-weight:700;font-size:12.5px;margin-top:6px;line-height:1.2}
+.char .cl{font-size:11px;color:var(--c,var(--acc));font-weight:700;margin-top:2px}
+.hid{margin-top:12px}.hid summary{cursor:pointer;color:var(--mut);font-size:13px;margin-bottom:10px}
+.cs-name{width:100%;background:var(--bg2);border:1px solid var(--line);border-radius:10px;padding:9px;font-weight:700;outline:0}
+.mytake .rating{margin-top:4px}
 </style>
 </head>
 <body>
@@ -313,6 +354,8 @@ const CATS = {
   book:   {label:"Books",  color:"#3ddc97", unit:"page",    units:"pages",    verb:"Reading",  done:"Read", own:true},
 };
 const COUNTRY = {manga:"JP", manhwa:"KR", manhua:"CN"};
+function adultOn(){ try{ return !!(data && data.active && data.profiles.find(p=>p.id===data.active)?.adult); }catch(e){ return false; } }
+const MDX_RATING = () => "&contentRating[]=safe&contentRating[]=suggestive&contentRating[]=erotica" + (adultOn() ? "&contentRating[]=pornographic" : "");
 
 function stripHtml(h){
   if(!h) return "";
@@ -342,7 +385,7 @@ function jsonp(url, ms=15000){
 }
 
 /* ---------- AniList: anime, manga, manhwa, manhua ---------- */
-const AL_FIELDS = `id idMal type format status episodes chapters volumes duration countryOfOrigin
+const AL_FIELDS = `id idMal isAdult type format status episodes chapters volumes duration countryOfOrigin
   title{romaji english native} synonyms coverImage{extraLarge large color} bannerImage
   description(asHtml:false) startDate{year} endDate{year} genres averageScore
   studios(isMain:true){nodes{name}} staff(perPage:4,sort:RELEVANCE){edges{role node{name{full}}}}
@@ -360,7 +403,7 @@ function fromAniList(m, cat){
   const eng = m.title.english, rom = m.title.romaji;
   return {
     cat, src:{al:m.id, mal:m.idMal||null},
-    title: eng || rom, alt: [eng && rom !== eng ? rom : null, m.title.native].filter(Boolean).join(" · "),
+    title: eng || rom, alt: [eng && rom !== eng ? rom : null, m.title.native].filter(Boolean).join(" · "), aka: (m.synonyms||[]).slice(0,8),
     cover: m.coverImage?.extraLarge || m.coverImage?.large || "", banner: m.bannerImage || "",
     color: m.coverImage?.color || null,
     synopsis: stripHtml(m.description),
@@ -376,14 +419,37 @@ function fromAniList(m, cat){
 }
 async function searchAniList(q, cat){
   const isAnime = cat==="anime";
-  const query = `query($s:String,$t:MediaType${isAnime?"":",$c:CountryCode"}){Page(perPage:20){media(search:$s,type:$t${isAnime?"":",countryOfOrigin:$c"},sort:SEARCH_MATCH,isAdult:false){${AL_FIELDS}}}}`;
+  const query = `query($s:String,$t:MediaType${isAnime?"":",$c:CountryCode"}){Page(perPage:20){media(search:$s,type:$t${isAnime?"":",countryOfOrigin:$c"},sort:SEARCH_MATCH${adultOn()?"":",isAdult:false"}){${AL_FIELDS}}}}`;
   const vars = {s:q, t: isAnime?"ANIME":"MANGA"}; if(!isAnime) vars.c = COUNTRY[cat];
   const d = await anilist(query, vars);
   return d.Page.media.map(m=>fromAniList(m, cat));
 }
+async function alByMal(mal, cat){
+  const d = await anilist(`query($m:Int,$t:MediaType){Media(idMal:$m,type:$t){${AL_FIELDS}}}`, {m:mal, t: cat==="anime"?"ANIME":"MANGA"});
+  return d.Media ? fromAniList(d.Media, cat) : null;
+}
 async function refreshAniList(item){
   const d = await anilist(`query($id:Int){Media(id:$id){${AL_FIELDS}}}`, {id:item.src.al});
   return fromAniList(d.Media, item.cat);
+}
+
+/* ---------- Jikan (MyAnimeList): second source for search ---------- */
+function fromJikan(m, cat){
+  const yr = m.year || m.aired?.prop?.from?.year || m.published?.prop?.from?.year || null;
+  const eng = m.title_english, main = m.title;
+  return { cat, src:{mal:m.mal_id}, title: eng || main, alt:[eng && main!==eng ? main : null, m.title_japanese].filter(Boolean).join(" · "),
+    aka: (m.title_synonyms||[]).slice(0,8), cover: m.images?.webp?.large_image_url || m.images?.jpg?.large_image_url || "", banner:"",
+    synopsis: (m.synopsis||"").replace(/\[Written by MAL Rewrite\]/i,"").trim(), year: yr,
+    genres: [...(m.genres||[]), ...(m.themes||[]), ...(m.demographics||[])].map(g=>g.name).slice(0,6),
+    meta:{ format: m.type || "", status: (m.status||"").replace("Publishing","RELEASING").replace("Currently Airing","RELEASING").replace("Finished Airing","FINISHED").replace("Finished","FINISHED"),
+      episodes: m.episodes || null, chapters: m.chapters || null, volumes: m.volumes || null,
+      authors: (m.authors||[]).map(a=>a.name.split(", ").reverse().join(" ")).slice(0,3), studio: m.studios?.[0]?.name || null, score: m.score ? Math.round(m.score*10) : null } };
+}
+async function searchJikan(q, cat){
+  const sfw = adultOn() ? "" : "&sfw=true";
+  const url = cat==="anime" ? `https://api.jikan.moe/v4/anime?q=${encodeURIComponent(q)}&limit=15${sfw}` : `https://api.jikan.moe/v4/manga?q=${encodeURIComponent(q)}&limit=15&type=${cat}${sfw}`;
+  const d = await getJSON(url, {}, 9000);
+  return (d.data||[]).map(m=>fromJikan(m, cat));
 }
 
 /* ---------- Jikan (MyAnimeList): anime episode titles ---------- */
@@ -402,6 +468,16 @@ async function animeEpisodes(item, onProgress){
     if(d.pagination?.has_next_page) await sleep(450);
     else break;
   } while(page <= last && page < 60);
+  try{ // episode pictures, where MyAnimeList has them
+    let p2 = 1, more = true; const imgs = {};
+    while(more && p2 <= 12){
+      await sleep(450);
+      const v = await getJSON(`https://api.jikan.moe/v4/anime/${item.src.mal}/videos/episodes?page=${p2}`);
+      (v.data||[]).forEach(e=>{ const u = e.images?.jpg?.image_url; if(u && !/apple-touch|questionmark/.test(u)) imgs[e.mal_id] = u; });
+      more = !!v.pagination?.has_next_page; p2++;
+    }
+    out.forEach(e=>{ if(imgs[e.no]) e.img = imgs[e.no]; });
+  }catch(e){}
   return out;
 }
 
@@ -409,7 +485,7 @@ async function animeEpisodes(item, onProgress){
 async function findMangaDexId(item){
   const titles = [item.title, ...(item.alt||"").split(" · ")].filter(Boolean);
   for(const t of titles.slice(0,2)){
-    const d = await getJSON(`https://api.mangadex.org/manga?title=${encodeURIComponent(t)}&limit=10&contentRating[]=safe&contentRating[]=suggestive&contentRating[]=erotica`);
+    const d = await getJSON(`https://api.mangadex.org/manga?title=${encodeURIComponent(t)}&limit=10${MDX_RATING()}`);
     const list = d.data || [];
     const hit = list.find(m=>String(m.attributes?.links?.al||"")===String(item.src.al)) ||
                 list.find(m=>item.src.mal && String(m.attributes?.links?.mal||"")===String(item.src.mal));
@@ -423,7 +499,7 @@ async function mangaChapters(item, onProgress){
   item.src.mdx = id;
   const map = new Map(); let offset = 0, total = 1;
   while(offset < total && offset < 9900){
-    const d = await getJSON(`https://api.mangadex.org/chapter?manga=${id}&translatedLanguage[]=en&order[chapter]=asc&limit=100&offset=${offset}&includeEmptyPages=0&contentRating[]=safe&contentRating[]=suggestive&contentRating[]=erotica`);
+    const d = await getJSON(`https://api.mangadex.org/chapter?manga=${id}&translatedLanguage[]=en&order[chapter]=asc&limit=100&offset=${offset}&includeEmptyPages=0${MDX_RATING()}`);
     total = d.total || 0;
     (d.data||[]).forEach(c=>{
       const a = c.attributes; if(a.chapter==null) return;
@@ -435,7 +511,21 @@ async function mangaChapters(item, onProgress){
   }
   const out = [...map.values()].sort((a,b)=>a.no-b.no);
   if(!out.length) throw new Error("no chapters");
+  try{ item.volCovers = await mdxCovers(id); }catch(e){}
   return out;
+}
+
+async function mdxCovers(id){
+  const map = {}; let offset = 0, total = 1;
+  while(offset < total && offset < 500){
+    const d = await getJSON(`https://api.mangadex.org/cover?manga[]=${id}&limit=100&offset=${offset}&order[volume]=asc`);
+    total = d.total || 0;
+    (d.data||[]).forEach(c=>{ const v = c.attributes?.volume; if(v==null || v==="") return; const k = String(parseFloat(v)||v);
+      const url = `https://uploads.mangadex.org/covers/${id}/${c.attributes.fileName}.512.jpg`;
+      if(!map[k] || c.attributes.locale==="en") map[k] = url; });
+    offset += 100;
+  }
+  return map;
 }
 
 /* ---------- TVmaze: TV shows + episodes ---------- */
@@ -460,7 +550,7 @@ async function tvEpisodes(item){
   const d = await getJSON(`https://api.tvmaze.com/shows/${item.src.tvm}/episodes`);
   return d.filter(e=>e.number!=null).map(e=>({
     k:`S${e.season}E${e.number}`, season:e.season, no:e.number, title:e.name||"",
-    date:e.airdate||"", runtime:e.runtime||null, summary: stripHtml(e.summary)
+    date:e.airdate||"", runtime:e.runtime||null, summary: stripHtml(e.summary), img: e.image?.medium || e.image?.original || ""
   }));
 }
 
@@ -522,11 +612,18 @@ async function olDescription(key){
 }
 
 /* ---------- dispatch ---------- */
-async function searchCat(cat, q){
+async function searchCat(cat, q, opts={}){
   if(cat==="tv") return searchTV(q);
   if(cat==="movie") return searchMovies(q);
-  if(cat==="book") return searchBooks(q);
-  return searchAniList(q, cat);
+  if(cat==="book"){ const isbn = q.replace(/[-\s]/g,""); if(/^(97[89])?\d{9}[\dxX]$/.test(isbn)){ try{ const r = await searchBooksGoogle("isbn:"+isbn); if(r.length) return r; }catch(e){} } return searchBooks(q); }
+  let al = []; try{ al = await searchAniList(q, cat); }catch(e){ if(!opts.deep) throw e; }
+  if(!opts.deep && al.length >= 5) return al;
+  try{
+    const mal = await searchJikan(q, cat);
+    const haveMal = new Set(al.map(r=>r.src.mal).filter(Boolean)), haveT = new Set(al.map(r=>r.title.toLowerCase()));
+    mal.forEach(r=>{ if(!haveMal.has(r.src.mal) && !haveT.has(r.title.toLowerCase())) al.push({...r, _from:"MyAnimeList"}); });
+  }catch(e){}
+  return al.slice(0, 30);
 }
 async function refreshItem(item){
   if(item.src?.al) return refreshAniList(item);
@@ -542,12 +639,16 @@ async function fetchUnits(item, onProgress){
 
 /* ============ BROWSE + RECOMMENDATIONS ============ */
 const GENRES = {
-  anilist: ["Action","Adventure","Comedy","Drama","Fantasy","Horror","Mahou Shoujo","Mecha","Music","Mystery","Psychological","Romance","Sci-Fi","Slice of Life","Sports","Supernatural","Thriller"],
-  tv: ["Action","Adventure","Anime","Comedy","Crime","Drama","Family","Fantasy","History","Horror","Legal","Medical","Music","Mystery","Romance","Science-Fiction","Sports","Supernatural","Thriller","War","Western"],
-  movie: ["Action & Adventure","Anime","Comedy","Documentary","Drama","Horror","Kids & Family","Romance","Sci-Fi & Fantasy","Thriller","Musicals","Western","Classics","Independent"],
-  book: ["Fantasy","Romance","Mystery","Thriller","Science Fiction","Historical Fiction","Horror","Young Adult","Biography","Self-Help","Poetry","Classics","Graphic Novels","Business","Psychology","True Crime"],
+  anilist: ["Action","Adventure","Comedy","Drama","Ecchi","Fantasy","Horror","Mahou Shoujo","Mecha","Music","Mystery","Psychological","Romance","Sci-Fi","Slice of Life","Sports","Supernatural","Thriller"],
+  anilistAdult: ["Hentai"],
+  tv: ["Action","Adventure","Anime","Children","Comedy","Crime","DIY","Drama","Espionage","Family","Fantasy","Food","History","Horror","Legal","Medical","Music","Mystery","Nature","Romance","Science-Fiction","Sports","Supernatural","Thriller","Travel","War","Western"],
+  tvAdult: ["Adult"],
+  movie: ["Action & Adventure","Anime","Classics","Comedy","Documentary","Drama","Foreign","Horror","Independent","Kids & Family","Musicals","Romance","Sci-Fi & Fantasy","Sports","Thriller","Western"],
+  book: ["Fantasy","Romantasy","Romance","Contemporary Romance","Dark Romance","Historical Romance","Paranormal Romance","Mystery","Thriller","Psychological Thriller","Crime","True Crime","Science Fiction","Dystopian","Historical Fiction","Literary Fiction","Horror","Young Adult","New Adult","Classics","Graphic Novels","Manga","Light Novels","LGBTQ+","Humor","Biography","Memoir","Self-Help","Psychology","Philosophy","Business","Poetry","Cooking","Travel"],
+  bookAdult: ["Erotica"],
 };
-const TAGS = ["Isekai","Reincarnation","Revenge","Martial Arts","School","Shounen","Shoujo","Seinen","Josei","Magic","Dungeon","Villainess","Cultivation","Survival","Time Manipulation","Video Games","Tragedy","Found Family"];
+// Used if AniList's live tag list can't load; the live list has every tag (hundreds)
+const TAGS = ["Isekai","Reincarnation","Time Manipulation","Revenge","Villainess","Female Protagonist","Male Protagonist","Romantic Subtext","Love Triangle","Age Gap","Arranged Marriage","Fake Relationship","Harem","Reverse Harem","Boys' Love","Yuri","Martial Arts","Cultivation","Dungeon","Video Games","Magic","Survival","Post-Apocalyptic","Super Power","Demons","Vampire","Gods","Mythology","Royal Affairs","Nobility","Politics","Historical","Military","War","Assassins","Crime","Detective","Mafia","School","College","Workplace","Coming of Age","Found Family","Tragedy","Iyashikei","Cooking","Idol","Music","Basketball","Volleyball","Death Game","Anti-Hero","Shounen","Shoujo","Seinen","Josei"];
 const SORTS = {
   anilist: [["POPULARITY_DESC","Most popular"],["SCORE_DESC","Top rated"],["TRENDING_DESC","Trending now"],["START_DATE_DESC","Newest"],["TITLE_ROMAJI","A–Z"]],
   tv: [["rating","Top rated"],["az","A–Z"],["new","Newest"]],
@@ -555,22 +656,36 @@ const SORTS = {
   book: [["relevance","Best match"],["newest","Newest"]],
 };
 const isAL = cat => ["anime","manga","manhwa","manhua"].includes(cat);
-const genreSet = cat => isAL(cat) ? GENRES.anilist : GENRES[cat] || [];
+const genreSet = cat => { const k = isAL(cat) ? "anilist" : cat; return [...(GENRES[k]||[]), ...(adultOn() ? GENRES[k+"Adult"]||[] : [])]; };
+let alCollections = null;
+async function aniCollections(){
+  if(alCollections) return alCollections;
+  try{
+    const cached = await DB.get("al:collections");
+    if(cached && Date.now()-cached.at < 7*86400e3){ alCollections = cached; return cached; }
+  }catch(e){}
+  const d = await anilist(`query{GenreCollection MediaTagCollection{name category isAdult description}}`, {});
+  alCollections = {at:Date.now(), genres:d.GenreCollection, tags:d.MediaTagCollection};
+  try{ await DB.set("al:collections", alCollections); }catch(e){}
+  return alCollections;
+}
+async function aniGenres(){ try{ const c = await aniCollections(); return c.genres.filter(g=>adultOn() || g!=="Hentai"); }catch(e){ return genreSet("anime"); } }
+async function aniTags(){ try{ const c = await aniCollections(); return c.tags.filter(t=>adultOn() || !t.isAdult); }catch(e){ return TAGS.map(n=>({name:n, category:"Popular", isAdult:false})); } }
 
 async function browseAniList(cat, {genre, tag, sort="POPULARITY_DESC", page=1}){
   const isAnime = cat==="anime";
   const args = ["page:$p","perPage:30"];
-  const decl = ["$p:Int","$t:MediaType","$s:[MediaSort]"]; if(!isAnime) decl.push("$c:CountryCode"); if(genre) decl.push("$g:[String]"); if(tag) decl.push("$tg:[String]");
+  const decl = ["$p:Int","$t:MediaType","$s:[MediaSort]"]; if(!isAnime) decl.push("$c:CountryCode"); if(genre) decl.push("$g:[String]"); if(tag && tag.length) decl.push("$tg:[String]");
   const q = `query(${decl.join(",")}){Page(${args.join(",")}){pageInfo{hasNextPage}
-    media(type:$t${isAnime?"":",countryOfOrigin:$c"}${genre?",genre_in:$g":""}${tag?",tag_in:$tg":""},sort:$s,isAdult:false){${AL_FIELDS}}}}`;
+    media(type:$t${isAnime?"":",countryOfOrigin:$c"}${genre?",genre_in:$g":""}${tag && tag.length?",tag_in:$tg":""},sort:$s${adultOn()?"":",isAdult:false"}){${AL_FIELDS}}}}`;
   const vars = {p:page, t:isAnime?"ANIME":"MANGA", s:[sort]};
-  if(!isAnime) vars.c = COUNTRY[cat]; if(genre) vars.g = [genre]; if(tag) vars.tg = [tag];
+  if(!isAnime) vars.c = COUNTRY[cat]; if(genre) vars.g = [genre]; if(tag && tag.length) vars.tg = Array.isArray(tag) ? tag : [tag];
   const d = await anilist(q, vars);
   return {items: d.Page.media.map(m=>fromAniList(m,cat)), more: d.Page.pageInfo.hasNextPage};
 }
 async function alRecs(item){
   const d = await anilist(`query($id:Int){Media(id:$id){recommendations(perPage:12,sort:RATING_DESC){nodes{rating mediaRecommendation{${AL_FIELDS}}}}}}`, {id:item.src.al});
-  return (d.Media?.recommendations?.nodes||[]).filter(n=>n.mediaRecommendation && n.rating>0).map(n=>{
+  return (d.Media?.recommendations?.nodes||[]).filter(n=>n.mediaRecommendation && n.rating>0 && (adultOn() || !n.mediaRecommendation.isAdult)).map(n=>{
     const m = n.mediaRecommendation;
     const cat = m.type==="ANIME" ? "anime" : ({KR:"manhwa",CN:"manhua",TW:"manhua"}[m.countryOfOrigin] || "manga");
     return {...fromAniList(m, cat), _score:n.rating};
@@ -635,7 +750,8 @@ if(window.DEMO_CATALOG){
   const match = (x,q)=> (x.title+" "+(x.alt||"")+" "+x.genres.join(" ")).toLowerCase().includes(q.toLowerCase());
   searchCat = async (cat,q)=>{ await sleep(300); return C.filter(x=>x.cat===cat && match(x,q)).map(x=>JSON.parse(JSON.stringify(x))); };
   browse = async (cat,{genre,tag,sort,page=1})=>{ await sleep(300);
-    let l = C.filter(x=>x.cat===cat && (!genre || x.genres.includes(genre)) && (!tag || (x.tags||[]).includes(tag)));
+    const tg = Array.isArray(tag) ? tag : (tag ? [tag] : []);
+    let l = C.filter(x=>x.cat===cat && (!genre || x.genres.includes(genre)) && (!tg.length || tg.some(t=>(x.tags||[]).includes(t))));
     if(/az|TITLE/.test(sort||"")) l = l.slice().sort((a,b)=>a.title.localeCompare(b.title));
     else if(/new|START/.test(sort||"")) l = l.slice().sort((a,b)=>(b.year||0)-(a.year||0));
     return {items:l.map(x=>JSON.parse(JSON.stringify(x))), more:false}; };
@@ -666,7 +782,7 @@ async function mdxLatest(item){
   const id = item.src.mdx || await findMangaDexId(item);
   if(!id) return null;
   item.src.mdx = id;
-  const d = await getJSON(`https://api.mangadex.org/chapter?manga=${id}&translatedLanguage[]=en&order[chapter]=desc&limit=10&contentRating[]=safe&contentRating[]=suggestive&contentRating[]=erotica`);
+  const d = await getJSON(`https://api.mangadex.org/chapter?manga=${id}&translatedLanguage[]=en&order[chapter]=desc&limit=10${MDX_RATING()}`);
   let best = null;
   (d.data||[]).forEach(c=>{ const n = parseFloat(c.attributes.chapter); if(!isNaN(n) && (!best || n > best.no)) best = {no:n, title:c.attributes.title||"", at: Date.parse(c.attributes.publishAt||c.attributes.readableAt||"")||null}; });
   return best;
@@ -698,7 +814,7 @@ function lev(a,b){ a=a.toLowerCase(); b=b.toLowerCase(); const m=a.length,n=b.le
   for(let i=1;i<=m;i++){ const cur=[i]; for(let j=1;j<=n;j++) cur[j]=Math.min(prev[j]+1,cur[j-1]+1,prev[j-1]+(a[i-1]===b[j-1]?0:1)); prev=cur; } return prev[n]; }
 function similar(q, r){
   const qs = q.toLowerCase().trim(); let best = 0;
-  [r.title, ...(r.alt||"").split(/ · |, /)].filter(Boolean).forEach(t=>{ t=t.toLowerCase();
+  [r.title, ...(r.alt||"").split(/ · |, /), ...(r.aka||[])].filter(Boolean).forEach(t=>{ t=t.toLowerCase();
     const s1 = 1 - lev(qs, t.slice(0, Math.max(qs.length, 1)+2)) / Math.max(qs.length, t.length, 1);
     const s2 = t.includes(qs) ? 1 : 0; best = Math.max(best, s1, s2); });
   return best;
@@ -781,6 +897,27 @@ if(window.DEMO_CATALOG){
   didYouMean = async (cat, q)=>{ await sleep(400); const scored = C2.filter(x=>x.cat===cat).map(x=>({x, d: lev(q, x.title.slice(0, q.length+3))/Math.max(q.length,1)})).sort((a,b)=>a.d-b.d).slice(0,3).filter(o=>o.d<0.6);
     return {alts: scored.map(o=>o.x.title), results: scored.map(o=>JSON.parse(JSON.stringify(o.x)))}; };
 }
+
+/* ============ CHARACTERS ============ */
+async function getCharacters(item){
+  const lead = (role, g) => role==="Main" ? (g==="Female" ? "Female lead" : g==="Male" ? "Male lead" : "Main character") : "Side character";
+  if(item.src?.al){
+    const d = await anilist(`query($id:Int){Media(id:$id){characters(sort:[ROLE,RELEVANCE,ID],perPage:30){edges{role node{id name{full native} image{large} gender}}}}}`, {id:item.src.al});
+    return (d.Media?.characters?.edges||[]).filter(e=>e.role!=="BACKGROUND").map(e=>{ const role = e.role==="MAIN"?"Main":"Supporting";
+      return {id:"al"+e.node.id, name:e.node.name.full, alt:e.node.name.native||"", img:e.node.image?.large||"", role, gender:e.node.gender||"", label: lead(role, e.node.gender)}; }).slice(0,24);
+  }
+  if(item.src?.mal){
+    const kind = item.cat==="anime" ? "anime" : "manga";
+    const d = await getJSON(`https://api.jikan.moe/v4/${kind}/${item.src.mal}/characters`);
+    return (d.data||[]).map(e=>({id:"mal"+e.character.mal_id, name:e.character.name.split(", ").reverse().join(" "), alt:"", img:e.character.images?.jpg?.image_url||"", role:e.role||"Supporting", gender:"", label: e.role==="Main"?"Main character":"Side character"})).slice(0,24);
+  }
+  if(item.src?.tvm){
+    const d = await getJSON(`https://api.tvmaze.com/shows/${item.src.tvm}/cast`);
+    return d.slice(0,20).map((e,i)=>({id:"tvm"+(e.character?.id||i), name:e.character?.name||e.person?.name, alt:e.person?.name?("Played by "+e.person.name):"", img:e.character?.image?.medium||e.person?.image?.medium||"", role:i<4?"Main":"Supporting", gender:e.person?.gender||"", label: i<4 ? (e.person?.gender==="Female"?"Female lead":e.person?.gender==="Male"?"Male lead":"Main character") : "Side character"}));
+  }
+  return [];
+}
+if(window.DEMO_CATALOG){ getCharacters = async item=>{ await sleep(300); return window.DEMO_CHARS?.[item.title] || []; }; }
 </script>
 <script>/* ============ STORAGE (IndexedDB, with localStorage fallback) ============ */
 const DB = (()=>{
@@ -897,7 +1034,7 @@ function touch(it){ it.updated = Date.now(); save(); }
 function findExisting(r){
   return Object.values(lib()).find(it => it.cat===r.cat && (
     (r.src.al && it.src?.al===r.src.al) || (r.src.tvm && it.src?.tvm===r.src.tvm) ||
-    (r.src.itunes && it.src?.itunes===r.src.itunes) || (r.src.gb && it.src?.gb===r.src.gb) || (r.src.ol && it.src?.ol===r.src.ol) ||
+    (r.src.mal && it.src?.mal===r.src.mal) || (r.src.itunes && it.src?.itunes===r.src.itunes) || (r.src.gb && it.src?.gb===r.src.gb) || (r.src.ol && it.src?.ol===r.src.ol) ||
     (it.title.trim().toLowerCase()===String(r.title||"").trim().toLowerCase() && (!r.year || !it.year || Math.abs(r.year-it.year)<=1))));
 }
 
@@ -918,7 +1055,7 @@ function back(){ if(history.length > 1 && location.hash) history.back(); else go
 window.addEventListener("hashchange", route);
 let curMain = null;
 function route(){
-  document.querySelectorAll(".page").forEach(p=>p.remove());
+  document.querySelectorAll(".page,.sheet-wrap").forEach(p=>p.remove());
   if(!data.profiles.length){ curMain = null; navBar(false); renderWelcome(); return; }
   navBar(true);
   const h = location.hash.slice(1);
@@ -964,7 +1101,7 @@ function renderWelcome(){
   const sel = [];
   app.innerHTML = `<div class="welcome">
     ${window.LOGO?`<img class="logo" src="${window.LOGO}" alt="">`:""}
-    <h1 class="display">Your shelf</h1>
+    <h1 class="display">Shelf Life</h1>
     <p>Track what you watch, read and own, with covers, episode lists and notes.</p>
     <div class="field"><label>Your name</label><input id="w-name" placeholder="e.g. Makenzie" maxlength="30"></div>
     <div class="field"><label>Pick a few categories to start with, or skip and make your own later</label>${catPicker(sel)}</div>
@@ -1000,7 +1137,7 @@ function renderHome(){
       <div class="mode-btn"><button data-m="ring" aria-label="Ring view">${IC.ring}</button><button data-m="grid" aria-label="Grid view">${IC.gridic}</button></div>
       <button class="icon-btn" id="h-set" aria-label="Settings">${IC.gear}</button>
     </div>
-    <div class="search">${IC.search}<input id="h-q" placeholder="Search your shelf" value="${esc(view.q)}"></div>
+    <div class="search">${IC.search}<input id="h-q" placeholder="Search titles, authors, characters, notes…" value="${esc(view.q)}"></div>
     <div class="chips" id="h-cats">
       <button class="chip ${view.cat==="all"?"on":""}" data-cat="all">All <span class="n">${items.length}</span></button>
       ${cats.map(k=>`<button class="chip ${view.cat===k?"on":""}" data-cat="${k}" style="--c:${C(k).color}">${esc(C(k).label)} <span class="n">${counts[k]||0}</span></button>`).join("")}
@@ -1051,7 +1188,8 @@ function drawGrid(){
   if(view.genre) items = items.filter(i=>(i.genres||[]).includes(view.genre));
   drawContinue();
   const q = view.q.trim().toLowerCase();
-  if(q) items = items.filter(i=>(i.title+" "+(i.alt||"")+" "+(i.genres||[]).join(" ")).toLowerCase().includes(q));
+  if(q) items = items.filter(i=>[i.title, i.alt, (i.aka||[]).join(" "), (i.genres||[]).join(" "), (i.meta?.authors||[]).join(" "), i.meta?.studio, i.meta?.network, i.meta?.director,
+      (i.my.notes||[]).map(n=>n.text).join(" "), Object.values(i.my.unotes||{}).join(" "), (i.my.chars?.list||[]).map(c=>c.name+" "+(c.label||"")).join(" "), C(i.cat).label].filter(Boolean).join(" ").toLowerCase().includes(q));
   const S = {updated:(a,b)=>b.updated-a.updated, added:(a,b)=>b.added-a.added, title:(a,b)=>a.title.localeCompare(b.title),
              rating:(a,b)=>(b.my.rating||0)-(a.my.rating||0)||b.updated-a.updated, progress:(a,b)=>pct(b)-pct(a),
              genre:(a,b)=>((a.genres||[])[0]||"~").localeCompare((b.genres||[])[0]||"~")||a.title.localeCompare(b.title)};
@@ -1198,17 +1336,19 @@ function resHTML(r, i){
   const ex = findExisting(r); const cat = r.cat;
   const bits = [r.year, r.meta?.format, r.meta?.episodes?r.meta.episodes+" eps":null, r.meta?.chapters?r.meta.chapters+" ch":null, r.meta?.pages?r.meta.pages+" pages":null, r.meta?.network, r.meta?.runtime&&cat==="movie"?r.meta.runtime+" min":null].filter(Boolean).join(" · ");
   return `<button class="res" data-i="${i}">${r.cover?`<img src="${esc(r.cover)}" ${r.cover2?`data-fb="${esc(r.cover2)}"`:""} loading="lazy" referrerpolicy="no-referrer" onerror="if(this.dataset.fb){this.src=this.dataset.fb;this.removeAttribute('data-fb')}else{this.style.visibility='hidden'}">`:`<div class="noimg"></div>`}
-    <div style="min-width:0"><div class="rt">${esc(r.title)}</div>${r.alt?`<div class="rs">${esc(r.alt)}</div>`:""}<div class="rs">${esc(bits)}</div>${r._why?`<div class="why">${esc(r._why)}</div>`:""}</div>${ex?`<span class="in">ON SHELF</span>`:""}</button>`;
+    <div style="min-width:0"><div class="rt">${esc(r.title)}</div>${r.alt?`<div class="rs">${esc(r.alt)}</div>`:""}${r._aka?`<div class="rs">Also called: <b>${esc(r._aka)}</b></div>`:""}<div class="rs">${esc(bits)}${r._from?` · <span style="color:var(--dim)">via ${esc(r._from)}</span>`:""}</div>${r._why?`<div class="why">${esc(r._why)}</div>`:""}</div>${ex?`<span class="in">ON SHELF</span>`:""}</button>`;
 }
 function renderAdd(cat){
   const p = prof(); if(!p.cats.length){ history.replaceState(null,"","#newcat"); route(); return; }
-  cat = p.cats.includes(cat) ? cat : p.cats[0];
-  const c = C(cat); const searchable = isSearchable(cat);
+  const scats = p.cats.filter(isSearchable);
+  cat = (cat==="all" && scats.length>1) || p.cats.includes(cat) ? cat : (scats.length>1 ? "all" : p.cats[0]);
+  const ALL = cat==="all";
+  const c = ALL ? {label:"everything", color:"var(--acc)"} : C(cat); const searchable = ALL || isSearchable(cat);
   const pg = page(`<div class="page-head"><button class="icon-btn" id="a-back">${IC.back}</button><h2 class="display">Add to shelf</h2></div>
   <div class="wrap">
-    <div class="chips" style="padding-top:0">${p.cats.map(k=>`<button class="chip ${k===cat?"on":""}" data-cat="${k}" style="--c:${C(k).color}">${esc(C(k).label)}</button>`).join("")}</div>
+    <div class="chips" style="padding-top:0">${scats.length>1?`<button class="chip ${ALL?"on":""}" data-cat="all">All</button>`:""}${p.cats.map(k=>`<button class="chip ${k===cat?"on":""}" data-cat="${k}" style="--c:${C(k).color}">${esc(C(k).label)}</button>`).join("")}</div>
     ${searchable ? `<div class="seg mode-seg" style="margin-top:12px"><button data-m="name" class="${addMode==="name"?"on":""}">Search by name</button><button data-m="desc" class="${addMode==="desc"?"on":""}">✨ Describe it</button></div>
-    <form class="search ${addMode==="name"?"":"hidden"}" id="a-form" style="margin-top:12px">${IC.search}<input id="a-q" placeholder="Search ${esc(c.label.toLowerCase())}…" autocomplete="off" enterkeyhint="search"></form>
+    <form class="search ${addMode==="name"?"":"hidden"}" id="a-form" style="margin-top:12px">${IC.search}<input id="a-q" placeholder="${ALL?"Search all your categories…":"Search "+esc(c.label.toLowerCase())+"…"}" autocomplete="off" enterkeyhint="search"></form>
     <div class="${addMode==="desc"?"":"hidden"}" id="a-desc" style="margin-top:12px"><textarea id="a-dt" rows="3" placeholder="Describe what you remember, e.g. “a manhwa where a guy goes back in time and becomes the best swordsman in a martial arts sect”"></textarea>
       <div class="row-btns"><button class="btn pri" id="a-find">Find it</button></div></div>
     <div id="a-res" class="results"><div class="hint">${addMode==="name"?"Start typing a title. Close spellings work too.":"Describe the story, characters or anything you remember."}</div></div>`
@@ -1217,14 +1357,16 @@ function renderAdd(cat){
   </div>`);
   pg.style.setProperty("--c", c.color);
   $("#a-back",pg).onclick = back;
-  $("#a-man",pg).onclick = ()=>{ view.cat = cat; go("#manual"); };
+  $("#a-man",pg).onclick = ()=>{ if(!ALL) view.cat = cat; go("#manual"); };
   pg.querySelectorAll(".chips .chip").forEach(b=>b.onclick=()=>{ history.replaceState(null,"","#add/"+b.dataset.cat); route(); });
   if(!searchable) return;
   const res = $("#a-res",pg), q = $("#a-q",pg);
   pg.querySelectorAll(".mode-seg button").forEach(b=>b.onclick=()=>{ addMode = b.dataset.m; route(); });
-  const show = (list, head="") => {
-    lastResults = list;
-    res.innerHTML = head + list.map(resHTML).join("");
+  const show = (list, head="", grouped=false) => {
+    lastResults = list; const qq = (q?.value||"").trim().toLowerCase();
+    list.forEach(r=>{ r._aka = ""; if(qq && !(r.title+" "+(r.alt||"")).toLowerCase().includes(qq)){ const m = (r.aka||[]).find(a=>a.toLowerCase().includes(qq) || similar(qq,{title:a})>0.7); if(m) r._aka = m; } });
+    let lastCat = null;
+    res.innerHTML = head + list.map((r,i)=>{ let h=""; if(grouped && r.cat!==lastCat){ lastCat=r.cat; h=`<div class="res-group" style="--c:${C(r.cat).color}">${esc(C(r.cat).label)}</div>`; } return h + resHTML(r,i); }).join("");
     res.querySelectorAll(".res").forEach(b=>b.onclick=()=>addResult(lastResults[+b.dataset.i]));
     res.querySelectorAll("[data-alt]").forEach(b=>b.onclick=()=>{ q.value = b.dataset.alt; runName(true); });
   };
@@ -1234,7 +1376,18 @@ function renderAdd(cat){
     if(term.length < 2){ res.innerHTML = `<div class="hint">Start typing a title. Close spellings work too.</div>`; return; }
     if(final) res.innerHTML = `<div class="spinner"></div>`;
     try{
-      const list = await searchCat(cat, term); if(my!==seq) return;
+      if(ALL){
+        const per = await Promise.all(scats.map(k=>searchCat(k, term, {deep:final}).then(l=>l.slice(0, final?8:5)).catch(()=>[])));
+        if(my!==seq) return;
+        const merged = per.flat().map(r=>({r, s:similar(term,r)})).filter(o=>o.s>0.3 || per.flat().length<6);
+        // best-matching category first, then by match quality inside each
+        const best = {}; merged.forEach(o=>best[o.r.cat]=Math.max(best[o.r.cat]||0,o.s));
+        merged.sort((a,b)=>(best[b.r.cat]-best[a.r.cat]) || (a.r.cat<b.r.cat?-1:a.r.cat>b.r.cat?1:0) || (b.s-a.s));
+        if(merged.length){ show(merged.map(o=>o.r), "", true); return; }
+        if(final) res.innerHTML = `<div class="hint">Nothing found for “${esc(term)}” in your categories. Try <b>✨ Describe it</b>, or pick one category to get spelling suggestions.</div>`;
+        return;
+      }
+      const list = await searchCat(cat, term, {deep:final}); if(my!==seq) return;
       const top = list.length ? Math.max(...list.slice(0,5).map(r=>similar(term, r))) : 0;
       if(list.length && top >= 0.5){ show(list); return; }
       if(!final && list.length){ show(list); }
@@ -1257,9 +1410,12 @@ function renderAdd(cat){
     const text = $("#a-dt",pg).value.trim(); if(text.length < 8){ toast("Add a few more details"); return; }
     res.innerHTML = `<div class="spinner"></div><div class="hint" id="a-step" style="padding-top:0">Thinking…</div>`;
     try{
-      const list = await describeSearch(cat, text, m=>{ const st=$("#a-step",pg); if(st) st.textContent = m; });
+      const step = m=>{ const st=$("#a-step",pg); if(st) st.textContent = m; };
+      let list;
+      if(ALL){ const per = []; for(const k of scats){ step(`Checking ${C(k).label}…`); try{ per.push(...(await describeSearch(k, text)).slice(0,5)); }catch(e){} } list = per; }
+      else list = await describeSearch(cat, text, step);
       if(!list.length){ res.innerHTML = `<div class="hint">Couldn't pin it down. Try adding a character name, a plot detail, or roughly when it came out.</div>`; return; }
-      show(list, `<div class="hint" style="text-align:left;padding:4px 2px 2px">Best guesses, most likely first:</div>`);
+      show(list, `<div class="hint" style="text-align:left;padding:4px 2px 2px">Best guesses, most likely first:</div>`, ALL);
     }catch(e){ res.innerHTML = `<div class="hint">Couldn't search right now. Check your connection and try again.</div>`; }
   };
 }
@@ -1306,17 +1462,19 @@ function renderDetail(id){
       ${it.synopsis?`<div class="sec"><h3>Synopsis</h3><div class="syn clamp" id="d-syn">${esc(it.synopsis)}</div><button class="link-btn" id="d-synmore" style="padding:6px 0 0">Show more</button></div>`:""}
       <div class="sec"><h3>My status</h3><div class="seg" id="d-status">${STATUSES.map(s=>`<button data-s="${s}" class="${it.my.status===s?"on":""}">${statusLabel(s,it.cat)}</button>`).join("")}</div>
         <div class="prog-row" style="margin-top:10px" id="d-dates"></div></div>
-      <div class="sec"><h3>My rating <span class="r" id="d-rnum"></span></h3><div class="rating" id="d-rating">${[1,2,3,4,5,6,7,8,9,10].map(n=>`<button data-n="${n}">${n}</button>`).join("")}</div><div class="rating-label" id="d-rlabel"></div></div>
       <div class="sec" id="d-progress"></div>
       <div id="d-release"></div>
       ${(c.vols||c.own||isOnce(it)||it.cat==="anime"||it.cat==="tv") ? `<div class="sec" id="d-own"></div>` : ""}
       <div class="sec" id="d-units"></div>
       ${facts.length?`<div class="sec"><h3>Details</h3><div class="facts">${facts.map(f=>`<div><span>${f[0]}</span>${esc(f[1])}</div>`).join("")}</div></div>`:""}
       <div id="d-like"></div>
-      <div class="sec"><h3>Notes <span class="r">${it.my.notes.length||""}</span></h3>
-        <div class="note-new"><textarea id="d-note" placeholder="Thoughts, favorite moments, where you left off…"></textarea>
+      <div class="sec mytake"><h3>My rating &amp; notes <span class="r" id="d-rnum"></span></h3>
+        <div class="rating" id="d-rating">${[1,2,3,4,5,6,7,8,9,10].map(n=>`<button data-n="${n}">${n}</button>`).join("")}</div><div class="rating-label" id="d-rlabel"></div>
+        <div class="b-label" style="margin-top:14px">Notes ${it.my.notes.length?`<span style="text-transform:none;letter-spacing:0">· ${it.my.notes.length}</span>`:""}</div>
+        <div class="note-new" style="margin-top:6px"><textarea id="d-note" placeholder="Thoughts, favorite moments, where you left off…"></textarea>
         <div class="row-btns"><button class="btn pri" id="d-addnote">Save note</button></div></div>
         <div id="d-notes"></div></div>
+      <div id="d-chars"></div>
       <div style="height:40px"></div>
     </div>`);
   pg.style.setProperty("--c", c.color);
@@ -1359,6 +1517,7 @@ function renderDetail(id){
   $("#d-addnote",pg).onclick = ()=>{ const t = $("#d-note",pg).value.trim(); if(!t) return; it.my.notes.push({id:uid(), at:Date.now(), text:t}); $("#d-note",pg).value=""; touch(it); drawNotes(); toast("Note saved"); };
   drawNotes();
   loadMoreLike(it, $("#d-like",pg));
+  renderChars(pg, it);
 }
 
 function setStatus(it, s){
@@ -1460,12 +1619,12 @@ function nextLabel(it){ const n = nextUnit(it); if(!n) return "All caught up"; r
 function renderOwn(pg, it){
   const box = $("#d-own",pg); const c = C(it.cat);
   if(c.vols){
-    const nv = it.meta?.volumes || it.manualVols || 0;
+    const nv = it.meta?.volumes || it.manualVols || Math.max(0, ...Object.keys(it.volCovers||{}).map(Number).filter(n=>n>0 && n<300));
     const mode = box.dataset.mode || "o";
     const ownedN = Object.values(it.my.vols).filter(v=>v.o).length, readN = Object.values(it.my.vols).filter(v=>v.r).length;
     box.innerHTML = `<h3>My collection <span class="r">${nv?`${ownedN} owned · ${readN} read`:""}</span></h3>
       ${nv?`<div class="seg" style="margin-bottom:10px"><button data-m="o" class="${mode==="o"?"on":""}">Tap = I own it</button><button data-m="r" class="${mode==="r"?"on":""}">Tap = I read it</button></div>
-      <div class="vols">${Array.from({length:nv},(_,i)=>{const v=it.my.vols[i+1]||{};return `<button class="vol ${v.o?"own":""} ${v.r?"read":""}" data-v="${i+1}"><small>VOL</small>${i+1}</button>`}).join("")}</div>
+      <div class="vols ${it.volCovers&&Object.keys(it.volCovers).length?"has-covers":""}">${Array.from({length:nv},(_,i)=>{const v=it.my.vols[i+1]||{}; const cv=it.volCovers?.[String(i+1)]; return `<button class="vol ${v.o?"own":""} ${v.r?"read":""} ${cv?"cv":""}" data-v="${i+1}">${cv?`<img src="${esc(cv)}" loading="lazy" referrerpolicy="no-referrer" alt="" onerror="this.remove()">`:""}<small>VOL</small>${i+1}${v.r?'<i class="vr">✓</i>':""}</button>`}).join("")}</div>
       <div class="legend"><span><i style="border:1.5px solid var(--good)"></i>Owned</span><span><i style="background:var(--c)"></i>Read</span></div>`
       :`<div style="color:var(--mut);font-size:13px">Volume count isn't known yet (it may still be releasing).</div>`}
       <div class="num-in" style="margin-top:12px"><span style="color:var(--mut);font-size:13px">Volumes</span><input type="number" inputmode="numeric" id="o-nv" value="${nv||""}" min="0" placeholder="?"></div>`;
@@ -1502,7 +1661,7 @@ function renderUnits(pg, it, after){
     const gDone = G.list.filter(x=>it.my.done[x.k]).length;
     box.innerHTML = `<h3>${U} <span class="r">${Object.keys(it.my.done).length}/${L.length} · hold to mark all before</span></h3>
       ${groups.length>1?`<div class="seasons">${groups.map(g=>{const dn=g.list.every(x=>it.my.done[x.k]);return `<button data-g="${g.id}" class="${g.id===group?"on":""}">${g.label}${dn?" ✓":""}</button>`}).join("")}</div>`:""}
-      <div id="u-list">${G.list.map(x=>`<div class="ep ${it.my.done[x.k]?"done":""}" data-k="${esc(x.k)}"><span class="ck"></span><span class="no">${x.season!=null?"E"+x.no:"#"+x.no}</span><span class="et">${x.title?esc(x.title):`<span style="color:var(--dim)">${c.unit==="episode"?"Episode":"Chapter"} ${x.no}</span>`}${x.filler?`<span class="fl">FILLER</span>`:""}${x.recap?`<span class="fl">RECAP</span>`:""}${x.date?`<span class="ed">${x.date>today()?"Airs ":""}${fmtDate(x.date)}${x.vol?" · Vol. "+esc(x.vol):""}</span>`:""}${(it.my.unotes||{})[x.k]?`<span class="un">${esc(it.my.unotes[x.k])}</span>`:""}</span><button class="nb ${(it.my.unotes||{})[x.k]?"has":""}" aria-label="Note">${IC.note}</button></div>`).join("")}</div>
+      <div id="u-list">${G.list.map(x=>`<div class="ep ${it.my.done[x.k]?"done":""}" data-k="${esc(x.k)}"><span class="ck"></span>${unitThumb(it,x)}<span class="no">${x.season!=null?"E"+x.no:"#"+x.no}</span><span class="et">${x.title?esc(x.title):`<span style="color:var(--dim)">${c.unit==="episode"?"Episode":"Chapter"} ${x.no}</span>`}${x.filler?`<span class="fl">FILLER</span>`:""}${x.recap?`<span class="fl">RECAP</span>`:""}${x.date?`<span class="ed">${x.date>today()?"Airs ":""}${fmtDate(x.date)}${x.vol?" · Vol. "+esc(x.vol):""}</span>`:""}${(it.my.unotes||{})[x.k]?`<span class="un">${esc(it.my.unotes[x.k])}</span>`:""}</span><button class="nb ${(it.my.unotes||{})[x.k]?"has":""}" aria-label="Note">${IC.note}</button></div>`).join("")}</div>
       <div class="row-btns"><button class="btn" id="u-all">${gDone===G.list.length?"Uncheck":"Check"} all in ${groups.length>1?G.label:"list"}</button><button class="btn" id="u-ref">Reload list</button></div>`;
     box.querySelectorAll(".seasons button").forEach(b=>b.onclick=()=>{ group=b.dataset.g; draw(); });
     $("#u-all",box).onclick = ()=>{
@@ -1513,13 +1672,15 @@ function renderUnits(pg, it, after){
     $("#u-ref",box).onclick = ()=>fetchList(true);
     box.querySelectorAll(".ep").forEach(row=>{
       let timer=null, long=false, sx=0, sy=0;
-      row.querySelector(".nb").addEventListener("click", e=>{ e.stopPropagation(); openUnitNote(row, row.dataset.k); });
-      row.addEventListener("pointerdown", e=>{ if(e.target.closest(".nb")) return; long=false; sx=e.clientX; sy=e.clientY; timer=setTimeout(()=>{ long=true; markUpTo(row.dataset.k); }, 520); });
+      const openS = e=>{ e.stopPropagation(); openUnitSheet(pg, it, units[it.id].find(x=>x.k===row.dataset.k), ()=>{ draw(); after(); }); };
+      row.querySelector(".nb").addEventListener("click", openS);
+      const th = row.querySelector(".uth"); if(th) th.addEventListener("click", openS);
+      row.addEventListener("pointerdown", e=>{ if(e.target.closest(".nb,.uth")) return; long=false; sx=e.clientX; sy=e.clientY; timer=setTimeout(()=>{ long=true; markUpTo(row.dataset.k); }, 520); });
       const cancel = e=>{ if(e && e.type==="pointermove" && Math.hypot(e.clientX-sx,e.clientY-sy)<8) return; clearTimeout(timer); };
       row.addEventListener("pointermove", cancel); row.addEventListener("pointerleave", cancel); row.addEventListener("pointercancel", cancel);
       row.addEventListener("pointerup", ()=>clearTimeout(timer));
       row.addEventListener("contextmenu", e=>e.preventDefault());
-      row.addEventListener("click", e=>{ if(long || e.target.closest(".nb")) return; const k=row.dataset.k; if(it.my.done[k]) delete it.my.done[k]; else it.my.done[k]=1; row.classList.toggle("done"); autoStatus(it); touch(it); after(); updateHead(); });
+      row.addEventListener("click", e=>{ if(long || e.target.closest(".nb,.uth")) return; const k=row.dataset.k; if(it.my.done[k]) delete it.my.done[k]; else it.my.done[k]=1; row.classList.toggle("done"); autoStatus(it); touch(it); after(); updateHead(); });
     });
   };
   const openUnitNote = (row, k)=>{
@@ -1627,6 +1788,9 @@ function renderSettings(){
       ${hiddenCats(p).length?`<div class="b-label" style="margin-top:14px">Hidden</div>${hiddenCats(p).map(k=>`<div class="prof"><span class="cdot" style="background:${C(k).color}"></span><div style="flex:1">${esc(C(k).label)} <span style="color:var(--dim);font-size:12px">${Object.values(lib()).filter(i=>i.cat===k).length} titles</span></div><button class="btn" data-unhide="${k}">Show again</button></div>`).join("")}`:""}
     </div>
     <div class="sec"><h3>Appearance</h3><div class="seg" id="s-theme">${[["dark","Dark"],["light","Light"],["auto","Match my phone"]].map(([v,l])=>`<button data-t="${v}" class="${(S().theme||"dark")===v?"on":""}">${l}</button>`).join("")}</div></div>
+    <div class="sec"><h3>Content</h3>
+      <div style="color:var(--mut);font-size:13px;margin-bottom:10px">Show 18+ titles, genres and tags in search, Browse and recommendations. Only affects this profile.</div>
+      <div class="seg" id="s-adult"><button data-a="1" class="${p.adult?"on":""}">Show 18+</button><button data-a="0" class="${p.adult?"":"on"}">Hide 18+</button></div></div>
     <div class="sec"><h3>Release alerts</h3>
       <div style="color:var(--mut);font-size:13px;margin-bottom:10px">Shelf checks for new episodes, chapters and books each time you open it (about every 3 hours). Turn this on to also get a phone notification when it finds something.</div>
       <div class="seg" id="s-notify"><button data-n="1" class="${S().notify?"on":""}">Notifications on</button><button data-n="0" class="${S().notify?"":"on"}">Off</button></div>
@@ -1645,6 +1809,7 @@ function renderSettings(){
       Anime, manga, manhwa &amp; manhua: AniList · Episode titles: MyAnimeList via Jikan · Chapter titles: MangaDex · TV shows: TVmaze · Movies: iTunes · Books: Google Books &amp; Open Library</div></div>
   </div>`);
   $("#s-back",pg).onclick = back;
+  pg.querySelectorAll("#s-adult button").forEach(b=>b.onclick=()=>{ p.adult = b.dataset.a==="1"; saveNow(); alGenreList=null; bstate.items=[]; bstate.tags=[]; bstate.genre=""; fyCache=null; pg.querySelectorAll("#s-adult button").forEach(x=>x.classList.toggle("on",x===b)); toast(p.adult?"18+ content is on for this profile":"18+ content hidden"); });
   pg.querySelectorAll("#s-theme button").forEach(b=>b.onclick=()=>{ S().theme=b.dataset.t; saveNow(); applyTheme(); pg.querySelectorAll("#s-theme button").forEach(x=>x.classList.toggle("on",x===b)); });
   pg.querySelectorAll("#s-notify button").forEach(b=>b.onclick=async()=>{
     if(b.dataset.n==="1"){
@@ -1681,7 +1846,7 @@ function renderSettings(){
 async function downloadBackup(){
   const u = {}; for(const k of await DB.keys()) if(String(k).startsWith("units:")) u[k] = await DB.get(k);
   const blob = new Blob([JSON.stringify({app:"shelf", v:1, at:new Date().toISOString(), data, units:u})], {type:"application/json"});
-  const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = `shelf-backup-${today()}.json`;
+  const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = `shelf-life-backup-${today()}.json`;
   document.body.appendChild(a); a.click(); a.remove(); toast("Backup saved to your Downloads");
 }
 async function restoreFile(f){
@@ -1741,38 +1906,71 @@ async function loadMoreLike(item, host){
 }
 
 /* ============ BROWSE ============ */
-const bstate = {cat:null, genre:"", tag:"", sort:"", page:1, items:[], more:false, loading:false, err:""};
-function renderBrowse(){
+const bstate = {cat:null, genre:"", tags:[], sort:"", page:1, items:[], more:false, loading:false, err:""};
+const QUICK_TAGS = ["Isekai","Reincarnation","Time Manipulation","Revenge","Villainess","Female Protagonist","Romantic Subtext","Harem","Reverse Harem","Boys' Love","Yuri","Martial Arts","Cultivation","Dungeon","Royal Affairs","Age Gap","Arranged Marriage","Tragedy","School","Workplace"];
+let alGenreList = null, alTagList = null;
+async function renderBrowse(){
   const p = prof(); const scats = p.cats.filter(isSearchable);
   if(!scats.length){ app.innerHTML = `<div class="top"><div class="top-row"><h1 class="display">Browse</h1></div></div><div class="empty" style="padding:60px 24px"><div class="big">Nothing to browse yet</div>Browse works with ready-made categories like Anime, Manhwa, TV Shows, Movies or Books.<br><button class="btn pri" id="b-new" style="margin-top:14px">+ Add a category</button></div>`; $("#b-new").onclick=()=>go("#newcat"); return; }
   if(!bstate.cat || !scats.includes(bstate.cat)){ bstate.cat = scats[0]; bstate.items=[]; }
   const cat = bstate.cat, c = C(cat), key = isAL(cat) ? "anilist" : cat;
   if(!bstate.sort || !SORTS[key].some(x=>x[0]===bstate.sort)) bstate.sort = SORTS[key][0][0];
+  if(isAL(cat) && (!alGenreList || alGenreList.adult!==adultOn())){
+    app.innerHTML = `<div class="top"><div class="top-row"><h1 class="display">Browse</h1></div></div><div class="spinner"></div>`;
+    const [g, t] = await Promise.all([aniGenres(), aniTags()]);
+    alGenreList = Object.assign(g.slice(), {adult:adultOn()}); alTagList = t;
+    if(curMain!=="browse") return;
+  }
+  const genres = isAL(cat) ? alGenreList : genreSet(cat);
+  const quick = isAL(cat) ? [...bstate.tags, ...QUICK_TAGS.filter(t=>!bstate.tags.includes(t) && (alTagList||[]).some(x=>x.name===t))] : [];
+  const label = [bstate.genre, ...bstate.tags].filter(Boolean);
   app.innerHTML = `<div class="top"><div class="top-row"><h1 class="display">Browse</h1><button class="icon-btn" id="b-search" aria-label="Search">${IC.search}</button></div>
       <div class="chips">${scats.map(k=>`<button class="chip ${k===cat?"on":""}" data-cat="${k}" style="--c:${C(k).color}">${esc(C(k).label)}</button>`).join("")}</div></div>
     <div class="b-filters" style="--c:${c.color}">
-      <div class="subbar" style="padding:0"><span class="count">${bstate.genre||bstate.tag ? esc([bstate.genre,bstate.tag].filter(Boolean).join(" + ")) : "All genres"}</span>
+      <div class="subbar" style="padding:0"><span class="count" style="display:block">${label.length ? esc(label.join(" + ")) : "Everything"}${label.length?` <button class="link-btn" id="b-clear" style="padding:0 0 0 6px;font-size:12.5px">Clear</button>`:""}</span>
         <select id="b-sort">${SORTS[key].map(([v,l])=>`<option value="${v}" ${v===bstate.sort?"selected":""}>${l}</option>`).join("")}</select></div>
       <div class="b-label">Genres</div>
-      <div class="chips sm" id="b-genres"><button class="chip ${!bstate.genre?"on":""}" data-g="">All</button>${genreSet(cat).map(g=>`<button class="chip ${g===bstate.genre?"on":""}" data-g="${esc(g)}">${esc(g)}</button>`).join("")}</div>
-      ${isAL(cat)?`<div class="b-label">Tags</div><div class="chips sm" id="b-tags"><button class="chip ${!bstate.tag?"on":""}" data-t="">Any</button>${TAGS.map(t=>`<button class="chip ${t===bstate.tag?"on":""}" data-t="${esc(t)}">${esc(t)}</button>`).join("")}</div>`:""}
+      <div class="chips sm" id="b-genres"><button class="chip ${!bstate.genre?"on":""}" data-g="">All</button>${genres.map(g=>`<button class="chip ${g===bstate.genre?"on":""}" data-g="${esc(g)}">${esc(g)}${/^(Hentai|Erotica|Adult)$/.test(g)?' <span class="r18">18+</span>':""}</button>`).join("")}</div>
+      ${isAL(cat)?`<div class="b-label">Tags <span style="text-transform:none;letter-spacing:0;font-weight:600">· pick as many as you like</span></div><div class="chips sm" id="b-tags">${quick.map(t=>`<button class="chip ${bstate.tags.includes(t)?"on":""}" data-t="${esc(t)}">${esc(t)}</button>`).join("")}<button class="chip" id="b-alltags">All ${alTagList?alTagList.length:""} tags…</button></div>`:""}
     </div>
     <div class="grid" id="b-grid" style="--c:${c.color}"></div>`;
-  app.querySelectorAll(".top .chip").forEach(b=>b.onclick=()=>{ bstate.cat=b.dataset.cat; bstate.genre=""; bstate.tag=""; bstate.sort=""; bstate.items=[]; renderBrowse(); });
+  app.querySelectorAll(".top .chip").forEach(b=>b.onclick=()=>{ bstate.cat=b.dataset.cat; bstate.genre=""; bstate.tags=[]; bstate.sort=""; bstate.items=[]; renderBrowse(); });
   app.querySelectorAll("#b-genres .chip").forEach(b=>b.onclick=()=>{ bstate.genre=b.dataset.g; bstate.items=[]; renderBrowse(); });
-  app.querySelectorAll("#b-tags .chip").forEach(b=>b.onclick=()=>{ bstate.tag=b.dataset.t; bstate.items=[]; renderBrowse(); });
+  app.querySelectorAll("#b-tags .chip[data-t]").forEach(b=>b.onclick=()=>{ const t=b.dataset.t; bstate.tags = bstate.tags.includes(t) ? bstate.tags.filter(x=>x!==t) : [...bstate.tags, t]; bstate.items=[]; renderBrowse(); });
+  const at = $("#b-alltags"); if(at) at.onclick = openTagPicker;
+  const cl = $("#b-clear"); if(cl) cl.onclick = ()=>{ bstate.genre=""; bstate.tags=[]; bstate.items=[]; renderBrowse(); };
   $("#b-sort").onchange = e=>{ bstate.sort=e.target.value; bstate.items=[]; renderBrowse(); };
   $("#b-search").onclick = ()=>go("#add/"+cat);
-  // keep the active chips in view
   app.querySelectorAll(".chips").forEach(row=>{ const on=row.querySelector(".chip.on"); if(on) row.scrollLeft = on.offsetLeft - 16; });
   if(!bstate.items.length && !bstate.err) loadBrowse(1); else drawBrowse();
 }
+function openTagPicker(){
+  const sel = new Set(bstate.tags); const tags = alTagList || [];
+  const cats = [...new Set(tags.map(t=>t.category||"Other"))].sort();
+  const pg = page(`<div class="page-head"><button class="icon-btn" id="tp-x">${IC.back}</button><h2 class="display">Tags</h2><button class="btn pri" id="tp-done">Done</button></div>
+    <div class="wrap"><form class="search" onsubmit="return false">${IC.search}<input id="tp-q" placeholder="Search ${tags.length} tags…" autocomplete="off"></form>
+    <div style="color:var(--dim);font-size:12.5px;margin:8px 2px">Tap to pick. Results match titles with your tags.${adultOn()?"":" 18+ tags are hidden; turn them on in Settings."}</div>
+    <div id="tp-list"></div></div>`);
+  pg.style.setProperty("--c", C(bstate.cat).color);
+  const draw = ()=>{
+    const q = $("#tp-q",pg).value.trim().toLowerCase();
+    $("#tp-list",pg).innerHTML = cats.map(cg=>{
+      const list = tags.filter(t=>(t.category||"Other")===cg && (!q || t.name.toLowerCase().includes(q) || (t.description||"").toLowerCase().includes(q)));
+      if(!list.length) return "";
+      return `<div class="b-label">${esc(cg)}</div><div class="chips sm wrap-chips">${list.map(t=>`<button class="chip ${sel.has(t.name)?"on":""}" data-t="${esc(t.name)}" title="${esc(t.description||"")}">${esc(t.name)}${t.isAdult?' <span class="r18">18+</span>':""}</button>`).join("")}</div>`;
+    }).join("") || `<div class="hint">No tags match.</div>`;
+    pg.querySelectorAll("#tp-list .chip").forEach(b=>b.onclick=()=>{ const t=b.dataset.t; sel.has(t)?sel.delete(t):sel.add(t); b.classList.toggle("on"); });
+  };
+  $("#tp-q",pg).oninput = draw; draw();
+  $("#tp-x",pg).onclick = ()=>pg.remove();
+  $("#tp-done",pg).onclick = ()=>{ bstate.tags=[...sel]; bstate.items=[]; pg.remove(); renderBrowse(); };
+}
 async function loadBrowse(page){
-  const want = JSON.stringify([bstate.cat,bstate.genre,bstate.tag,bstate.sort]);
+  const want = JSON.stringify([bstate.cat,bstate.genre,bstate.tags,bstate.sort]);
   bstate.loading = true; bstate.err=""; if(page===1) bstate.items=[]; drawBrowse();
   try{
-    const r = await browse(bstate.cat, {genre:bstate.genre, tag:bstate.tag, sort:bstate.sort, page});
-    if(want !== JSON.stringify([bstate.cat,bstate.genre,bstate.tag,bstate.sort])) return;
+    const r = await browse(bstate.cat, {genre:bstate.genre, tag:bstate.tags, sort:bstate.sort, page});
+    if(want !== JSON.stringify([bstate.cat,bstate.genre,bstate.tags,bstate.sort])) return;
     bstate.items = page===1 ? r.items : bstate.items.concat(r.items); bstate.more = r.more; bstate.page = page;
   }catch(e){ bstate.err = "Couldn't load this right now. Check your connection and try again."; }
   bstate.loading = false; drawBrowse();
@@ -1857,7 +2055,13 @@ function drawForYou(){
 const S = () => (data.settings ||= {theme:"dark", notify:false, lastCheck:{}});
 const UPD = () => ((data.updates ||= {})[data.active] ||= []);
 const FOL = () => (((data.follow ||= {})[data.active]) ||= {authors:{}});
-function autoFollow(it){ if(!isPages(it)) return; const a = (it.meta?.authors||[])[0]; if(a && !FOL().authors[a]) FOL().authors[a] = {on:true}; }
+async function linkAniList(it){
+  if(!it.src?.mal || it.src?.al || !isAL(it.cat)) return;
+  try{ const f = await alByMal(it.src.mal, it.cat); if(!f) return;
+    it.src.al = f.src.al; if(f.banner) it.banner = f.banner; if(!it.synopsis && f.synopsis) it.synopsis = f.synopsis;
+    it.meta = {...f.meta, ...Object.fromEntries(Object.entries(it.meta||{}).filter(([k,v])=>v!=null && v!==""))}; save(); }catch(e){}
+}
+function autoFollow(it){ linkAniList(it); if(!isPages(it)) return; const a = (it.meta?.authors||[])[0]; if(a && !FOL().authors[a]) FOL().authors[a] = {on:true}; }
 function maxDoneNo(it){ const ks = Object.keys(it.my.done||{}).map(parseFloat).filter(n=>!isNaN(n)); return ks.length ? Math.max(...ks) : (it.my.count||0); }
 function behind(it){
   const t = it.track; if(!t || !/RELEASING|Running|NOT YET/i.test(it.meta?.status||"")) return 0;
@@ -1961,7 +2165,7 @@ async function checkUpdates(force){
 }
 async function notifyPhone(list){
   if(!S().notify || !("Notification" in window) || Notification.permission!=="granted") return;
-  const title = list.length===1 ? list[0].title || "Shelf" : `${list.length} new updates on your shelf`;
+  const title = list.length===1 ? list[0].title || "Shelf Life" : `${list.length} new updates on your shelf`;
   const body = list.length===1 ? list[0].text : list.slice(0,4).map(u=>(u.title?u.title+": ":"")+u.text).join("\n");
   try{ const reg = await navigator.serviceWorker?.getRegistration(); if(reg) reg.showNotification(title,{body, icon:"icon-192.png", badge:"icon-192.png", tag:"shelf-updates"}); else new Notification(title,{body, icon:"icon-192.png"}); }catch(e){}
 }
@@ -2078,6 +2282,99 @@ function renderNewCat(){
     p.cats.push(id); saveNow(); view.cat = id; saveView();
     history.replaceState(null,"","#"); curMain = null; route(); toast(`Added ${name}`);
   };
+}
+
+
+/* ============ EPISODE / CHAPTER PICTURES + SHEET ============ */
+const volKey = v => v==null || v==="" ? null : String(parseFloat(v)||v);
+function unitImg(it, x){ if(x.img) return x.img; const vk = volKey(x.vol); return vk && it.volCovers?.[vk] || ""; }
+function unitThumb(it, x){
+  const u = unitImg(it, x); if(!u) return "";
+  const ep = !!x.img;
+  return `<span class="uth ${ep?"wide":""}"><img src="${esc(u)}" loading="lazy" referrerpolicy="no-referrer" alt="" onerror="this.parentNode.remove()">${!ep&&x.vol?`<b>V${esc(x.vol)}</b>`:""}</span>`;
+}
+function openUnitSheet(pg, it, x, onChange){
+  if(!x) return; const c = C(it.cat); const ep = c.unit==="episode";
+  document.querySelectorAll(".sheet-wrap").forEach(s=>s.remove());
+  const img = unitImg(it, x) || it.cover; const vk = volKey(x.vol);
+  const w = document.createElement("div"); w.className = "sheet-wrap";
+  const label = x.season!=null ? `Season ${x.season} · Episode ${x.no}` : `${ep?"Episode":"Chapter"} ${x.no}${x.vol?` · Volume ${esc(x.vol)}`:""}`;
+  w.innerHTML = `<div class="sheet"><div class="grab"></div>
+    <div class="sh-top"><div class="sh-img ${x.img?"wide":""}">${img?`<img src="${esc(img)}" referrerpolicy="no-referrer" alt="">`:""}</div>
+      <div style="min-width:0"><div class="sh-l">${label}</div><div class="sh-t">${x.title?esc(x.title):esc(it.title)}</div>
+      ${x.date?`<div class="sh-d">${x.date>today()?"Airs":"Released"} ${fmtDate(x.date)}${x.runtime?` · ${x.runtime} min`:""}</div>`:""}
+      ${!x.img && vk && it.volCovers?.[vk] ? `<div class="sh-d">Cover of volume ${esc(x.vol)}</div>` : (!x.img && !x.vol && !ep ? `<div class="sh-d">Not collected in a volume yet</div>` : "")}</div></div>
+    ${x.summary?`<div class="syn" style="margin-top:12px;font-size:13.5px">${esc(x.summary)}</div>`:""}
+    <div class="row-btns"><button class="btn pri" id="sh-done">${it.my.done[x.k]?"✓ "+c.done:"Mark as "+c.done.toLowerCase()}</button><button class="btn" id="sh-upto">Mark everything up to here</button></div>
+    <div class="b-label">My note for this ${c.unit}</div>
+    <textarea id="sh-note" placeholder="What happened, favorite moment, how it made you feel…">${esc((it.my.unotes||{})[x.k]||"")}</textarea>
+    <div class="row-btns"><button class="btn pri" id="sh-save">Save note</button><button class="btn" id="sh-close">Close</button></div></div>`;
+  document.body.appendChild(w);
+  const close = ()=>{ w.classList.add("out"); setTimeout(()=>w.remove(), 180); };
+  w.onclick = e=>{ if(e.target===w) close(); };
+  $("#sh-close",w).onclick = close;
+  $("#sh-done",w).onclick = ()=>{ if(it.my.done[x.k]) delete it.my.done[x.k]; else it.my.done[x.k]=1; autoStatus(it); touch(it); onChange(); close(); };
+  $("#sh-upto",w).onclick = ()=>{ const L = units[it.id]; const idx = L.findIndex(y=>y.k===x.k); const before={...it.my.done}; for(let i=0;i<=idx;i++) it.my.done[L[i].k]=1; autoStatus(it); touch(it); onChange(); close(); toast("Marked everything through "+label, ()=>{ it.my.done=before; touch(it); onChange(); }); };
+  $("#sh-save",w).onclick = ()=>{ const v = $("#sh-note",w).value.trim(); it.my.unotes ||= {}; if(v) it.my.unotes[x.k]=v; else delete it.my.unotes[x.k]; touch(it); onChange(); close(); toast(v?"Note saved":"Note removed"); };
+}
+
+
+/* ============ CHARACTER RATINGS (optional per title) ============ */
+const CHAR_LABELS = ["Female lead","Male lead","Main character","Second lead","Love interest","Villain","Side character","Favorite"];
+function renderChars(pg, it){
+  const box = $("#d-chars",pg); if(!box) return; const ch = it.my.chars;
+  const canFetch = !!(it.src?.al || it.src?.mal || it.src?.tvm);
+  if(!ch?.on){
+    box.innerHTML = `<div class="sec chars-off"><div style="flex:1"><b>Rate the characters</b><div style="font-size:12.5px;color:var(--mut);margin-top:2px">Optional. ${canFetch?"Pulls in the cast with pictures so you can rate leads and side characters.":"Add the characters you care about with photos and ratings."}</div></div><button class="btn pri" id="ch-on">Turn on</button></div>`;
+    $("#ch-on",box).onclick = async ()=>{ it.my.chars = {on:true, list: ch?.list||[]}; touch(it);
+      if(canFetch && !it.my.chars.list.length){ box.innerHTML = `<div class="sec"><h3>Characters</h3><div class="spinner" style="margin:12px auto"></div></div>`;
+        try{ it.my.chars.list = (await getCharacters(it)).map(c=>({...c, rating:0, note:"", hidden:false})); touch(it); }catch(e){ toast("Couldn't load the cast right now. You can add characters yourself."); } }
+      renderChars(pg, it); };
+    return;
+  }
+  const vis = ch.list.filter(c=>!c.hidden), hid = ch.list.filter(c=>c.hidden);
+  const order = l => l.slice().sort((a,b)=>(CHAR_LABELS.indexOf(a.label)+(a.label?0:99)) - (CHAR_LABELS.indexOf(b.label)+(b.label?0:99)));
+  const card = c => `<button class="char" data-id="${esc(c.id)}"><div class="ci">${c.img?`<img src="${esc(c.img)}" loading="lazy" referrerpolicy="no-referrer" alt="">`:`<span>${esc((c.name||"?")[0])}</span>`}${c.rating?`<b class="cr" style="background:${ratingColor(c.rating)}">${c.rating}</b>`:""}</div><div class="cn">${esc(c.name)}</div><div class="cl">${esc(c.label||c.role||"")}</div></button>`;
+  box.innerHTML = `<div class="sec"><h3>Characters <span class="r">${vis.filter(c=>c.rating).length} of ${vis.length} rated</span></h3>
+    ${vis.length?`<div class="chars">${order(vis).map(card).join("")}</div>`:`<div style="color:var(--mut);font-size:13px">No characters yet. Add the ones you care about.</div>`}
+    ${hid.length?`<details class="hid"><summary>${hid.length} hidden</summary><div class="chars">${hid.map(card).join("")}</div></details>`:""}
+    <div class="row-btns"><button class="btn" id="ch-add">+ Add a character</button>${canFetch?`<button class="btn" id="ch-ref">Reload cast</button>`:""}<button class="btn danger" id="ch-off">Turn off</button></div></div>`;
+  box.querySelectorAll(".char").forEach(b=>b.onclick=()=>openCharSheet(pg, it, ch.list.find(c=>c.id===b.dataset.id)));
+  $("#ch-add",box).onclick = ()=>openCharSheet(pg, it, null);
+  $("#ch-off",box).onclick = ()=>{ ch.on = false; touch(it); renderChars(pg,it); toast("Characters hidden. Your ratings are kept."); };
+  const rf = $("#ch-ref",box); if(rf) rf.onclick = async ()=>{ try{ const fresh = await getCharacters(it); const old = new Map(ch.list.map(c=>[c.id,c]));
+      fresh.forEach(f=>{ const o = old.get(f.id); if(o){ o.img = f.img || o.img; o.name = f.name; } else ch.list.push({...f, rating:0, note:"", hidden:false}); }); touch(it); renderChars(pg,it); toast("Cast updated"); }catch(e){ toast("Couldn't reload right now"); } };
+}
+function openCharSheet(pg, it, c){
+  const isNew = !c; c = c || {id:"u"+uid(), name:"", img:"", role:"", label:"Side character", rating:0, note:"", hidden:false, custom:true};
+  let img = c.img, rating = c.rating, label = c.label;
+  document.querySelectorAll(".sheet-wrap").forEach(s=>s.remove());
+  const w = document.createElement("div"); w.className = "sheet-wrap";
+  w.innerHTML = `<div class="sheet"><div class="grab"></div>
+    <div class="sh-top"><div class="sh-img" id="cs-img">${img?`<img src="${esc(img)}" referrerpolicy="no-referrer">`:`<div class="ph" style="display:grid;place-items:center;height:100%">No photo</div>`}</div>
+      <div style="min-width:0;flex:1">${isNew||c.custom?`<input id="cs-name" class="cs-name" placeholder="Character name" value="${esc(c.name)}">`:`<div class="sh-t">${esc(c.name)}</div>`}${c.alt?`<div class="sh-d">${esc(c.alt)}</div>`:""}${c.role?`<div class="sh-d">${esc(c.role)} role</div>`:""}
+      <div class="row-btns" style="margin-top:8px"><button class="btn" id="cs-photo">${img?"Change photo":"Add photo"}</button></div><input type="file" id="cs-file" accept="image/*" hidden></div></div>
+    <div class="b-label">Who are they?</div><div class="seg" id="cs-label">${CHAR_LABELS.map(l=>`<button class="${l===label?"on":""}">${l}</button>`).join("")}</div>
+    <div class="b-label">My rating <span id="cs-rn" style="text-transform:none;letter-spacing:0"></span></div><div class="rating" id="cs-rating" style="margin-top:6px">${[1,2,3,4,5,6,7,8,9,10].map(n=>`<button data-n="${n}">${n}</button>`).join("")}</div>
+    <div class="b-label">Thoughts</div><textarea id="cs-note" placeholder="Why you love (or hate) them…">${esc(c.note||"")}</textarea>
+    <div class="row-btns"><button class="btn pri" id="cs-save">Save</button>${isNew?"":`<button class="btn" id="cs-hide">${c.hidden?"Show in list":"Hide"}</button>${c.custom?`<button class="btn danger" id="cs-del">Delete</button>`:""}`}<button class="btn" id="cs-x">Close</button></div></div>`;
+  document.body.appendChild(w);
+  const close = ()=>{ w.classList.add("out"); setTimeout(()=>w.remove(),180); };
+  w.onclick = e=>{ if(e.target===w) close(); };
+  const drawR = ()=>{ w.querySelectorAll("#cs-rating button").forEach(b=>{ const on = +b.dataset.n<=rating; b.classList.toggle("on",on); b.style.background = on?ratingColor(rating):""; }); $("#cs-rn",w).textContent = rating ? `· ${rating}/10 · ${RATING_WORDS[rating]}` : ""; };
+  w.querySelectorAll("#cs-rating button").forEach(b=>b.onclick=()=>{ const n=+b.dataset.n; rating = rating===n?0:n; drawR(); }); drawR();
+  w.querySelectorAll("#cs-label button").forEach(b=>b.onclick=()=>{ label=b.textContent; w.querySelectorAll("#cs-label button").forEach(x=>x.classList.toggle("on",x===b)); });
+  $("#cs-photo",w).onclick = ()=>$("#cs-file",w).click();
+  $("#cs-file",w).onchange = async e=>{ const f=e.target.files[0]; if(!f) return; img = await shrinkImage(f); $("#cs-img",w).innerHTML = `<img src="${img}">`; };
+  $("#cs-x",w).onclick = close;
+  $("#cs-save",w).onclick = ()=>{
+    const nm = $("#cs-name",w) ? $("#cs-name",w).value.trim() : c.name; if(!nm){ toast("Add a name"); return; }
+    Object.assign(c, {name:nm, img, rating, label, note:$("#cs-note",w).value.trim()});
+    if(isNew) it.my.chars.list.push(c);
+    touch(it); renderChars(pg,it); close(); toast("Saved");
+  };
+  const hd = $("#cs-hide",w); if(hd) hd.onclick = ()=>{ c.hidden = !c.hidden; touch(it); renderChars(pg,it); close(); };
+  const dl = $("#cs-del",w); if(dl) dl.onclick = ()=>{ it.my.chars.list = it.my.chars.list.filter(x=>x!==c); touch(it); renderChars(pg,it); close(); };
 }
 
 /* ============ BOOT ============ */
