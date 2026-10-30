@@ -3161,7 +3161,7 @@ function renderSettings(sub){
         ${x.id===data.active?`<span style="font-size:12px;color:var(--good);font-weight:700">ACTIVE</span>`:`<button class="btn" data-sw="${x.id}">Switch</button><button class="btn danger" data-rm="${x.id}">Delete</button>`}</div>`).join("")}
       <div class="row-btns"><button class="btn" id="s-newp">+ Add a profile</button></div></div>` : ""}
     ${want("backup") ? `<div class="sec"><h3>Transfer with a code</h3>
-      <div style="color:var(--mut);font-size:13px;margin-bottom:10px">Make your phone and computer match. Open Shelf Life on both, tap <b>Send</b> on the one that has the shelf you want, then type the code on the other. Nothing is uploaded anywhere. It goes straight from one device to the other.</div>
+      <div style="color:var(--mut);font-size:13px;margin-bottom:10px">Make your phone and computer match. Tap <b>Send</b> on the one that has the shelf you want, then type the code on the other. Your shelf is locked with the code before it leaves your device, and the locked copy deletes itself after a few hours.</div>
       <div class="row-btns"><button class="btn pri" id="s-send">📤 Send my shelf</button><button class="btn pri" id="s-recv">📥 Get a shelf</button></div></div>
     <div class="sec"><h3>Backup &amp; restore</h3>
       <div style="color:var(--mut);font-size:13px;margin-bottom:8px">Your shelf lives on this phone. Save a backup every so often so you never lose it, or use one to move your shelf to a new phone.</div>
@@ -4467,67 +4467,83 @@ function drawMovies(pg, it, ALL, after){
   box.querySelectorAll(".mv").forEach(b=>b.onclick=()=>{ const k = b.dataset.k; if(it.my.done[k]) delete it.my.done[k]; else it.my.done[k] = 1; touch(it); drawMovies(pg, it, ALL, after); after && after(); });
 }
 
-/* ============ TRANSFER WITH A CODE (device to device, no account) ============ */
-function loadPeer(){ return new Promise((res, rej)=>{ if(window.Peer) return res(window.Peer); const sc = document.createElement("script"); sc.src = "peerjs.min.js"; sc.onload = ()=>window.Peer ? res(window.Peer) : rej(new Error("load")); sc.onerror = ()=>rej(new Error("load")); document.head.appendChild(sc); }); }
+/* ============ TRANSFER WITH A CODE (no account) ============ */
+// The shelf is compressed and locked with the code (AES-256), then parked on ntfy.sh for a few hours.
+// Only someone with the code can unlock it; ntfy deletes it automatically.
 async function shelfPackage(){ const u = {}; for(const k of await DB.keys()) if(String(k).startsWith("units:")) u[k] = await DB.get(k); return {app:"shelf", v:1, at:Date.now(), data:JSON.parse(JSON.stringify(data)), units:u}; }
+const XF_ALPHA = "23456789ABCDEFGHJKMNPQRSTUVWXYZ";
+const XF_HOST = "https://ntfy.sh/";
+function xfCode(){ const r = crypto.getRandomValues(new Uint8Array(8)); return [...r].map(x=>XF_ALPHA[x % XF_ALPHA.length]).join(""); }
+const xfNorm = c => String(c||"").toUpperCase().replace(/[^0-9A-Z]/g,"").replace(/[O]/g,"0").replace(/[IL]/g,"1");
+async function xfTopic(code){ const h = new Uint8Array(await crypto.subtle.digest("SHA-256", new TextEncoder().encode("shelflife-topic:" + code))); return "shelflife_" + [...h].slice(0,12).map(x=>x.toString(16).padStart(2,"0")).join(""); }
+async function xfKey(code){ const base = await crypto.subtle.importKey("raw", new TextEncoder().encode(code), "PBKDF2", false, ["deriveKey"]); return crypto.subtle.deriveKey({name:"PBKDF2", salt:new TextEncoder().encode("shelflife-salt-v1"), iterations:150000, hash:"SHA-256"}, base, {name:"AES-GCM", length:256}, false, ["encrypt","decrypt"]); }
+async function xfPack(obj, code){
+  const raw = new Blob([JSON.stringify(obj)]).stream().pipeThrough(new CompressionStream("gzip"));
+  const zipped = new Uint8Array(await new Response(raw).arrayBuffer());
+  const iv = crypto.getRandomValues(new Uint8Array(12)); const ct = new Uint8Array(await crypto.subtle.encrypt({name:"AES-GCM", iv}, await xfKey(code), zipped));
+  const out = new Uint8Array(4 + iv.length + ct.length); out.set(new TextEncoder().encode("SLX1")); out.set(iv, 4); out.set(ct, 16); return out;
+}
+async function xfUnpack(buf, code){
+  const u = new Uint8Array(buf); if(new TextDecoder().decode(u.slice(0,4)) !== "SLX1") throw new Error("format");
+  const pt = await crypto.subtle.decrypt({name:"AES-GCM", iv:u.slice(4,16)}, await xfKey(code), u.slice(16));
+  const txt = await new Response(new Blob([pt]).stream().pipeThrough(new DecompressionStream("gzip"))).text(); return JSON.parse(txt);
+}
 function openTransfer(mode){
   document.querySelectorAll(".xfer").forEach(x=>x.remove());
-  const w = document.createElement("div"); w.className = "sheet-wrap xfer";
-  let peer = null, conn = null, timer = null, done = false;
-  const cleanup = ()=>{ clearTimeout(timer); try{ conn && conn.close(); }catch(e){} try{ peer && peer.destroy(); }catch(e){} };
-  const close = ()=>{ cleanup(); w.classList.add("out"); setTimeout(()=>w.remove(), 180); };
+  const w = document.createElement("div"); w.className = "sheet-wrap xfer"; let done = false;
+  const close = ()=>{ w.classList.add("out"); setTimeout(()=>w.remove(), 180); };
   const body = html => { w.innerHTML = `<div class="sheet"><div class="sh-grab"></div>${html}<div class="row-btns" style="margin-top:16px"><button class="btn" id="x-close">${done?"Done":"Cancel"}</button></div></div>`; $("#x-close",w).onclick = close; };
-  const fail = msg => body(`<h3 class="display" style="margin:0 0 6px">Couldn't connect</h3><div style="color:var(--mut);font-size:13.5px">${msg}</div><div style="color:var(--dim);font-size:12.5px;margin-top:10px">Tips: make sure both devices are online and the app is open on both. Some school or work Wi-Fi blocks direct connections, so switching one device to mobile data can help. A backup file always works too.</div>`);
+  const fail = (msg, extra="") => body(`<h3 class="display" style="margin:0 0 6px">That didn't work</h3><div style="color:var(--mut);font-size:13.5px">${msg}</div>${extra}<div style="color:var(--dim);font-size:12.5px;margin-top:10px">If it keeps happening, the backup file below always works.</div>`);
   document.body.appendChild(w); w.onclick = e=>{ if(e.target===w) close(); };
-  body(`<div class="spinner" style="margin:20px auto"></div><div class="hint">Getting ready…</div>`);
-  const code = () => String(Math.floor(100000 + Math.random()*900000));
-  loadPeer().then(Peer=>{
-    if(mode === "send"){
-      const start = (tries) => {
-        const c = code(); peer = new Peer("shelflife-x-" + c, {debug:0});
-        peer.on("open", ()=>{
-          body(`<h3 class="display" style="margin:0 0 6px">Your code</h3><div style="color:var(--mut);font-size:13.5px">On your other device, open Shelf Life, go to <b>Settings → Transfer & backup → Get a shelf</b> and type this code.</div>
-            <div class="x-code">${c.slice(0,3)} ${c.slice(3)}</div><div class="hint" id="x-st">Waiting for your other device… keep this screen open.</div>`);
-          timer = setTimeout(()=>fail("The code expired after 10 minutes. Tap Send again to get a new one."), 600000);
-        });
-        peer.on("connection", async cn=>{ conn = cn; const st = $("#x-st",w); if(st) st.textContent = "Connected! Sending your shelf…";
-          cn.on("open", async ()=>{ const pkg = await shelfPackage(); const n = Object.values(pkg.data.items||{}).reduce((s,x)=>s+Object.keys(x).length,0);
-            cn.send({t:"shelf", pkg}); cn.on("data", d=>{ if(d && d.t==="got"){ done = true; body(`<h3 class="display" style="margin:0 0 6px">Sent! 🎉</h3><div style="color:var(--mut);font-size:13.5px">${n} title${n===1?"":"s"} went to your other device.</div>`); setTimeout(cleanup, 1500); } }); });
-        });
-        peer.on("error", err=>{ if(err.type==="unavailable-id" && tries < 4){ try{ peer.destroy(); }catch(e){} start(tries+1); } else fail(err.type==="network" || err.type==="server-error" || err.type==="socket-error" ? "Couldn't reach the connection service. Check your internet and try again." : "Something went wrong (" + (err.type||"error") + "). Try again."); });
-      };
-      start(0);
-    } else {
-      body(`<h3 class="display" style="margin:0 0 6px">Get a shelf</h3><div style="color:var(--mut);font-size:13.5px">On the device that has your shelf, tap <b>Send my shelf</b>, then type the code it shows.</div>
-        <input class="x-in" id="x-code" inputmode="numeric" maxlength="7" placeholder="123 456" autocomplete="off"><button class="btn pri" id="x-go" style="width:100%;margin-top:10px;padding:12px">Connect</button>`);
-      const inp = $("#x-code",w); setTimeout(()=>inp.focus(), 100);
-      inp.oninput = ()=>{ const d = inp.value.replace(/\D/g,"").slice(0,6); inp.value = d.length > 3 ? d.slice(0,3)+" "+d.slice(3) : d; };
-      $("#x-go",w).onclick = ()=>{ const c = inp.value.replace(/\D/g,""); if(c.length !== 6){ toast("The code has 6 numbers"); return; }
-        body(`<div class="spinner" style="margin:20px auto"></div><div class="hint" id="x-st">Connecting…</div>`);
-        peer = new Peer(undefined, {debug:0});
-        peer.on("open", ()=>{ conn = peer.connect("shelflife-x-" + c, {reliable:true});
-          timer = setTimeout(()=>fail("Couldn't find that code. Double-check the numbers, and make sure the other device is still showing it."), 25000);
-          conn.on("open", ()=>{ const st = $("#x-st",w); if(st) st.textContent = "Connected! Receiving your shelf…"; });
-          conn.on("data", d=>{ if(!d || d.t!=="shelf") return; clearTimeout(timer); try{ conn.send({t:"got"}); }catch(e){} askApply(d.pkg); });
-          conn.on("error", ()=>fail("The connection dropped. Try again."));
-        });
-        peer.on("error", err=>{ clearTimeout(timer); fail(err.type==="peer-unavailable" ? "Couldn't find that code. Double-check the numbers, and make sure the other device is still showing it." : "Couldn't reach the connection service. Check your internet and try again."); });
-      };
-      inp.onkeydown = e=>{ if(e.key==="Enter") $("#x-go",w).click(); };
-    }
-  }).catch(()=>fail("Couldn't load the transfer tool. Check your internet and try again."));
+  if(mode === "send"){
+    body(`<div class="spinner" style="margin:20px auto"></div><div class="hint" id="x-st">Packing up your shelf…</div>`);
+    (async()=>{
+      try{
+        const code = xfCode(); const pkg = await shelfPackage(); const n = Object.values(pkg.data.items||{}).reduce((s,x)=>s+Object.keys(x).length,0);
+        const bin = await xfPack(pkg, code); if(bin.length > 14e6) throw new Error("big");
+        const st = $("#x-st",w); if(st) st.textContent = "Uploading a locked copy…";
+        const r = await fetch(XF_HOST + await xfTopic(code), {method:"PUT", body:new Blob([bin]), headers:{"Filename":"shelf.bin", "Title":"Shelf Life transfer"}});
+        if(!r.ok) throw new Error("http " + r.status);
+        const shown = code.slice(0,4) + "-" + code.slice(4);
+        body(`<h3 class="display" style="margin:0 0 6px">Your code</h3><div style="color:var(--mut);font-size:13.5px">On your other device, open Shelf Life, go to <b>Settings → Transfer & backup → Get a shelf</b> and type this code. You can close this screen now.</div>
+          <div class="x-code">${shown}</div><div class="row-btns" style="justify-content:center"><button class="btn" id="x-copy">Copy code</button></div>
+          <div class="hint">${n} title${n===1?"":"s"} ready. The code works for about 3 hours.</div>`);
+        $("#x-copy",w).onclick = ()=>{ try{ navigator.clipboard.writeText(shown); toast("Code copied"); }catch(e){} };
+      }catch(e){ fail(e.message==="big" ? "Your shelf is too big to send this way. Use the backup file instead." : "Couldn't upload your shelf. Check your internet connection and try again."); }
+    })();
+  } else {
+    body(`<h3 class="display" style="margin:0 0 6px">Get a shelf</h3><div style="color:var(--mut);font-size:13.5px">On the device that has your shelf, tap <b>Send my shelf</b>, then type the 8-character code it shows.</div>
+      <input class="x-in" id="x-code" maxlength="9" placeholder="ABCD-1234" autocomplete="off" autocapitalize="characters" spellcheck="false"><button class="btn pri" id="x-go" style="width:100%;margin-top:10px;padding:12px">Get it</button>`);
+    const inp = $("#x-code",w); setTimeout(()=>inp.focus(), 100);
+    inp.oninput = ()=>{ const d = xfNorm(inp.value).slice(0,8); inp.value = d.length > 4 ? d.slice(0,4)+"-"+d.slice(4) : d; };
+    inp.onkeydown = e=>{ if(e.key==="Enter") $("#x-go",w).click(); };
+    $("#x-go",w).onclick = async()=>{
+      const code = xfNorm(inp.value); if(code.length !== 8){ toast("The code has 8 letters and numbers"); return; }
+      body(`<div class="spinner" style="margin:20px auto"></div><div class="hint" id="x-st">Looking for your shelf…</div>`);
+      try{
+        const r = await fetch(XF_HOST + await xfTopic(code) + "/json?poll=1&since=12h"); if(!r.ok) throw new Error("http");
+        const msgs = (await r.text()).split("\n").filter(Boolean).map(l=>{ try{ return JSON.parse(l); }catch(e){ return null; } }).filter(m=>m && m.event==="message" && m.attachment && m.attachment.url);
+        if(!msgs.length){ fail("Couldn't find a shelf with that code. Double-check it, or send again to get a new code. Codes last about 3 hours."); return; }
+        const st = $("#x-st",w); if(st) st.textContent = "Found it! Unlocking…";
+        const f = await fetch(msgs[msgs.length-1].attachment.url); if(!f.ok) throw new Error("gone");
+        let pkg; try{ pkg = await xfUnpack(await f.arrayBuffer(), code); }catch(e){ fail("That code didn't unlock the shelf. Check that you typed it exactly."); return; }
+        if(!pkg || pkg.app !== "shelf") throw new Error("bad");
+        askApply(pkg);
+      }catch(e){ fail(e.message==="gone" ? "That code expired. Tap Send again on your other device to get a new one." : "Couldn't reach the transfer service. Check your internet connection and try again."); }
+    };
+  }
   function askApply(pkg){
     const inc = pkg.data, n = Object.values(inc.items||{}).reduce((s,x)=>s+Object.keys(x).length,0);
     const mine = Object.values(data.items||{}).reduce((s,x)=>s+Object.keys(x).length,0);
     body(`<h3 class="display" style="margin:0 0 6px">Got it! 📦</h3><div style="color:var(--mut);font-size:13.5px">${n} title${n===1?"":"s"} from your other device. This device has ${mine}.</div>
       <div class="x-opt"><button class="btn pri" id="x-merge">Combine both</button><div>Adds anything new and keeps whichever copy was updated most recently. Nothing gets lost.</div></div>
       <div class="x-opt"><button class="btn" id="x-replace">Replace this device's shelf</button><div>Makes this device an exact copy of the other one.</div></div>`);
-    $("#x-merge",w).onclick = async()=>{ const r = await mergeShelf(pkg); done = true; body(`<h3 class="display" style="margin:0 0 6px">All matched up 🎉</h3><div style="color:var(--mut);font-size:13.5px">Added ${r.added}, updated ${r.updated}${r.profiles?`, and ${r.profiles} new profile${r.profiles>1?"s":""}`:""}.</div>`); cleanup(); };
+    $("#x-merge",w).onclick = async()=>{ const r = await mergeShelf(pkg); done = true; body(`<h3 class="display" style="margin:0 0 6px">All matched up 🎉</h3><div style="color:var(--mut);font-size:13.5px">Added ${r.added}, updated ${r.updated}${r.profiles?`, and ${r.profiles} new profile${r.profiles>1?"s":""}`:""}.</div>`); };
     $("#x-replace",w).onclick = async()=>{ for(const k of await DB.keys()) if(String(k).startsWith("units:")) await DB.del(k);
       for(const [k,v] of Object.entries(pkg.units||{})) await DB.set(k, v);
       const keepAi = data.settings?.ai; data = inc; if(keepAi) (data.settings ||= {}).ai = keepAi; Object.keys(units).forEach(k=>delete units[k]);
       if(!data.profiles.find(p=>p.id===data.active)) data.active = data.profiles[0]?.id; await saveNow(); applyTheme(); done = true;
-      body(`<h3 class="display" style="margin:0 0 6px">All matched up 🎉</h3><div style="color:var(--mut);font-size:13.5px">This device now has the same shelf as your other one.</div>`); cleanup(); };
+      body(`<h3 class="display" style="margin:0 0 6px">All matched up 🎉</h3><div style="color:var(--mut);font-size:13.5px">This device now has the same shelf as your other one.</div>`); };
   }
 }
 async function mergeShelf(pkg){
@@ -4552,7 +4568,7 @@ async function mergeShelf(pkg){
     if(ip.plantState?.days && (!lp.plantState?.days || ip.plantState.days.length > lp.plantState.days.length)) lp.plantState = ip.plantState;
     if(!lp.look && ip.look) lp.look = ip.look;
   }
-  await saveNow(); applyTheme(); route();
+  await saveNow(); applyTheme(); curMain = null;
   return {added, updated, profiles};
 }
 

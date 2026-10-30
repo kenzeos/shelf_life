@@ -1,6 +1,6 @@
-const CACHE = "shelf-v23";
+const CACHE = "shelf-v24";
 const IMG = "shelf-img-v1";
-const FILES = ["./", "./index.html", "./manifest.json", "./peerjs.min.js", "./icon-192.png", "./icon-512.png", "./apple-touch-icon.png", "./favicon.png"];
+const FILES = ["./", "./index.html", "./manifest.json", "./icon-192.png", "./icon-512.png", "./apple-touch-icon.png", "./favicon.png"];
 
 self.addEventListener("install", e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(FILES.map(u => new Request(u, {cache: "reload"})))));
