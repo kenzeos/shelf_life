@@ -473,6 +473,47 @@ html.ombre .sec,html.ombre .res,html.ombre .cont{background:color-mix(in srgb,va
 .q-rate button.on{color:#1a1200;border-color:transparent}
 .q-acts{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
 .ai-on{font-size:9.5px;font-weight:800;background:var(--acc);color:#fff;border-radius:5px;padding:1px 4px;margin-left:3px;vertical-align:middle}
+.chip.lifted{transform:scale(1.1);box-shadow:0 8px 20px var(--shadow);z-index:5;position:relative;outline:2px solid var(--c,var(--acc))}
+.chips.reordering{scroll-behavior:auto}
+.chip-pop{position:fixed;z-index:90;display:flex;align-items:center;gap:8px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:6px 6px 6px 6px;box-shadow:0 10px 26px var(--shadow);font-size:12px;color:var(--dim);animation:fade .15s ease}
+.chip-pop span{padding-right:6px}
+.chip-pop .cp-set{border:0;background:var(--acc);color:#fff;font-weight:700;border-radius:9px;padding:7px 10px;font-size:13px}
+.drag-h{font-size:20px;color:var(--dim);padding:6px 4px 6px 8px;cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none}
+.catrow.lifted{background:var(--bg2);box-shadow:0 8px 22px var(--shadow);border-radius:12px;transform:scale(1.02)}
+.cs-cols{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
+.cs-cols button{width:32px;height:32px;border-radius:50%;border:3px solid transparent;box-shadow:0 0 0 1px var(--line)}
+.cs-cols button.on{border-color:var(--txt)}
+.set-menu{display:flex;flex-direction:column;gap:8px;margin-top:4px}
+.set-item{display:flex;align-items:center;gap:12px;text-align:left;background:var(--card);border:var(--bw,1px) solid var(--line);border-radius:var(--r);padding:13px 14px;color:var(--txt);width:100%}
+.si-ic{font-size:22px;width:30px;text-align:center;flex:none}
+.si-t{flex:1;min-width:0}.si-t b{display:block;font-size:15px}.si-t small{display:block;font-size:12px;color:var(--mut);margin-top:2px;line-height:1.3}
+.si-ar{font-size:22px;color:var(--dim)}
+/* groups */
+.gstack{background:transparent!important;box-shadow:none!important;overflow:visible!important}
+.gstack .gs{position:absolute;inset:0;border-radius:inherit;overflow:hidden;box-shadow:0 4px 12px var(--shadow);transform:translate(calc(var(--k)*5px),calc(var(--k)*-5px)) rotate(calc(var(--k)*2.5deg));background:var(--bg2)}
+.gstack .gs img{width:100%;height:100%;object-fit:cover;display:block}
+.gcount{position:absolute;top:6px;left:6px;z-index:4;background:var(--c,var(--acc));color:#fff;font-size:11px;font-weight:800;border-radius:99px;padding:2px 7px;box-shadow:0 2px 6px rgba(0,0,0,.3)}
+.gstack .rate,.gstack .bar{z-index:4}
+.gstrip{padding:10px 12px}
+.gs-top{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}.gs-top b{font-size:14.5px}.gs-top span{font-size:11.5px;color:var(--dim);flex:1}
+.gs-row{display:flex;gap:8px;overflow-x:auto;padding:8px 0 2px;scrollbar-width:none}
+.gs-it{flex:none;width:62px;background:none;border:0;padding:0;color:var(--mut);font-size:10.5px;text-align:center;opacity:.6}
+.gs-it .cover{width:62px;border-radius:7px;margin-bottom:3px}.gs-it span{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;line-height:1.2}
+.gs-it.on{opacity:1;color:var(--txt)}.gs-it.on .cover{outline:2.5px solid var(--c,var(--acc));outline-offset:1px}
+.page.swipe-l{transform:translateX(-30px);opacity:.4;transition:.12s}.page.swipe-r{transform:translateX(30px);opacity:.4;transition:.12s}
+.gm-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-top:1px solid var(--line)}
+.gm-row .cover{width:38px;flex:none;border-radius:6px}.gm-row b{display:block;font-size:13.5px;line-height:1.25}.gm-row small{font-size:11.5px;color:var(--mut)}
+.gm-row.lifted{background:var(--bg2);border-radius:10px;box-shadow:0 6px 18px var(--shadow)}
+/* batch select */
+.selck{position:absolute;top:6px;right:6px;z-index:6;width:22px;height:22px;border-radius:50%;border:2px solid #fff;background:rgba(0,0,0,.35);box-shadow:0 1px 4px rgba(0,0,0,.4)}
+.tile.sel .selck{background:var(--acc);border-color:#fff}
+.tile.sel .selck::after{content:"";position:absolute;left:6px;top:2px;width:5px;height:10px;border:solid #fff;border-width:0 2.5px 2.5px 0;transform:rotate(45deg)}
+.grid.selecting .tile .cover{transition:transform .15s}.grid.selecting .tile.sel .cover{transform:scale(.92)}
+.grid.selecting .tile .rate{display:none}
+.selbar{position:fixed;left:8px;right:8px;bottom:calc(64px + var(--safe-b));z-index:46;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:10px 12px;box-shadow:0 10px 30px var(--shadow);animation:fade .15s ease}
+.sb-top{display:flex;align-items:center;gap:10px}.sb-top b{flex:1}
+.sb-acts{display:flex;gap:6px;margin-top:8px}.sb-acts .btn{flex:1;padding:9px 6px}
+.sb-acts .btn:disabled{opacity:.4}
 
 /* ================= DECOR ================= */
 :root{--acc2:#ff7eb3;--shk:1;--bw:1px}
@@ -2154,6 +2195,7 @@ function statusLabel(s, cat){
 }
 const bookDone = (it,b) => (it.my.books?.[b.id]?.status)==="completed";
 function totalOf(it){
+  if(it.isGroup) return 0;
   if(it.isSeries) return (it.books||[]).length;
   if(it.cat==="game") return 0;
   if(isOnce(it)) return 1;
@@ -2164,13 +2206,14 @@ function totalOf(it){
   return (C(it.cat)?.unit==="episode" ? it.meta?.episodes : it.meta?.chapters) || it.manualTotal || 0;
 }
 function doneOf(it){
+  if(it.isGroup) return 0;
   if(it.isSeries) return (it.books||[]).filter(b=>bookDone(it,b)).length;
   if(isOnce(it)) return it.my.status==="completed" ? 1 : 0;
   if(isPages(it)) return it.my.pages || 0;
   if(it.unitsTotal) return Object.keys(it.my.done||{}).length;
   return it.my.count || 0;
 }
-function pct(it){ if(isOnce(it) && it.my.status!=="completed" && it.my.time && it.meta?.runtime) return Math.min(99, Math.round(it.my.time/(it.meta.runtime*60)*100)); const t = totalOf(it), d = doneOf(it); return t ? Math.min(100, Math.round(d/t*100)) : (it.my.status==="completed"?100:0); }
+function pct(it){ if(it.isGroup) return it.gp; if(isOnce(it) && it.my.status!=="completed" && it.my.time && it.meta?.runtime) return Math.min(99, Math.round(it.my.time/(it.meta.runtime*60)*100)); const t = totalOf(it), d = doneOf(it); return t ? Math.min(100, Math.round(d/t*100)) : (it.my.status==="completed"?100:0); }
 function newItem(base){
   return {...base, id: uid(), added: Date.now(), updated: Date.now(),
     my:{status:"planned", rating:0, notes:[], done:{}, count:0, pages:0, owned:false, ownFormat:"", vols:{}, started:"", finished:"", rewatch:0}};
@@ -2202,7 +2245,8 @@ function back(){ if(history.length > 1 && location.hash) history.back(); else go
 window.addEventListener("hashchange", route);
 let curMain = null;
 function route(){
-  document.querySelectorAll(".page,.sheet-wrap").forEach(p=>p.remove());
+  document.querySelectorAll(".page,.sheet-wrap,.chip-pop").forEach(p=>p.remove());
+  if(location.hash.slice(1) && selecting){ selecting = null; document.querySelectorAll(".selbar").forEach(x=>x.remove()); }
   if(!data.profiles.length){ curMain = null; navBar(false); renderWelcome(); return; }
   navBar(true);
   const h = location.hash.slice(1);
@@ -2212,10 +2256,10 @@ function route(){
   if(h.startsWith("item/")) renderDetail(h.slice(5));
   else if(h.startsWith("preview/")) renderPreview(h.slice(8));
   else if(h.startsWith("add")) renderAdd(h.split("/")[1]);
-  else if(h==="settings") renderSettings();
+  else if(h==="settings" || h.startsWith("settings/")) renderSettings(h.split("/")[1]);
   else if(h==="updates") renderUpdates();
   else if(h==="newcat") renderNewCat();
-  else if(h==="look") renderLook();
+  else if(h==="look" || h.startsWith("look/")) renderLook(h.split("/")[1]);
   else if(h==="manual") renderManual();
   else if(h.startsWith("edit/")) renderManual(h.slice(5));
   document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("on", b.dataset.t===curMain));
@@ -2280,7 +2324,7 @@ function renderHome(){
   app.innerHTML = `
   <div class="top">
     <div class="top-row">
-      <h1 class="display">${esc(p.name)}${/s$/i.test(p.name)?"'":"'s"} Shelf</h1>
+      <h1 class="display">Shelf Life</h1>
       <button class="icon-btn bell" id="h-bell" aria-label="Updates">${IC.bell}<span class="dot hidden" id="h-dot"></span></button>
       <div class="mode-btn"><button data-m="ring" aria-label="Ring view">${IC.ring}</button><button data-m="grid" aria-label="Grid view">${IC.gridic}</button><button data-m="chars" aria-label="Characters">${IC.people}</button></div>
       <button class="icon-btn" id="h-set" aria-label="Settings">${IC.gear}</button>
@@ -2321,6 +2365,7 @@ function renderHome(){
   $("#h-genre").onchange = e=>{ view.genre = e.target.value; saveView(); drawGrid(); };
   document.querySelectorAll(".mode-btn button").forEach(b=>{ b.classList.toggle("on", b.dataset.m===view.mode); b.onclick=()=>{ view.mode=b.dataset.m; saveView(); document.querySelectorAll(".mode-btn button").forEach(x=>x.classList.toggle("on",x.dataset.m===view.mode)); drawGrid(); }; });
   $("#h-cats").querySelectorAll(".chip[data-cat]").forEach(b=>b.onclick=()=>{ view.cat = b.dataset.cat; saveView(); renderHome(); });
+  wireChipReorder($("#h-cats"));
   $("#h-addcat").onclick = ()=>go("#newcat");
   drawGrid();
 }
@@ -2340,15 +2385,19 @@ function drawGrid(){
   const q = view.q.trim().toLowerCase();
   if(q) items = items.filter(i=>[i.title, i.alt, (i.aka||[]).join(" "), (i.genres||[]).join(" "), (i.meta?.authors||[]).join(" "), i.meta?.studio, i.meta?.network, i.meta?.director,
       (i.my.notes||[]).map(n=>n.text).join(" "), Object.values(i.my.unotes||{}).join(" "), (i.my.chars?.list||[]).map(c=>c.name+" "+(c.label||"")).join(" "), C(i.cat).label].filter(Boolean).join(" ").toLowerCase().includes(q));
+  if(q){ const gm = Object.values(GRP()).filter(G=>G.name.toLowerCase().includes(q)).flatMap(G=>G.members); const all = Object.values(lib()).filter(i=>prof().cats.includes(i.cat)); gm.forEach(id=>{ const x = lib()[id]; if(x && !items.includes(x) && all.includes(x)) items.push(x); }); }
+  items = collapseGroups(items);
   const S = {updated:(a,b)=>b.updated-a.updated, added:(a,b)=>b.added-a.added, title:(a,b)=>a.title.localeCompare(b.title),
-             rating:(a,b)=>(b.my.rating||0)-(a.my.rating||0)||b.updated-a.updated, progress:(a,b)=>pct(b)-pct(a),
+             rating:(a,b)=>(b.my.rating||0)-(a.my.rating||0)||b.updated-a.updated, progress:(a,b)=>pctX(b)-pctX(a),
              genre:(a,b)=>((a.genres||[])[0]||"~").localeCompare((b.genres||[])[0]||"~")||a.title.localeCompare(b.title)};
   items.sort(S[view.sort]||S.updated);
-  $("#h-count").textContent = items.length + (items.length===1?" title":" titles");
-  if(view.mode==="chars" && prof().cats.length){ drawCharView(g, items); return; }
-  g.className = view.mode==="ring" && items.length ? "" : "grid";
+  { const n = items.reduce((s,x)=>s+(x.isGroup?x.members.length:1),0); $("#h-count").textContent = n + (n===1?" title":" titles"); }
+  drawSelBar();
+  const flat = items.flatMap(x=>x.isGroup ? x.shown : [x]);
+  if(view.mode==="chars" && prof().cats.length){ drawCharView(g, flat); return; }
+  g.className = view.mode==="ring" && items.length && !selecting ? "" : "grid";
   if(!prof().cats.length){ g.className="grid"; g.innerHTML = `<div class="empty"><div class="big">Make your first category</div>Anime, books, K-dramas, video games… whatever you want to keep track of.<br><button class="btn pri" id="h-newcat" style="margin-top:14px">+ Add a category</button></div>`; $("#h-newcat").onclick=()=>go("#newcat"); return; }
-  if(items.length && view.mode==="ring"){ const h1 = document.createElement("div"); g.innerHTML = ""; g.appendChild(h1); drawRing(h1, items, {key:"titles", cls: prof().showChars!==false && allChars(items).length ? "tight" : ""}); drawShelfCharRing(g, items); return; }
+  if(items.length && view.mode==="ring" && !selecting){ const h1 = document.createElement("div"); g.innerHTML = ""; g.appendChild(h1); drawRing(h1, items, {key:"titles", cls: prof().showChars!==false && allChars(flat).length ? "tight" : ""}); drawShelfCharRing(g, flat); return; }
   if(!items.length){
     const none = !Object.keys(lib()).length;
     g.innerHTML = `<div class="empty"><div class="big">${none?"Your shelf is empty":"Nothing here yet"}</div>${none?"Tap <b>Add</b> to search for something you're watching or reading.":"Try a different filter."}</div>`;
@@ -2362,10 +2411,12 @@ function drawGrid(){
     if(hd && hd!==lastHead){ lastHead = hd; head = `<div class="ghead">${esc(hd)} <small>${counts[hd]}</small></div>`; }
     return head + tileHTML(it);
   }).join("");
-  g.querySelectorAll(".tile").forEach(t=>t.onclick=()=>go("#item/"+t.dataset.id));
-  wireHold(g, ".tile", el=>({it: lib()[el.dataset.id]}));
+  g.querySelectorAll(".tile").forEach(t=>t.onclick=()=>{ if(selecting){ toggleSel(t); return; } go("#item/"+t.dataset.id); });
+  wireHold(g, ".tile", el=>el.dataset.gid ? {group:el.dataset.gid} : {it: lib()[el.dataset.id]});
+  if(selecting) g.classList.add("selecting");
 }
 function tileHTML(it){
+  if(it.isGroup) return groupTileHTML(it);
   {
     const c = C(it.cat); const p = pct(it); const t = totalOf(it), d = doneOf(it);
     let sub = statusLabel(it.my.status, it.cat);
@@ -2373,7 +2424,7 @@ function tileHTML(it){
     else if(isOnce(it) && it.my.time && it.my.status!=="completed") sub = "Stopped at " + fmtTime(it.my.time);
     else if(!isOnce(it) && t && it.my.status!=="completed") sub = `${isPages(it)?"p.":c.unit==="episode"?"Ep":"Ch"} ${d}/${t}`;
     const owned = it.my.owned || Object.values(it.my.vols||{}).some(v=>v.o);
-    return `<div class="tile" data-id="${it.id}" style="--c:${c.color}">
+    return `<div class="tile ${selecting&&selecting.has(it.id)?"sel":""}" data-id="${it.id}" style="--c:${c.color}">${selecting?`<span class="selck"></span>`:""}
       <div class="cover">${coverImg(it)}
         ${view.cat==="all"?`<span class="badge" style="background:${c.color}">${c.label.replace(" Shows","")}</span>`:""}
         ${it.my.rating?`<span class="rate">★ ${it.my.rating}</span>`:""}
@@ -2447,8 +2498,8 @@ function drawRing(host, all, opts={}){
   function showInfo(it){
     if(opts.info){ const o = opts.info(it); info.innerHTML = o.html; const ob = info.querySelector(".open"); if(ob) ob.onclick = ()=>opts.open(it); glow.style.setProperty("--gc", o.color); return; }
     const c = C(it.cat); const t = totalOf(it), d = doneOf(it);
-    let prog = statusLabel(it.my.status, it.cat);
-    if(!isOnce(it) && t && it.my.status!=="completed") prog += ` · ${isPages(it)?"page":c.unit==="episode"?"Ep":"Ch"} ${d} of ${t}`;
+    let prog = it.isGroup ? `Group · ${it.members.length} titles · ${it.gp}% done` : statusLabel(it.my.status, it.cat);
+    if(!it.isGroup && !isOnce(it) && t && it.my.status!=="completed") prog += ` · ${isPages(it)?"page":c.unit==="episode"?"Ep":"Ch"} ${d} of ${t}`;
     info.innerHTML = `<span class="rk" style="background:${c.color}">${c.label}</span>
       <div class="rt">${esc(it.title)}</div><div class="rs">${esc(prog)}${it.my.rating?` · ★ ${it.my.rating}/10`:""}</div>
       <button class="open" style="background:${c.color}">Open</button>`;
@@ -2469,7 +2520,7 @@ function drawRing(host, all, opts={}){
   }
   let holdT = null, held = false;
   stage.addEventListener("pointerdown", e=>{ dragging = true; target = null; vel = 0; sx = lastX = e.clientX; sRot = rot; lastT = performance.now(); moved = 0; held = false; stage.setPointerCapture(e.pointerId);
-    clearTimeout(holdT); if(!opts.open){ const px = e.clientX, py = e.clientY; holdT = setTimeout(()=>{ if(moved >= 7 || !dragging) return; const el = document.elementFromPoint(px, py); const card = el && el.closest(".rcard"); if(!card) return; const it = items[+card.dataset.i]; if(!it || !it.my) return; held = true; dragging = false; if(navigator.vibrate) try{ navigator.vibrate(25); }catch(_){} openQuick({it}); }, 560); } });
+    clearTimeout(holdT); if(!opts.open){ const px = e.clientX, py = e.clientY; holdT = setTimeout(()=>{ if(moved >= 7 || !dragging) return; const el = document.elementFromPoint(px, py); const card = el && el.closest(".rcard"); if(!card) return; const it = items[+card.dataset.i]; if(!it || !it.my) return; held = true; dragging = false; if(navigator.vibrate) try{ navigator.vibrate(25); }catch(_){} openQuick(it.isGroup ? {group:it.gid} : {it}); }, 560); } });
   stage.addEventListener("contextmenu", e=>e.preventDefault());
   stage.addEventListener("pointermove", e=>{
     if(!dragging) return; const now = performance.now();
@@ -2663,6 +2714,7 @@ function renderDetail(id){
       </div>
     </div>
     <div class="wrap" style="padding-top:0">
+      ${groupStrip(it)}
       ${it.synopsis?`<div class="sec"><h3>Synopsis</h3><div class="syn clamp" id="d-syn">${esc(it.synopsis)}</div><button class="link-btn" id="d-synmore" style="padding:6px 0 0">Show more</button></div>`:""}
       <div class="sec"><h3>My status</h3><div class="seg" id="d-status">${STATUSES.map(s=>`<button data-s="${s}" class="${it.my.status===s?"on":""}">${statusLabel(s,it.cat)}</button>`).join("")}</div>
         <div class="prog-row" style="margin-top:10px" id="d-dates"></div></div>
@@ -2684,6 +2736,7 @@ function renderDetail(id){
     </div>`);
   pg.style.setProperty("--c", c.color);
   $("#d-back",pg).onclick = back;
+  wireGroupStrip(pg, it);
   $("#d-more",pg).onclick = e=>{ e.stopPropagation(); openMenu(pg, it); };
   if($("#d-synmore",pg)){ const s = $("#d-syn",pg); if(s.scrollHeight <= s.clientHeight+4) $("#d-synmore",pg).remove(); else $("#d-synmore",pg).onclick = e=>{ s.classList.toggle("clamp"); e.target.textContent = s.classList.contains("clamp")?"Show more":"Show less"; }; }
 
@@ -3021,52 +3074,64 @@ function shrinkImage(file){
 }
 
 /* ============ SETTINGS ============ */
-function renderSettings(){
+const SET_MENU = [
+  ["profile","👤","Profile","Your name, profiles on this phone"],
+  ["cats","🗂️","Categories","Add, rename, recolor, reorder or remove"],
+  ["look:","🎨","Appearance","Themes, colors, fonts, frames, effects, app icon"],
+  ["look:buddy","🐾","Buddy & plant","Your on-screen buddy and the plant you water"],
+  ["look:shelf","📚","Shelf display","Layout, cover size, descriptions, character ring"],
+  ["search","🔎","Search & content","AI helper and 18+ content"],
+  ["alerts","🔔","Alerts","New episode and chapter notifications, authors you follow"],
+  ["backup","💾","Backup & restore","Save your shelf or move it to a new phone"],
+  ["about","ℹ️","About","Where the info comes from"],
+];
+function renderSettings(sub){
   const p = prof(); const sel = [];
-  const pg = page(`<div class="page-head"><button class="icon-btn" id="s-back">${IC.back}</button><h2 class="display">Settings</h2></div>
+  const SUBT = {profile:"Profile", cats:"Categories", search:"Search & content", alerts:"Alerts", backup:"Backup & restore", about:"About"};
+  if(sub && !SUBT[sub]) sub = "";
+  const want = id => !sub ? false : sub === id;
+  const pg = page(`<div class="page-head"><button class="icon-btn" id="s-back">${IC.back}</button><h2 class="display">${sub ? SUBT[sub] : "Settings"}</h2></div>
   <div class="wrap">
-    <div class="sec"><h3>Profile</h3>
+    ${!sub ? `<div class="set-menu">${SET_MENU.map(([k,ic,t,d])=>`<button class="set-item" data-go="${k}"><span class="si-ic">${ic}</span><span class="si-t"><b>${t}</b><small>${d}</small></span><span class="si-ar">›</span></button>`).join("")}</div>` : ""}
+    ${want("profile") ? `<div class="sec"><h3>Profile</h3>
       <div class="field"><label>Name</label><input id="s-name" value="${esc(p.name)}" maxlength="30"></div>
-      <button class="btn pri" id="s-save">Save name</button></div>
-    <div class="sec"><h3>AI helper <span class="r">${aiOn()?"On":"Off"}</span></h3>
+      <button class="btn pri" id="s-save">Save name</button></div>` : ""}
+    ${want("search") ? `<div class="sec"><h3>AI helper <span class="r">${aiOn()?"On":"Off"}</span></h3>
       <div style="color:var(--mut);font-size:13px;margin-bottom:8px">Lets ✨ Describe it and misspelled searches ask an AI what you mean. It uses the free AI built into Chrome and runs on your phone, so it never costs anything. Seasons and movies are grouped either way.</div>
       <div class="seg" id="s-ai"><button data-v="" class="${S().ai?.mode!=="builtin"?"on":""}">Off</button><button data-v="builtin" class="${S().ai?.mode==="builtin"?"on":""}">On</button></div>
       ${S().ai?.mode==="builtin" ? `<div style="font-size:12.5px;color:${builtinAI()?"var(--good)":"var(--warn)"};margin-top:8px">${builtinAI()?"Chrome's built-in AI is ready on this phone.":"Chrome's built-in AI isn't available on this phone yet. It'll start working on its own once Chrome adds it, and searching works normally until then."}</div>` : ""}
     </div>
-    <div class="sec"><h3>My categories <span class="r">${p.cats.length}</span></h3>
+    <div class="sec"><h3>18+ content</h3>
+      <div style="color:var(--mut);font-size:13px;margin-bottom:10px">Show 18+ titles, genres and tags in search, Browse and recommendations. Only affects this profile.</div>
+      <div class="seg" id="s-adult"><button data-a="1" class="${p.adult?"on":""}">Show 18+</button><button data-a="0" class="${p.adult?"":"on"}">Hide 18+</button></div></div>` : ""}
+    ${want("cats") ? `<div class="sec"><h3>My categories <span class="r">${p.cats.length}</span></h3>
       <div style="color:var(--mut);font-size:13px;margin-bottom:6px">Rename them, change colors, or remove ones you don't use. Removing a category hides it but keeps what's in it.</div>
       <div id="s-cats"></div>
       <div class="row-btns"><button class="btn pri" id="s-addcat">+ Add a category</button></div>
       ${hiddenCats(p).length?`<div class="b-label" style="margin-top:14px">Hidden</div>${hiddenCats(p).map(k=>`<div class="prof"><span class="cdot" style="background:${C(k).color}"></span><div style="flex:1">${esc(C(k).label)} <span style="color:var(--dim);font-size:12px">${Object.values(lib()).filter(i=>i.cat===k).length} titles</span></div><button class="btn" data-unhide="${k}">Show again</button><button class="btn danger" data-purge="${k}">Delete</button></div>`).join("")}`:""}
-    </div>
-    <div class="sec look-link" id="s-look"><div style="flex:1"><b>Appearance</b><div style="font-size:12.5px;color:var(--mut);margin-top:2px">Colors, ombré backgrounds, fonts, text size, shelf layout and app icon</div></div><span style="font-size:20px;color:var(--dim)">›</span></div>
-    <div class="sec"><h3>Shelf display</h3>
-      <div style="color:var(--mut);font-size:13px;margin-bottom:10px">Show a spinning ring of your picked characters under your titles on the shelf.</div>
-      <div class="seg" id="s-chars"><button data-v="1" class="${p.showChars!==false?"on":""}">Show characters</button><button data-v="0" class="${p.showChars===false?"on":""}">Hide characters</button></div></div>
-    <div class="sec"><h3>Content</h3>
-      <div style="color:var(--mut);font-size:13px;margin-bottom:10px">Show 18+ titles, genres and tags in search, Browse and recommendations. Only affects this profile.</div>
-      <div class="seg" id="s-adult"><button data-a="1" class="${p.adult?"on":""}">Show 18+</button><button data-a="0" class="${p.adult?"":"on"}">Hide 18+</button></div></div>
-    <div class="sec"><h3>Release alerts</h3>
+    </div>` : ""}
+    ${want("alerts") ? `<div class="sec"><h3>Release alerts</h3>
       <div style="color:var(--mut);font-size:13px;margin-bottom:10px">Shelf checks for new episodes, chapters and books each time you open it (about every 3 hours). Turn this on to also get a phone notification when it finds something.</div>
       <div class="seg" id="s-notify"><button data-n="1" class="${S().notify?"on":""}">Notifications on</button><button data-n="0" class="${S().notify?"":"on"}">Off</button></div>
       ${Object.keys(FOL().authors).length?`<div class="b-label" style="margin-top:14px">Authors you follow</div>${Object.entries(FOL().authors).map(([a,f])=>`<div class="prof"><div style="flex:1">${esc(a)}</div><button class="btn ${f.on?"pri":""}" data-au="${esc(a)}">${f.on?"On":"Off"}</button></div>`).join("")}`:""}
-    </div>
-    <div class="sec"><h3>Profiles on this phone</h3>
+    </div>` : ""}
+    ${want("profile") ? `<div class="sec"><h3>Profiles on this phone</h3>
       <div style="color:var(--mut);font-size:13px;margin-bottom:8px">Sharing one device? Each person gets their own shelf. On separate phones, everyone's shelf is already separate.</div>
       ${data.profiles.map(x=>`<div class="prof"><div class="avatar">${esc(x.name[0]||"?").toUpperCase()}</div><div style="flex:1"><b>${esc(x.name)}</b><div style="font-size:12px;color:var(--mut)">${Object.keys(data.items[x.id]||{}).length} titles</div></div>
         ${x.id===data.active?`<span style="font-size:12px;color:var(--good);font-weight:700">ACTIVE</span>`:`<button class="btn" data-sw="${x.id}">Switch</button><button class="btn danger" data-rm="${x.id}">Delete</button>`}</div>`).join("")}
-      <div class="row-btns"><button class="btn" id="s-newp">+ Add a profile</button></div></div>
-    <div class="sec"><h3>Backup &amp; restore</h3>
+      <div class="row-btns"><button class="btn" id="s-newp">+ Add a profile</button></div></div>` : ""}
+    ${want("backup") ? `<div class="sec"><h3>Backup &amp; restore</h3>
       <div style="color:var(--mut);font-size:13px;margin-bottom:8px">Your shelf lives on this phone. Save a backup every so often so you never lose it, or use one to move your shelf to a new phone.</div>
       <div class="row-btns"><button class="btn pri" id="s-bk">Download backup</button><button class="btn" id="s-rs">Restore backup</button></div>
-      <input type="file" id="s-file" accept=".json,application/json" hidden></div>
-    <div class="sec"><h3>Where the info comes from</h3><div style="color:var(--mut);font-size:13px;line-height:1.6">
-      Anime, manga, manhwa &amp; manhua: AniList · Episode titles: MyAnimeList via Jikan · Chapter titles: MangaDex · TV shows: TVmaze · Movies: iTunes · Books: Google Books &amp; Open Library</div></div>
+      <input type="file" id="s-file" accept=".json,application/json" hidden></div>` : ""}
+    ${want("about") ? `<div class="sec"><h3>Where the info comes from</h3><div style="color:var(--mut);font-size:13px;line-height:1.6">
+      Anime, manga, manhwa &amp; manhua: AniList · Episode titles: MyAnimeList via Jikan · Chapter titles: MangaDex · TV shows: TVmaze · Movies: iTunes · Books: Google Books &amp; Open Library · Games: Wikipedia &amp; Wikidata</div></div>` : ""}
   </div>`);
+  pg.querySelectorAll(".set-item").forEach(b=>b.onclick=()=>{ const k = b.dataset.go; go(k.startsWith("look:") ? "#look" + (k.slice(5) ? "/"+k.slice(5) : "") : "#settings/"+k); });
+  const $$ = (sel, fn) => { const el = $(sel, pg); if(el) fn(el); };
   $("#s-back",pg).onclick = back;
   pg.querySelectorAll("#s-chars button").forEach(b=>b.onclick=()=>{ p.showChars = b.dataset.v==="1"; saveNow(); pg.querySelectorAll("#s-chars button").forEach(x=>x.classList.toggle("on",x===b)); });
   pg.querySelectorAll("#s-adult button").forEach(b=>b.onclick=()=>{ p.adult = b.dataset.a==="1"; saveNow(); alTagList=null; bstate.items=[]; bstate.sel=[]; bstate.rawTags=[]; bstate.level="all"; fyCache=null; pg.querySelectorAll("#s-adult button").forEach(x=>x.classList.toggle("on",x===b)); toast(p.adult?"18+ content is on for this profile":"18+ content hidden"); });
-  $("#s-look",pg).onclick = ()=>go("#look");
   pg.querySelectorAll("#s-notify button").forEach(b=>b.onclick=async()=>{
     if(b.dataset.n==="1"){
       if(!("Notification" in window)){ toast("This browser can't show notifications"); return; }
@@ -3076,10 +3141,10 @@ function renderSettings(){
     saveNow(); pg.querySelectorAll("#s-notify button").forEach(x=>x.classList.toggle("on", (x.dataset.n==="1")===!!S().notify));
   });
   pg.querySelectorAll("[data-au]").forEach(b=>b.onclick=()=>{ const f=FOL().authors[b.dataset.au]; f.on=!f.on; save(); b.classList.toggle("pri",f.on); b.textContent=f.on?"On":"Off"; });
-  $("#s-save",pg).onclick = ()=>{ p.name = $("#s-name",pg).value.trim() || p.name; saveNow(); toast("Saved"); };
+  $$("#s-save", el=>el.onclick = ()=>{ p.name = $("#s-name",pg).value.trim() || p.name; saveNow(); toast("Saved"); });
   drawCatManager(pg, p);
   pg.querySelectorAll("#s-ai button").forEach(b=>b.onclick=()=>{ S().ai = {...(S().ai||{}), mode:b.dataset.v}; saveNow(); const y = pg.scrollTop; route(); const n = document.querySelector(".page"); if(n){ n.style.animation="none"; n.scrollTop = y; } });
-  $("#s-addcat",pg).onclick = ()=>go("#newcat");
+  $$("#s-addcat", el=>el.onclick = ()=>go("#newcat"));
   pg.querySelectorAll("[data-unhide]").forEach(b=>b.onclick=()=>{ p.cats.push(b.dataset.unhide); saveNow(); route(); });
   pg.querySelectorAll("[data-purge]").forEach(b=>b.onclick=async()=>{ const k = b.dataset.purge; const its = Object.values(lib()).filter(i=>i.cat===k);
     if(b.dataset.confirm!=="1"){ b.dataset.confirm="1"; b.textContent=`Delete ${its.length} title${its.length===1?"":"s"}?`; setTimeout(()=>{ b.dataset.confirm=""; b.textContent="Delete"; },3500); return; }
@@ -3090,7 +3155,7 @@ function renderSettings(){
     if(b.dataset.confirm!=="1"){ b.dataset.confirm="1"; b.textContent="Tap again to delete"; setTimeout(()=>{ b.dataset.confirm=""; b.textContent="Delete"; },3500); return; }
     data.profiles = data.profiles.filter(q=>q.id!==x.id); delete data.items[x.id]; saveNow(); route(); toast("Deleted "+x.name);
   });
-  $("#s-newp",pg).onclick = ()=>{
+  if($("#s-newp",pg)) $("#s-newp",pg).onclick = ()=>{
     const pp = page(`<div class="welcome"><h1 class="display">New profile</h1><p>Their own shelf with their own picks.</p>
       <div class="field"><label>Name</label><input id="n-name" maxlength="30"></div>
       <div class="field"><label>Pick categories to start with (optional, they can add their own later)</label>${catPicker([])}</div>
@@ -3099,9 +3164,9 @@ function renderSettings(){
     $("#n-x",pp).onclick = ()=>pp.remove();
     $("#n-go",pp).onclick = ()=>{ const n=$("#n-name",pp).value.trim(); if(!n){ toast("Add a name"); return; } const np={id:uid(),name:n,cats:s2.slice(),catNames:{},catColors:{},custom:{}}; data.profiles.push(np); data.items[np.id]={}; data.active=np.id; view.cat="all"; saveNow(); go(""); };
   };
-  $("#s-bk",pg).onclick = downloadBackup;
-  $("#s-rs",pg).onclick = ()=>$("#s-file",pg).click();
-  $("#s-file",pg).onchange = e=>restoreFile(e.target.files[0]);
+  $$("#s-bk", el=>el.onclick = downloadBackup);
+  $$("#s-rs", el=>el.onclick = ()=>$("#s-file",pg).click());
+  $$("#s-file", el=>el.onchange = e=>restoreFile(e.target.files[0]));
 }
 async function downloadBackup(){
   const u = {}; for(const k of await DB.keys()) if(String(k).startsWith("units:")) u[k] = await DB.get(k);
@@ -3609,12 +3674,18 @@ function drawCatManager(pg, p){
   box.innerHTML = p.cats.map((k,i)=>{ const c = C(k); const n = Object.values(lib()).filter(x=>x.cat===k).length;
     return `<div class="prof catrow" data-k="${k}"><button class="cdot big" data-color style="background:${c.color}" aria-label="Change color"></button>
       <div style="flex:1;min-width:0"><input class="cname" value="${esc(c.label)}" maxlength="24"><div style="font-size:11.5px;color:var(--dim)">${c.custom?"Custom · tracks "+(TRACK[c.track]?.label||"").toLowerCase():"Searches "+CATS[k].label.toLowerCase()} · ${n} titles</div></div>
-      <button class="btn" data-up ${i===0?"disabled":""} aria-label="Move up">↑</button><button class="btn danger" data-crm>Remove</button></div>`; }).join("");
+      <button class="btn danger" data-crm>Remove</button><span class="drag-h" aria-label="Drag to reorder" title="Drag to reorder">⠿</span></div>`; }).join("") + `<div style="font-size:12px;color:var(--dim);margin-top:8px">Drag ⠿ to change the order. You can also hold a category on your shelf and drag it.</div>`;
   box.querySelectorAll(".catrow").forEach(row=>{
     const k = row.dataset.k;
     row.querySelector(".cname").onchange = e=>{ const v = e.target.value.trim(); if(!v) return; if(p.custom?.[k]) p.custom[k].name = v; else (p.catNames ||= {})[k] = v; saveNow(); toast("Renamed"); };
     row.querySelector("[data-color]").onclick = ()=>{ const cur = C(k).color; const nx = PALETTE[(PALETTE.indexOf(cur)+1) % PALETTE.length]; if(p.custom?.[k]) p.custom[k].color = nx; else (p.catColors ||= {})[k] = nx; saveNow(); drawCatManager(pg,p); };
-    row.querySelector("[data-up]").onclick = ()=>{ const i = p.cats.indexOf(k); if(i>0){ p.cats.splice(i,1); p.cats.splice(i-1,0,k); saveNow(); drawCatManager(pg,p); } };
+    const h = row.querySelector(".drag-h");
+    h.onpointerdown = e=>{ e.preventDefault(); try{ box.setPointerCapture(e.pointerId); }catch(_){} row.classList.add("lifted"); if(navigator.vibrate) try{ navigator.vibrate(20); }catch(_){}
+      const move = ev=>{ const y = ev.clientY; const rows = [...box.querySelectorAll(".catrow")]; for(const r of rows){ if(r===row) continue; const b = r.getBoundingClientRect(); if(y > b.top && y < b.bottom){ if(y < b.top + b.height/2) box.insertBefore(row, r); else box.insertBefore(row, r.nextSibling); break; } }
+        const pr = pg.getBoundingClientRect(); if(y < pr.top + 80) pg.scrollTop -= 8; if(y > pr.bottom - 80) pg.scrollTop += 8; };
+      const up = ()=>{ box.removeEventListener("pointermove", move); box.removeEventListener("pointerup", up); box.removeEventListener("pointercancel", up); row.classList.remove("lifted");
+        const order = [...box.querySelectorAll(".catrow")].map(r=>r.dataset.k); if(order.join()!==p.cats.join()){ p.cats = order; saveNow(); toast("Order saved"); } };
+      box.addEventListener("pointermove", move); box.addEventListener("pointerup", up); box.addEventListener("pointercancel", up); };
     const rm = row.querySelector("[data-crm]");
     const n = Object.values(lib()).filter(x=>x.cat===k).length;
     rm.onclick = ()=>{ if(rm.dataset.confirm!=="1"){ rm.dataset.confirm="1"; rm.textContent="Tap to confirm"; setTimeout(()=>{ rm.dataset.confirm=""; rm.textContent="Remove"; },3000); return; }
@@ -4083,6 +4154,7 @@ function wireHold(root, sel, resolve){
 }
 function openQuick(x){
   document.querySelectorAll(".quick-wrap").forEach(q=>q.remove());
+  if(x.group){ openGroupSheet(x.group, true); return; }
   const it = x.it || (x.r ? findExisting(x.r) : null), r = x.r;
   const obj = it || r; const c = C(obj.cat);
   const w = document.createElement("div"); w.className = "sheet-wrap quick-wrap";
@@ -4092,7 +4164,7 @@ function openQuick(x){
       <div class="q-head"><div class="cover">${coverImg(obj)}</div><div style="min-width:0"><div class="q-t">${esc(obj.title)}</div><div class="q-s"><span style="color:${c.color}">●</span> ${esc(c.label)}${cur?` · ${esc(statusLabel(cur.my.status, cur.cat))}`:" · not on your shelf"}${cur && pct(cur)?` · ${pct(cur)}%`:""}</div></div></div>
       ${cur ? `<div class="b-label">Status</div><div class="q-st">${STATUSES.map(s=>`<button data-s="${s}" class="${cur.my.status===s?"on":""}">${esc(statusLabel(s, cur.cat))}</button>`).join("")}</div>
         <div class="b-label">Rating</div><div class="q-rate">${[1,2,3,4,5,6,7,8,9,10].map(n=>`<button data-n="${n}" class="${cur.my.rating>=n?"on":""}" style="${cur.my.rating>=n?`background:${ratingColor(cur.my.rating)}`:""}">${n}</button>`).join("")}</div>
-        <div class="q-acts"><button class="btn pri" id="q-open">Open</button>${!isOnce(cur) && cur.cat!=="game" && cur.my.status!=="completed" ? `<button class="btn" id="q-done">Mark all done</button>`:""}<button class="btn danger" id="q-del">Remove from shelf</button></div>`
+        <div class="q-acts"><button class="btn pri" id="q-open">Open</button>${!isOnce(cur) && cur.cat!=="game" && cur.my.status!=="completed" ? `<button class="btn" id="q-done">Mark all done</button>`:""}<button class="btn danger" id="q-del">Remove from shelf</button>${!location.hash.slice(1) ? `<button class="btn" id="q-sel">☑ Select multiple</button>` : ""}</div>`
       : `<div class="b-label">Add to my shelf as</div><div class="q-st">${["planned","current","completed"].map(s=>`<button data-add="${s}">${esc(statusLabel(s, obj.cat))}</button>`).join("")}</div><div class="q-acts"><button class="btn" id="q-prev">See details</button></div>`}
     </div>`;
     const done = ()=>{ refreshUnder(); draw(); };
@@ -4100,6 +4172,7 @@ function openQuick(x){
       w.querySelectorAll("[data-s]").forEach(b=>b.onclick=()=>{ setStatus(cur, b.dataset.s); done(); toast(`Marked as ${statusLabel(b.dataset.s, cur.cat).toLowerCase()}`); });
       w.querySelectorAll("[data-n]").forEach(b=>b.onclick=()=>{ const n = +b.dataset.n; cur.my.rating = cur.my.rating===n ? 0 : n; touch(cur); done(); });
       $("#q-open",w).onclick = ()=>{ close(); go("#item/"+cur.id); };
+      const qs = $("#q-sel",w); if(qs) qs.onclick = ()=>{ close(); startSelect([cur.id]); };
       const md = $("#q-done",w); if(md) md.onclick = ()=>{ setStatus(cur, "completed"); done(); toast("All marked as done"); };
       const del = $("#q-del",w); del.onclick = async()=>{ if(del.dataset.c!=="1"){ del.dataset.c="1"; del.textContent = "Tap again to remove"; return; }
         const copy = cur; const un = await DB.get("units:"+cur.id); delete lib()[cur.id]; await DB.del("units:"+cur.id); save(); close(); refreshUnder();
@@ -4121,6 +4194,166 @@ function refreshUnder(){
   if(h.startsWith("add")){ const res = document.querySelector("#a-res"); if(res && lastResults.length){ res.querySelectorAll(".res").forEach(b=>{ const r = lastResults[+b.dataset.i]; const on = !!findExisting(r); const tag = b.querySelector(".in"); if(on && !tag) b.insertAdjacentHTML("beforeend", `<span class="in">ON SHELF</span>`); if(!on && tag) tag.remove(); }); } return; }
   if(h==="browse" || h==="foryou") return;
   route();
+}
+
+/* ============ HOLD A CATEGORY TO MOVE IT OR OPEN ITS SETTINGS ============ */
+function wireChipReorder(row){
+  if(!row) return;
+  const chips = () => [...row.querySelectorAll(".chip[data-cat]")].filter(c=>c.dataset.cat!=="all");
+  chips().forEach(chip=>{
+    let t = null, sx = 0, sy = 0, lifted = false, moved = false, pid = null;
+    const outside = e => { if(e.target.closest(".chip-pop") || e.target === chip) return; closeChipPop(); document.removeEventListener("pointerdown", outside, true); };
+    const pop = () => { closeChipPop(); const r = chip.getBoundingClientRect(); const d = document.createElement("div"); d.className = "chip-pop"; d.innerHTML = `<button class="cp-set">⚙ Settings</button><span>or drag to move</span>`;
+      document.body.appendChild(d); const w = d.offsetWidth; d.style.left = Math.max(8, Math.min(innerWidth - w - 8, r.left + r.width/2 - w/2)) + "px"; d.style.top = (r.bottom + 8) + "px";
+      d.querySelector(".cp-set").onclick = e=>{ e.stopPropagation(); closeChipPop(); openCatSheet(chip.dataset.cat); };
+      setTimeout(()=>document.addEventListener("pointerdown", outside, true), 0); };
+    const onMove = e => { if(!lifted) return; e.preventDefault();
+      if(Math.abs(e.clientX - sx) > 6 && !moved){ moved = true; closeChipPop(); }
+      if(!moved) return; const x = e.clientX;
+      for(const o of chips()){ if(o === chip) continue; const b = o.getBoundingClientRect(); if(x > b.left && x < b.right){ if(x < b.left + b.width/2){ if(chip.nextSibling !== o) row.insertBefore(chip, o); } else if(o.nextSibling !== chip) row.insertBefore(chip, o.nextSibling); break; } }
+      const rb = row.getBoundingClientRect(); if(x < rb.left + 40) row.scrollLeft -= 10; if(x > rb.right - 40) row.scrollLeft += 10; };
+    const onEnd = () => { row.removeEventListener("pointermove", onMove); row.removeEventListener("pointerup", onEnd); row.removeEventListener("pointercancel", onEnd);
+      if(!lifted) return; lifted = false; chip.classList.remove("lifted"); row.classList.remove("reordering");
+      if(moved){ const p = prof(); const order = chips().map(c=>c.dataset.cat).filter(k=>p.cats.includes(k)); if(order.join() !== p.cats.join()){ p.cats = order; saveNow(); toast("Category order saved"); } } };
+    const lift = () => { lifted = true; moved = false; chip._held = Date.now(); chip.classList.add("lifted"); row.classList.add("reordering"); if(navigator.vibrate) try{ navigator.vibrate(25); }catch(_){}
+      try{ row.setPointerCapture(pid); }catch(_){} row.addEventListener("pointermove", onMove); row.addEventListener("pointerup", onEnd); row.addEventListener("pointercancel", onEnd); pop(); };
+    chip.addEventListener("pointerdown", e=>{ sx = e.clientX; sy = e.clientY; lifted = false; pid = e.pointerId; clearTimeout(t); t = setTimeout(lift, 430); });
+    chip.addEventListener("pointermove", e=>{ if(!lifted && Math.hypot(e.clientX-sx, e.clientY-sy) > 8) clearTimeout(t); });
+    ["pointerup","pointercancel"].forEach(ev=>chip.addEventListener(ev, ()=>clearTimeout(t)));
+    chip.addEventListener("contextmenu", e=>e.preventDefault());
+    chip.addEventListener("touchmove", e=>{ if(lifted) e.preventDefault(); }, {passive:false});
+    chip.addEventListener("click", e=>{ if(chip._held && Date.now() - chip._held < 1500){ e.stopImmediatePropagation(); e.preventDefault(); chip._held = 0; } }, true);
+  });
+  row.addEventListener("touchmove", e=>{ if(row.classList.contains("reordering")) e.preventDefault(); }, {passive:false});
+}
+function closeChipPop(){ document.querySelectorAll(".chip-pop").forEach(x=>x.remove()); }
+function openCatSheet(k){
+  const p = prof(); const c = C(k); if(!c) return;
+  const w = document.createElement("div"); w.className = "sheet-wrap";
+  const n = Object.values(lib()).filter(x=>x.cat===k).length;
+  w.innerHTML = `<div class="sheet"><div class="sh-grab"></div><h3 class="display" style="margin:0 0 4px">${esc(c.label)}</h3><div style="font-size:12.5px;color:var(--mut);margin-bottom:12px">${n} title${n===1?"":"s"}${c.custom?" · your own category":""}</div>
+    <div class="field"><label>Name</label><input id="cs-n" value="${esc(c.label)}" maxlength="24"></div>
+    <div class="b-label">Color</div><div class="cs-cols">${PALETTE.map(col=>`<button data-col="${col}" class="${col===c.color?"on":""}" style="background:${col}" aria-label="${col}"></button>`).join("")}</div>
+    <div class="b-label">Position</div><div class="row-btns" style="margin-top:6px"><button class="btn" id="cs-first">Move to front</button><button class="btn" id="cs-last">Move to end</button></div>
+    <div class="row-btns" style="margin-top:16px"><button class="btn pri" id="cs-ok">Done</button><button class="btn danger" id="cs-rm">Remove category</button></div></div>`;
+  const close = ()=>{ w.classList.add("out"); setTimeout(()=>w.remove(), 180); renderHome(); };
+  document.body.appendChild(w); w.onclick = e=>{ if(e.target===w) close(); };
+  const setName = v=>{ v = v.trim(); if(!v) return; if(p.custom?.[k]) p.custom[k].name = v; else (p.catNames ||= {})[k] = v; saveNow(); };
+  $("#cs-n",w).onchange = e=>setName(e.target.value);
+  w.querySelectorAll("[data-col]").forEach(b=>b.onclick=()=>{ if(p.custom?.[k]) p.custom[k].color = b.dataset.col; else (p.catColors ||= {})[k] = b.dataset.col; saveNow(); w.querySelectorAll("[data-col]").forEach(x=>x.classList.toggle("on", x===b)); });
+  $("#cs-first",w).onclick = ()=>{ p.cats = [k, ...p.cats.filter(x=>x!==k)]; saveNow(); toast("Moved to the front"); };
+  $("#cs-last",w).onclick = ()=>{ p.cats = [...p.cats.filter(x=>x!==k), k]; saveNow(); toast("Moved to the end"); };
+  $("#cs-ok",w).onclick = ()=>{ setName($("#cs-n",w).value); close(); };
+  const rm = $("#cs-rm",w); rm.onclick = ()=>{ if(rm.dataset.c!=="1"){ rm.dataset.c="1"; rm.textContent = n ? "Tap again (titles are kept)" : "Tap again to remove"; return; } p.cats = p.cats.filter(x=>x!==k); if(view.cat===k) view.cat = "all"; saveNow(); close(); toast(n ? `${c.label} removed. Its titles are kept under Hidden in Settings.` : `${c.label} removed`); };
+}
+
+/* ============ YOUR OWN GROUPS (combine titles under one name) ============ */
+const GRP = () => (prof().groups ||= {});
+function groupOf(id){ return Object.values(GRP()).find(G=>G.members.includes(id)) || null; }
+function cleanGroups(){ const L = lib(); Object.values(GRP()).forEach(G=>{ G.members = G.members.filter(id=>L[id]); if(G.members.length < 2) delete GRP()[G.id]; }); }
+function collapseGroups(items){
+  cleanGroups(); const out = []; const seen = new Set();
+  for(const it of items){
+    const G = groupOf(it.id); if(!G){ out.push(it); continue; }
+    if(seen.has(G.id)) continue; seen.add(G.id);
+    const mem = G.members.map(id=>lib()[id]).filter(x=>x && items.includes(x)); if(!mem.length) continue;
+    if(mem.length === 1 && G.members.length === 1){ out.push(mem[0]); continue; }
+    const all = G.members.map(id=>lib()[id]).filter(Boolean);
+    const first = all[0];
+    out.push({isGroup:true, gid:G.id, id:first.id, title:G.name, cat:first.cat, cover:first.cover, members:all, shown:mem,
+      updated:Math.max(...all.map(x=>x.updated||0)), added:Math.min(...all.map(x=>x.added||0)), genres:first.genres||[],
+      my:{status:first.my.status, rating:Math.max(...all.map(x=>x.my.rating||0))}, gp:Math.round(all.reduce((s,x)=>s+pct(x),0)/all.length)});
+  }
+  return out;
+}
+const pctX = x => x.isGroup ? x.gp : pct(x);
+function groupTileHTML(g){
+  const c = C(g.cat); const allSel = selecting && g.members.every(m=>selecting.has(m.id));
+  const done = g.members.filter(m=>m.my.status==="completed").length;
+  return `<div class="tile gtile ${allSel?"sel":""}" data-id="${g.id}" data-gid="${g.gid}" style="--c:${c.color}">${selecting?`<span class="selck"></span>`:""}
+    <div class="cover gstack">${g.members.slice(0,3).reverse().map((m,i,a)=>`<div class="gs" style="--k:${a.length-1-i}">${coverImg(m)}</div>`).join("")}
+      <span class="gcount">${g.members.length}</span>${g.my.rating?`<span class="rate">★ ${g.my.rating}</span>`:""}${g.gp>0?`<div class="bar"><i style="width:${g.gp}%"></i></div>`:""}</div>
+    <div class="tx"><div class="t">${esc(g.title)}</div><div class="s">${g.members.length} titles${done?` · ${done} done`:""}</div></div></div>`;
+}
+/* group strip on a title's page: swipe or tap to move between titles in the group */
+function groupStrip(it){
+  const G = groupOf(it.id); if(!G || G.members.length < 2) return "";
+  const i = G.members.indexOf(it.id), mem = G.members.map(id=>lib()[id]).filter(Boolean);
+  return `<div class="sec gstrip"><div class="gs-top"><b>${esc(G.name)}</b><span>${i+1} of ${mem.length} · swipe to see the others</span><button class="link-btn" id="gs-manage">Manage</button></div>
+    <div class="gs-row">${mem.map((m,j)=>`<button class="gs-it ${m.id===it.id?"on":""}" data-id="${m.id}"><div class="cover">${coverImg(m)}</div><span>${esc(m.title)}</span></button>`).join("")}</div></div>`;
+}
+function wireGroupStrip(pg, it){
+  const G = groupOf(it.id); if(!G) return;
+  const goTo = id => { if(!id || id===it.id) return; history.replaceState(null, "", "#item/"+id); route(); const n = document.querySelector(".page"); if(n) n.style.animation = "none"; };
+  pg.querySelectorAll(".gs-it").forEach(b=>b.onclick=()=>goTo(b.dataset.id));
+  const on = pg.querySelector(".gs-it.on"); if(on) setTimeout(()=>on.scrollIntoView({inline:"center", block:"nearest"}), 50);
+  const mg = $("#gs-manage",pg); if(mg) mg.onclick = ()=>openGroupSheet(G.id);
+  let sx = 0, sy = 0, ok = false;
+  pg.addEventListener("touchstart", e=>{ const t = e.touches[0]; sx = t.clientX; sy = t.clientY; ok = !e.target.closest(".hrow,.seasons,.chips,.carousel,.gs-row,input,textarea,.vols,.seg,.q-rate,#d-rating"); }, {passive:true});
+  pg.addEventListener("touchend", e=>{ if(!ok) return; const t = e.changedTouches[0]; const dx = t.clientX - sx, dy = t.clientY - sy;
+    if(Math.abs(dx) > 80 && Math.abs(dy) < 50){ const m = G.members; const i = m.indexOf(it.id); const j = dx < 0 ? i+1 : i-1; if(j>=0 && j<m.length){ pg.classList.add(dx<0?"swipe-l":"swipe-r"); setTimeout(()=>goTo(m[j]), 120); } } }, {passive:true});
+}
+function openGroupSheet(gid, fromHold){
+  const G = GRP()[gid]; if(!G) return;
+  const w = document.createElement("div"); w.className = "sheet-wrap quick-wrap";
+  const draw = ()=>{ const mem = G.members.map(id=>lib()[id]).filter(Boolean);
+    w.innerHTML = `<div class="sheet"><div class="sh-grab"></div>
+      <div class="field"><label>Group name</label><input id="gn" value="${esc(G.name)}" maxlength="40"></div>
+      <div class="b-label">${mem.length} titles · drag ⠿ to reorder</div><div id="gm">${mem.map(m=>`<div class="gm-row" data-id="${m.id}"><div class="cover">${coverImg(m)}</div><div style="flex:1;min-width:0"><b>${esc(m.title)}</b><small>${esc(C(m.cat).label)} · ${esc(statusLabel(m.my.status, m.cat))}${pct(m)?` · ${pct(m)}%`:""}</small></div><button class="btn" data-out="${m.id}">Take out</button><span class="drag-h">⠿</span></div>`).join("")}</div>
+      <div class="row-btns" style="margin-top:14px"><button class="btn pri" id="g-open">Open</button>${fromHold && !location.hash.slice(1) ? `<button class="btn" id="g-sel">☑ Select multiple</button>`:""}<button class="btn" id="g-un">Ungroup</button><button class="btn danger" id="g-del">Remove all from shelf</button></div></div>`;
+    $("#gn",w).onchange = e=>{ G.name = e.target.value.trim() || G.name; saveNow(); refreshUnder(); };
+    $("#g-open",w).onclick = ()=>{ close(); go("#item/"+G.members[0]); };
+    const gs = $("#g-sel",w); if(gs) gs.onclick = ()=>{ close(); startSelect(G.members); };
+    $("#g-un",w).onclick = ()=>{ delete GRP()[gid]; saveNow(); close(); refreshUnder(); toast("Ungrouped. The titles are back on their own."); };
+    const del = $("#g-del",w); del.onclick = async()=>{ if(del.dataset.c!=="1"){ del.dataset.c="1"; del.textContent = `Remove ${mem.length} titles? Tap again`; return; } await removeMany(G.members); close(); };
+    w.querySelectorAll("[data-out]").forEach(b=>b.onclick=()=>{ G.members = G.members.filter(x=>x!==b.dataset.out); if(G.members.length < 2) delete GRP()[gid]; saveNow(); refreshUnder(); if(!GRP()[gid]){ close(); toast("Group removed since only one title was left"); } else draw(); });
+    const box = $("#gm",w);
+    box.querySelectorAll(".drag-h").forEach(h=>{ const row = h.closest(".gm-row"); h.onpointerdown = e=>{ e.preventDefault(); try{ box.setPointerCapture(e.pointerId); }catch(_){} row.classList.add("lifted");
+      const mv = ev=>{ for(const r of box.querySelectorAll(".gm-row")){ if(r===row) continue; const b = r.getBoundingClientRect(); if(ev.clientY > b.top && ev.clientY < b.bottom){ if(ev.clientY < b.top + b.height/2) box.insertBefore(row, r); else box.insertBefore(row, r.nextSibling); break; } } };
+      const up = ()=>{ box.removeEventListener("pointermove", mv); box.removeEventListener("pointerup", up); box.removeEventListener("pointercancel", up); row.classList.remove("lifted"); G.members = [...box.querySelectorAll(".gm-row")].map(r=>r.dataset.id); saveNow(); refreshUnder(); };
+      box.addEventListener("pointermove", mv); box.addEventListener("pointerup", up); box.addEventListener("pointercancel", up); }; });
+  };
+  const close = ()=>{ w.classList.add("out"); setTimeout(()=>w.remove(), 180); };
+  document.body.appendChild(w); w.onclick = e=>{ if(e.target===w) close(); }; draw();
+}
+async function removeMany(ids){
+  const copies = []; for(const id of ids){ const it = lib()[id]; if(!it) continue; copies.push([it, await DB.get("units:"+id)]); delete lib()[id]; await DB.del("units:"+id); }
+  const grpBefore = JSON.parse(JSON.stringify(GRP())); cleanGroups(); save(); refreshUnder();
+  toast(`Removed ${copies.length} title${copies.length===1?"":"s"}`, async()=>{ for(const [it,u] of copies){ lib()[it.id] = it; if(u) await DB.set("units:"+it.id, u); } prof().groups = grpBefore; save(); refreshUnder(); });
+}
+/* batch select on the shelf */
+let selecting = null;
+function startSelect(ids){ selecting = new Set(ids||[]); if(location.hash.slice(1)) go(""); else drawGrid(); }
+function stopSelect(){ selecting = null; document.querySelectorAll(".selbar").forEach(x=>x.remove()); drawGrid(); }
+function toggleSel(t){ const ids = t.dataset.gid ? (GRP()[t.dataset.gid]?.members||[]) : [t.dataset.id]; const all = ids.every(id=>selecting.has(id)); ids.forEach(id=>all ? selecting.delete(id) : selecting.add(id)); t.classList.toggle("sel", !all); drawSelBar(); }
+function drawSelBar(){
+  document.querySelectorAll(".selbar").forEach(x=>x.remove()); if(!selecting) return;
+  const n = selecting.size; const b = document.createElement("div"); b.className = "selbar";
+  b.innerHTML = `<div class="sb-top"><b>${n} selected</b><button class="link-btn" id="sb-all">Select all</button><button class="icon-btn" id="sb-x" aria-label="Done">✕</button></div>
+    <div class="sb-acts"><button class="btn" id="sb-st" ${n?"":"disabled"}>Set status</button><button class="btn" id="sb-grp" ${n>1?"":"disabled"}>Group together</button><button class="btn danger" id="sb-del" ${n?"":"disabled"}>Remove</button></div>`;
+  document.body.appendChild(b);
+  $("#sb-x",b).onclick = stopSelect;
+  $("#sb-all",b).onclick = ()=>{ document.querySelectorAll("#h-grid .tile").forEach(t=>{ (t.dataset.gid ? GRP()[t.dataset.gid]?.members||[] : [t.dataset.id]).forEach(id=>selecting.add(id)); t.classList.add("sel"); }); drawSelBar(); };
+  $("#sb-st",b).onclick = ()=>{ const w = document.createElement("div"); w.className = "sheet-wrap quick-wrap";
+    w.innerHTML = `<div class="sheet"><div class="sh-grab"></div><div class="b-label" style="margin-top:0">Set ${n} title${n===1?"":"s"} to</div><div class="q-st">${STATUSES.map(s=>`<button data-s="${s}">${esc(statusLabel(s, "anime").replace("Watching","In progress").replace("Plan to watch","Planned"))}</button>`).join("")}</div></div>`;
+    document.body.appendChild(w); w.onclick = e=>{ if(e.target===w) w.remove(); };
+    w.querySelectorAll("[data-s]").forEach(x=>x.onclick=()=>{ selecting.forEach(id=>{ const it = lib()[id]; if(it) setStatus(it, x.dataset.s); }); w.remove(); toast(`Updated ${n} title${n===1?"":"s"}`); stopSelect(); }); };
+  $("#sb-grp",b).onclick = ()=>{ const ids = [...selecting]; const its = ids.map(id=>lib()[id]).filter(Boolean);
+    const existing = [...new Set(ids.map(id=>groupOf(id)?.id).filter(Boolean))];
+    const guess = existing.length ? GRP()[existing[0]].name : commonName(its.map(i=>i.title));
+    openTextSheet(existing.length ? "Add to the group" : "Group together", `${its.length} titles will show as one on your shelf. Tap it to swipe between them.`, guess, "Group", name=>{
+      const G = existing.length ? GRP()[existing[0]] : {id:"g"+uid(), name:"", members:[]}; G.name = name.trim() || guess;
+      existing.slice(1).forEach(e=>{ G.members.push(...GRP()[e].members); delete GRP()[e]; });
+      Object.values(GRP()).forEach(o=>{ if(o!==G) o.members = o.members.filter(x=>!ids.includes(x)); });
+      ids.forEach(id=>{ if(!G.members.includes(id)) G.members.push(id); });
+      G.members.sort((a,b)=>(lib()[a]?.year||9999)-(lib()[b]?.year||9999) || (lib()[a]?.added||0)-(lib()[b]?.added||0));
+      GRP()[G.id] = G; saveNow(); toast(`Grouped ${G.members.length} titles as "${G.name}"`); stopSelect(); }); };
+  const del = $("#sb-del",b); del.onclick = async()=>{ if(del.dataset.c!=="1"){ del.dataset.c="1"; del.textContent = `Remove ${n}? Tap again`; return; } const ids = [...selecting]; selecting = null; b.remove(); await removeMany(ids); };
+}
+function commonName(titles){
+  if(!titles.length) return "My group"; const w = titles.map(t=>t.split(/\s+/)); let k = 0;
+  while(w.every(x=>x[k] && x[k].toLowerCase().replace(/[^a-z0-9]/g,"")===w[0][k].toLowerCase().replace(/[^a-z0-9]/g,""))) k++;
+  const c = w[0].slice(0,k).join(" ").replace(/[:\-–,]+$/,"").trim(); return c.length >= 3 ? c : (typeof frSeriesTitle==="function" ? frSeriesTitle(titles[0]) : titles[0]);
 }
 
 /* ================= DECOR: THEMES, FRAMES, EFFECTS, BUDDIES, PLANT ================= */
@@ -5017,7 +5250,8 @@ function effLook(){
 function holidayRevert(){
   const p = prof(); if(!p) return; const L = look(); const pr = PRESETS[L.preset];
   if(pr && pr.holiday && !holidayOn(pr.holiday)){
-    const back = p.lookBeforeHoliday ? {...p.lookBeforeHoliday, preset:""} : {...presetLook(PRESETS.classic.look), preset:"classic"};
+    const keep = {}; ["buddy","bud","budBase","plant","ptype","pot","potC","flowerC","flowerHex","potFace","pcounter"].forEach(k=>{ if(L[k]!==undefined) keep[k] = L[k]; });
+    const back = p.lookBeforeHoliday ? {...p.lookBeforeHoliday, ...keep, preset:""} : {...presetLook(PRESETS.classic.look), preset:"classic"};
     p.look = back; delete p.lookBeforeHoliday; saveNow(); setTimeout(()=>toast(`${HOLIDAYS[pr.holiday].name} is over, so your usual look is back`), 1500); return true;
   }
   const sp = BUDDY_SPECIES[L.buddy];
@@ -5305,7 +5539,7 @@ function openPlantSheet(){
       const h = document.createElement("i"); h.className = "pl-love"; h.textContent = st.loveToday < 5 ? "💚" : "😊"; h.style.left = (e.offsetX||100)+"px"; h.style.top = (e.offsetY||80)+"px"; big.appendChild(h); setTimeout(()=>h.remove(), 1100);
       big.classList.remove("wig"); void big.offsetWidth; big.classList.add("wig");
       if(st.loveToday < 5){ st.loveToday++; st.love++; saveNow(); const lab = w.querySelector(".pl-big + div"); if(lab) lab.textContent = `Tap your plant to give it some love (${st.loveToday}/5 today)`; } };
-    $("#pl-style",w).onclick = () => { close(); lookOpen.plant = true; go("#look"); setTimeout(()=>{ const s = document.querySelector('[data-sec="plant"]'); s && s.scrollIntoView({behavior:"smooth"}); }, 350); };
+    $("#pl-style",w).onclick = () => { close(); lookOpen.plant = true; go("#look/buddy"); setTimeout(()=>{ const s = document.querySelector('[data-sec="plant"]'); s && s.scrollIntoView({behavior:"smooth"}); }, 350); };
     const rs = $("#pl-reset",w); rs.onclick = () => { if(rs.dataset.c !== "1"){ rs.dataset.c = "1"; rs.textContent = "Start over? Tap again"; return; } prof().plantState = {}; plantState(); saveNow(); drawPlant(effLook()); draw(); toast("A fresh seed is planted 🌱"); };
   };
   const close = () => { w.classList.add("out"); setTimeout(()=>w.remove(), 180); };
@@ -5317,10 +5551,10 @@ let lookOpen = {presets:true};
 let presetFilter = "All", budFilter = "All";
 function setBud(k, v){ const p = prof(); const L = look(); p.look = {...L, ...(p.look||{}), bud:{...(L.bud||{}), [k]:v}}; saveNow(); applyTheme(); }
 function presetLook(pr){
-  const L = look(), keep = L.keepBud;
+  const L = look(), keep = true;
   const base = {...L, ...LOOK_DEFAULT, size:L.size, shelf:L.shelf, grid:L.grid, desc:L.desc, icon:L.icon, keepBud:keep, seasonal:L.seasonal, motion:L.motion, wallDim:L.wallDim, wallBlur:L.wallBlur};
   const n = {...base, ...pr};
-  if(keep){ ["buddy","bud","plant","ptype","pot","potC","flowerC","flowerHex","potFace","pcounter"].forEach(k=>{ n[k] = L[k]; }); }
+  if(keep){ ["buddy","bud","budBase","plant","ptype","pot","potC","flowerC","flowerHex","potFace","pcounter"].forEach(k=>{ n[k] = L[k]; }); }
   return n;
 }
 function themeCode(L){ const o = {...L}; return "SHELF1:" + btoa(unescape(encodeURIComponent(JSON.stringify(o)))); }
@@ -5330,12 +5564,16 @@ function presetCard(key, name, desc, l, on){
   const bg = l.bg || pal.bg, ac = l.accent || pal.acc, a2 = l.acc2 || mix(ac, md==="dark"?"#ffffff":"#000000", .3); const om = OMBRES[l.ombre];
   const bgc = l.ombre === "custom" ? `linear-gradient(${l.omAngle||165}deg, ${l.omA}, ${bg} 55%, ${l.omB})` : om && om.d ? `linear-gradient(165deg, ${(md==="light"?om.l:om.d)[0]}, ${bg} 55%, ${(md==="light"?om.l:om.d)[1]})` : bg;
   const f = FONTS[l.font] || FONTS.default;
-  const bud = l.buddy && l.buddy !== "none" && BUDDY_SPECIES[l.buddy] ? buddySVG(l.buddy, (l.bud||{}).coat, {acc:(l.bud||{}).acc, accC:(l.bud||{}).accC}) : "";
+  const bud = "";
   return `<button class="preset ${on?"on":""}" data-p="${key}" style="background:${bgc};color:${lum(bg)<.5?"#fff":"#1a1a1a"}"><span class="pv-bar" style="background:linear-gradient(90deg,${ac},${a2})"></span><span class="pv-t" style="font-family:'${f.display}',serif;font-weight:${f.dw||700}">${esc(name)}</span><span class="pv-d">${esc(desc||"")}</span><span class="pv-tiles"><i style="background:${ac}"></i><i style="background:${a2}"></i><i style="background:${lum(bg)<.5?"rgba(255,255,255,.18)":"rgba(0,0,0,.1)"}"></i></span>${bud?`<span class="pv-bud">${bud}</span>`:""}</button>`;
 }
-function renderLook(){
+const LOOK_GROUPS = {"":["presets","colors","wall","type","cards","frame","pattern","fx","extra","icon"], buddy:["buddy","plant"], shelf:["layout","chars"]};
+const LOOK_TITLES = {"":"Appearance", buddy:"Buddy & plant", shelf:"Shelf display"};
+function renderLook(view0){
+  const VIEW = LOOK_GROUPS[view0||""] ? (view0||"") : "";
   const L = look(), p = prof(), B = L.bud || {};
-  const grp = (id, title, body, sub="") => `<div class="sec lk-sec ${lookOpen[id]?"open":""}" data-sec="${id}"><h3 class="lk-h">${title}<span class="r">${sub}</span><span class="lk-ar">${lookOpen[id]?"−":"+"}</span></h3><div class="lk-b">${lookOpen[id] ? body() : ""}</div></div>`;
+  if(VIEW && !lookOpen["_"+VIEW]){ lookOpen["_"+VIEW] = 1; LOOK_GROUPS[VIEW].forEach(k=>lookOpen[k] = true); }
+  const grp = (id, title, body, sub="") => !LOOK_GROUPS[VIEW].includes(id) ? "" : `<div class="sec lk-sec ${lookOpen[id]?"open":""}" data-sec="${id}"><h3 class="lk-h">${title}<span class="r">${sub}</span><span class="lk-ar">${lookOpen[id]?"−":"+"}</span></h3><div class="lk-b">${lookOpen[id] ? body() : ""}</div></div>`;
   const seg = (id, obj, cur) => `<div class="seg wrap" id="${id}">${Object.entries(obj).map(([k,n])=>`<button data-v="${k}" class="${String(cur)===String(k)?"on":""}">${n}</button>`).join("")}</div>`;
   const slider = (id, min, max, val, lab, unit="") => `<label class="sl"><span>${lab}</span><input type="range" id="${id}" min="${min}" max="${max}" value="${val}"><b id="${id}-v">${val}${unit}</b></label>`;
   const sw = (key, list, cur) => `<div class="swatch-row">${Object.entries(list).filter(([k])=>k!=="custom").map(([k,v])=>`<button class="pal ${k===cur?"on":""}" data-k="${key}" data-v="${k}" title="${esc(v.name)}"><span class="pal-c" style="background:${v.bg ? `linear-gradient(135deg, ${v.bg} 55%, ${v.acc} 55%)` : v.d ? `linear-gradient(135deg, ${(look().mode==="light"?v.l:v.d).join(",")})` : "var(--bg2)"}"></span><span class="pal-n">${esc(v.name)}</span></button>`).join("")}</div>`;
@@ -5349,15 +5587,15 @@ function renderLook(){
   const FXA = avail(EFFECTS, FX_HOLIDAY), PATA = avail(PATTERNS, PAT_HOLIDAY), FRA = avail(FRAMES, FRAME_HOLIDAY);
   const accA = Object.entries(BUDDY_ACC).filter(([k,a])=>k==="none" || holidayOn(a.holiday));
 
-  const pg = page(`<div class="page-head"><button class="icon-btn" id="lk-back">${IC.back}</button><h2 class="display">Appearance</h2></div>
+  const pg = page(`<div class="page-head"><button class="icon-btn" id="lk-back">${IC.back}</button><h2 class="display">${LOOK_TITLES[VIEW]}</h2></div>
   <div class="wrap lk">
   ${grp("presets", "Theme presets", ()=>`
     <div class="lk-tools"><button class="btn" id="lk-rand">🎲 Surprise me</button><button class="btn" id="lk-save">＋ Save this look</button><button class="btn" id="lk-share">Share code</button><button class="btn" id="lk-use">Use a code</button></div>
-    <label class="lk-check"><input type="checkbox" id="lk-keep" ${L.keepBud?"checked":""}> Keep my buddy and plant when I pick a preset</label>
+    <div style="font-size:12px;color:var(--dim);margin-bottom:6px">Themes change colors, fonts, frames, patterns and effects. Your buddy and plant stay exactly how you set them.</div>
     <div class="chips lk-filter">${["All", ...(mine.length?["My themes"]:[]), ...PRESET_GROUPS.filter(g=>Object.values(PRESETS).some(x=>x.g===g && okP(x)))].map(g=>`<button class="chip ${presetFilter===g?"on":""}" data-pf="${g}">${g==="Holiday" ? (hol.map(h=>HOLIDAYS[h].icon).join("")+" "+(hol.length===1?HOLIDAYS[hol[0]].name:"Holiday")) : g}</button>`).join("")}</div>
     ${hol.length ? `<div class="hol-note">${holLabel} themes, critters and accessories are here until ${holidayUntil(hol[hol.length-1])}. When the holiday ends, your usual look comes back on its own.</div>` : ""}
     <div class="preset-grid">${presetFilter==="My themes" || (presetFilter==="All" && mine.length) ? mine.map((t,i)=>presetCard("my:"+i, t.name, "Your saved look", t.look, false).replace("</button>",`<span class="pv-x" data-del="${i}">✕</span></button>`)).join("") : ""}
-    ${presetFilter==="My themes" ? "" : Object.entries(PRESETS).filter(([,x])=>okP(x) && (presetFilter==="All" || x.g===presetFilter)).sort((a,b)=>(b[1].holiday?1:0)-(a[1].holiday?1:0)).map(([k,x])=>presetCard(k, x.name, x.desc, {...LOOK_DEFAULT, ...x.look}, L.preset===k)).join("")}</div>`, `${Object.keys(PRESETS).length} looks`)}
+    ${presetFilter==="My themes" ? "" : Object.entries(PRESETS).filter(([,x])=>okP(x) && (presetFilter==="All" || x.g===presetFilter)).sort((a,b)=>(b[1].holiday?1:0)-(a[1].holiday?1:0)).map(([k,x])=>presetCard(k, x.name, x.desc, {...LOOK_DEFAULT, ...x.look}, L.preset===k)).join("")}</div>`, `${Object.values(PRESETS).filter(okP).length} looks`)}
 
   ${grp("colors", "Colors", ()=>`
     <div class="b-label" style="margin-top:0">Mode</div>${seg("lk-mode", {dark:"Dark", light:"Light", auto:"Match my phone"}, L.mode)}
@@ -5451,11 +5689,13 @@ function renderLook(){
     <div class="b-label">Cover size</div><div class="seg" id="lk-grid">${[["sm","Small"],["md","Medium"],["lg","Large"]].map(([v,l])=>`<button data-v="${v}" class="${L.grid===v?"on":""}">${l}</button>`).join("")}</div>
     <div class="b-label">Descriptions on the shelf</div><div class="seg" id="lk-desc"><button data-v="1" class="${L.desc?"on":""}">Show</button><button data-v="0" class="${L.desc?"":"on"}">Hide</button></div>`)}
 
+  ${grp("chars", "Character ring", ()=>`<div style="color:var(--mut);font-size:13px;margin-bottom:10px">Show a spinning ring of your picked characters under your titles on the shelf.</div>
+    <div class="seg" id="lk-chars"><button data-v="1" class="${p.showChars!==false?"on":""}">Show characters</button><button data-v="0" class="${p.showChars===false?"on":""}">Hide characters</button></div>`)}
   ${grp("icon", "App icon", ()=>`<div class="icon-grid">${Object.entries(ICONS).map(([k,n])=>`<button class="icon-opt ${L.icon===k?"on":""}" data-v="${k}"><img src="${window.ICON_PREVIEWS?.[k] || (k==="original"?"icon-192.png":"icon-"+k+".png")}" alt=""><span>${n}</span></button>`).join("")}</div>
     <div style="color:var(--dim);font-size:12px;margin-top:8px">To change the icon on your home screen, remove Shelf Life from your home screen and install it again from Chrome. Your shelf stays safe.</div>`)}
   <div style="height:40px"></div></div>`);
 
-  const redo = ()=>{ const y = pg.scrollTop; pg.remove(); renderLook(); const n = document.querySelector(".page:last-of-type"); if(n){ n.style.animation="none"; n.scrollTop = y; } };
+  const redo = ()=>{ const y = pg.scrollTop; pg.remove(); renderLook(VIEW); const n = document.querySelector(".page:last-of-type"); if(n){ n.style.animation="none"; n.scrollTop = y; } };
   const Q = s => pg.querySelectorAll(s);
   $("#lk-back",pg).onclick = back;
   Q(".lk-h").forEach(h=>h.onclick=()=>{ const id = h.parentElement.dataset.sec; lookOpen[id] = !lookOpen[id]; redo(); });
@@ -5468,13 +5708,12 @@ function renderLook(){
     const k = b.dataset.p; let nl, nm;
     if(k.startsWith("my:")){ const t = mine[+k.slice(3)]; nl = presetLook(t.look); nm = t.name; }
     else { nl = presetLook(PRESETS[k].look); nl.preset = k; nm = PRESETS[k].name;
-      if(PRESETS[k].holiday){ if(!PRESETS[look().preset]?.holiday) p.lookBeforeHoliday = {...look()}; if(BUDDY_SPECIES[nl.buddy]?.holiday && !BUDDY_SPECIES[look().buddy]?.holiday) nl.budBase = {buddy:look().buddy, bud:look().bud}; }
+      if(PRESETS[k].holiday){ if(!PRESETS[look().preset]?.holiday) p.lookBeforeHoliday = {...look()}; }
       else delete p.lookBeforeHoliday; }
     p.look = nl; S().theme = nl.mode; saveNow(); applyTheme(); redo(); toast(`${nm} applied`); });
-  const kp = $("#lk-keep",pg); if(kp) kp.onchange = e=>setLook("keepBud", e.target.checked);
   const rnd = a => a[Math.floor(Math.random()*a.length)];
-  const rb = $("#lk-rand",pg); if(rb) rb.onclick = ()=>{ const base = PRESETS[rnd(Object.keys(PRESETS).filter(k=>!PRESETS[k].holiday && okP(PRESETS[k])))].look; const sps = Object.keys(BUDDY_SPECIES).filter(k=>!BUDDY_SPECIES[k].holiday), spk = rnd(sps);
-    const nl = presetLook({...base, frame:rnd(Object.keys(FRA)), fcol:rnd(Object.keys(FRAME_COLORS).filter(x=>x!=="custom")), pattern:rnd(Object.keys(PATA)), palpha:20+Math.floor(Math.random()*40), fx:rnd(Object.keys(FXA)), card:rnd(Object.keys(CARD_STYLES)), font:rnd(Object.keys(FONTS)), btn:rnd(Object.keys(BUTTON_STYLES)), bar:rnd(Object.keys(BAR_STYLES)), buddy:spk, bud:{coat:rnd(Object.keys(BUDDY_SPECIES[spk].coats)), acc:"none"}, ptype:rnd(Object.keys(PLANT_TYPES)), pot:rnd(Object.keys(PLANT_POTS))});
+  const rb = $("#lk-rand",pg); if(rb) rb.onclick = ()=>{ const base = PRESETS[rnd(Object.keys(PRESETS).filter(k=>!PRESETS[k].holiday && okP(PRESETS[k])))].look; 
+    const nl = presetLook({...base, frame:rnd(Object.keys(FRA)), fcol:rnd(Object.keys(FRAME_COLORS).filter(x=>x!=="custom")), pattern:rnd(Object.keys(PATA)), palpha:20+Math.floor(Math.random()*40), fx:rnd(Object.keys(FXA)), card:rnd(Object.keys(CARD_STYLES)), font:rnd(Object.keys(FONTS)), btn:rnd(Object.keys(BUTTON_STYLES)), bar:rnd(Object.keys(BAR_STYLES)), });
     nl.preset = ""; p.look = nl; S().theme = nl.mode; saveNow(); applyTheme(); redo(); toast("🎲 Surprise! Tap again for another"); };
   const sv = $("#lk-save",pg); if(sv) sv.onclick = ()=>{ openTextSheet("Save this look", "Name it", "", "Save", name=>{ (p.myThemes ||= []).unshift({name:name||"My theme", look:{...look()}}); saveNow(); presetFilter = "My themes"; redo(); toast("Saved to My themes"); }); };
   const sh = $("#lk-share",pg); if(sh) sh.onclick = ()=>{ const code = themeCode(look()); try{ navigator.clipboard.writeText(code); toast("Theme code copied. Paste it to share your look!"); }catch(e){} openTextSheet("Your theme code", "Copy this and send it to someone. They tap Use a code and paste it in.", code, "Done", ()=>{}, true); };
@@ -5542,6 +5781,7 @@ function renderLook(){
   const se = $("#lk-seasonal",pg); if(se) se.onchange = e=>setLook("seasonal", e.target.checked);
   segSet("#lk-motion", "motion");
   segSet("#lk-shelf", "shelf"); segSet("#lk-grid", "grid"); segSet("#lk-desc", "desc", v=>v==="1");
+  Q("#lk-chars button").forEach(b=>b.onclick=()=>{ p.showChars = b.dataset.v==="1"; saveNow(); redo(); });
   Q(".icon-opt").forEach(b=>b.onclick=()=>{ setLook("icon", b.dataset.v); redo(); toast("Icon updated. Reinstall from Chrome to change it on your home screen."); });
 }
 function openTextSheet(title, hint, val, btn, cb, readonly){
