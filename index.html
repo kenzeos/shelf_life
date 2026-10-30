@@ -514,6 +514,34 @@ html.ombre .sec,html.ombre .res,html.ombre .cont{background:color-mix(in srgb,va
 .sb-top{display:flex;align-items:center;gap:10px}.sb-top b{flex:1}
 .sb-acts{display:flex;gap:6px;margin-top:8px}.sb-acts .btn{flex:1;padding:9px 6px}
 .sb-acts .btn:disabled{opacity:.4}
+.mic{flex:none;border:0;background:transparent;color:var(--mut);width:34px;height:34px;border-radius:50%;display:grid;place-items:center;margin-right:-4px}
+.mic.on{background:var(--acc);color:#fff;animation:micp 1.2s ease-in-out infinite}
+@keyframes micp{0%,100%{box-shadow:0 0 0 0 color-mix(in srgb,var(--acc) 50%,transparent)}50%{box-shadow:0 0 0 8px transparent}}
+.mic-ta{position:absolute;right:8px;top:8px;background:var(--bg2)}
+.cpk{display:flex;flex-direction:column;gap:10px;margin-top:6px}
+.cpk-sv{position:relative;height:150px;border-radius:12px;cursor:crosshair}
+.cpk-dot{position:absolute;width:22px;height:22px;border-radius:50%;border:3px solid #fff;box-shadow:0 0 0 1px rgba(0,0,0,.4),0 2px 6px rgba(0,0,0,.4);transform:translate(-50%,-50%);pointer-events:none}
+.cpk-hue{position:relative;height:18px;border-radius:99px;background:linear-gradient(90deg,#f00,#ff0,#0f0,#0ff,#00f,#f0f,#f00)}
+.cpk-knob{position:absolute;top:50%;width:24px;height:24px;border-radius:50%;border:3px solid #fff;box-shadow:0 0 0 1px rgba(0,0,0,.35),0 2px 6px rgba(0,0,0,.4);transform:translate(-50%,-50%);pointer-events:none}
+.cpk-row{display:flex;gap:8px;align-items:center}
+.cpk-prev{width:38px;height:38px;border-radius:10px;flex:none;box-shadow:inset 0 0 0 1px rgba(0,0,0,.15)}
+.cpk-hex{flex:1;min-width:0;font:inherit;font-family:ui-monospace,monospace;background:var(--bg2);color:var(--txt);border:1px solid var(--line);border-radius:10px;padding:9px 10px;text-transform:uppercase}
+.cpk-sw,.cpk-rec{display:flex;flex-wrap:wrap;gap:7px;align-items:center}
+.cpk-sw button,.cpk-rec button{width:26px;height:26px;border-radius:50%;border:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.15)}
+.cpk-rec span{font-size:11px;color:var(--dim);margin-right:2px}
+.mv-list{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:10px}
+.mv{background:none;border:0;padding:0;text-align:left;color:var(--txt)}
+.mv .cover{position:relative;border-radius:10px}
+.mv .cover img{transition:filter .2s}
+.mv:not(.done) .cover img{filter:saturate(.55) brightness(.8)}
+.mv-ck{position:absolute;right:6px;bottom:6px;width:26px;height:26px;border-radius:50%;border:2px solid #fff;background:rgba(0,0,0,.45);color:#fff;display:grid;place-items:center;font-weight:900;font-size:14px;z-index:2}
+.mv.done .mv-ck{background:var(--c,var(--acc))}
+.mv-t{font-size:12.5px;font-weight:700;line-height:1.25;margin-top:6px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.mv-s{font-size:11px;color:var(--mut);margin-top:2px}
+.x-code{font-family:ui-monospace,monospace;font-size:44px;font-weight:800;letter-spacing:4px;text-align:center;margin:18px 0 8px;color:var(--acc)}
+.x-in{width:100%;box-sizing:border-box;margin-top:14px;font-family:ui-monospace,monospace;font-size:30px;font-weight:800;letter-spacing:4px;text-align:center;background:var(--bg2);color:var(--txt);border:2px solid var(--line);border-radius:14px;padding:12px}
+.x-in:focus{border-color:var(--acc);outline:none}
+.x-opt{display:flex;flex-direction:column;gap:4px;margin-top:12px}.x-opt div{font-size:12.5px;color:var(--mut)}.x-opt .btn{padding:12px}
 
 /* ================= DECOR ================= */
 :root{--acc2:#ff7eb3;--shk:1;--bw:1px}
@@ -806,6 +834,7 @@ html[data-theme=light] .fx-stars{background:var(--acc);box-shadow:none}
 .mv-burst{width:4px;height:4px;border-radius:50%;animation:fxburst calc(var(--d)*.7) ease-out infinite}
 .mv-burst b{position:absolute;inset:0;border-radius:50%;box-shadow:0 -34px 0 var(--fc),24px -24px 0 var(--fc),34px 0 0 var(--fc),24px 24px 0 var(--fc),0 34px 0 var(--fc),-24px 24px 0 var(--fc),-34px 0 0 var(--fc),-24px -24px 0 var(--fc),0 -17px 0 #fff,17px 0 0 #fff,0 17px 0 #fff,-17px 0 0 #fff}
 @keyframes fxburst{0%,60%{transform:scale(.05);opacity:0}64%{opacity:1}100%{transform:scale(1.4);opacity:0}}
+.acc-grid.hol .acc-opt{background:color-mix(in srgb,var(--acc) 10%,var(--chip))}
 </style>
 </head>
 <body>
@@ -2038,7 +2067,7 @@ function franchiseItem(base, fr){
     title: frSeriesTitle(eng || rom), alt:[eng && rom!==eng ? frSeriesTitle(rom) : null, f.title.native].filter(Boolean).join(" · "),
     cover: f.coverImage?.extraLarge || f.coverImage?.large || base.cover, banner: f.bannerImage || base.banner || "",
     synopsis: stripHtml(f.description) || base.synopsis, year: f.startDate?.year || base.year, genres: f.genres?.length ? f.genres : base.genres,
-    meta:{...(base.meta||{}), format:"Series", status: anyLive ? "RELEASING" : "FINISHED", episodes: seasons.reduce((s,p)=>s+(p.episodes||p.aired||0),0) + sp.reduce((s,p)=>s+(p.episodes||0),0) + movies.length,
+    meta:{...(base.meta||{}), format:"Series", status: anyLive ? "RELEASING" : "FINISHED", episodes: seasons.reduce((s,p)=>s+(p.episodes||p.aired||0),0) + sp.reduce((s,p)=>s+(p.episodes||0),0),
       seasons: new Set(seasons.map(p=>p.n)).size, movies: movies.length, specials: sp.length, studio: f.studios?.nodes?.[0]?.name || base.meta?.studio || null, score: f.averageScore || base.meta?.score || null}};
 }
 function partLabel(p){ return p.kind==="season" ? `Season ${p.n}` : p.kind==="movie" ? "Movie" : (p.format==="OVA" ? "OVA" : "Special"); }
@@ -2205,12 +2234,15 @@ function totalOf(it){
   if(extra) return extra;
   return (C(it.cat)?.unit==="episode" ? it.meta?.episodes : it.meta?.chapters) || it.manualTotal || 0;
 }
+function isMovieKey(it, k){ return !!(it.parts && it.parts.some(p=>p.kind==="movie" && k.startsWith(p.al+":"))); }
+const epCount = L => L.filter(x=>x.kind!=="movie").length;
+function doneEps(it){ return Object.keys(it.my.done||{}).filter(k=>!isMovieKey(it,k)).length; }
 function doneOf(it){
   if(it.isGroup) return 0;
   if(it.isSeries) return (it.books||[]).filter(b=>bookDone(it,b)).length;
   if(isOnce(it)) return it.my.status==="completed" ? 1 : 0;
   if(isPages(it)) return it.my.pages || 0;
-  if(it.unitsTotal) return Object.keys(it.my.done||{}).length;
+  if(it.unitsTotal) return it.franchise ? Object.keys(it.my.done||{}).filter(k=>!isMovieKey(it,k)).length : Object.keys(it.my.done||{}).length;
   return it.my.count || 0;
 }
 function pct(it){ if(it.isGroup) return it.gp; if(isOnce(it) && it.my.status!=="completed" && it.my.time && it.meta?.runtime) return Math.min(99, Math.round(it.my.time/(it.meta.runtime*60)*100)); const t = totalOf(it), d = doneOf(it); return t ? Math.min(100, Math.round(d/t*100)) : (it.my.status==="completed"?100:0); }
@@ -2360,6 +2392,7 @@ function renderHome(){
   setBell();
   $("#h-add").onclick = ()=>{ addMemo = null; go(prof().cats.length ? "#add" + (view.cat!=="all" ? "/"+view.cat : "") : "#newcat"); };
   $("#h-q").oninput = e=>{ view.q = e.target.value; saveView(); drawGrid(); };
+  addMic($("#h-q"), ()=>{ view.q = $("#h-q").value; saveView(); drawGrid(); });
   $("#h-status").onchange = e=>{ view.status = e.target.value; saveView(); drawGrid(); };
   $("#h-sort").onchange = e=>{ view.sort = e.target.value; saveView(); drawGrid(); };
   $("#h-genre").onchange = e=>{ view.genre = e.target.value; saveView(); drawGrid(); };
@@ -2636,12 +2669,14 @@ function renderAdd(cat){
     let t = null;
     q.oninput = ()=>{ clearTimeout(t); t = setTimeout(()=>runName(false), 450); };
     $("#a-form",pg).onsubmit = e=>{ e.preventDefault(); clearTimeout(t); q.blur(); runName(true); };
+    addMic(q, ()=>{ clearTimeout(t); runName(true); });
     if(addMemo && addMemo.cat===cat && addMemo.mode===addMode && addMemo.list){
       q.value = addMemo.q; const dt = $("#a-dt",pg); if(dt) dt.value = addMemo.desc || ""; const y = addMemo.scroll;
       show(addMemo.list, addMemo.head, addMemo.grouped); pg.style.animation = "none"; requestAnimationFrame(()=>{ pg.scrollTop = y; });
     } else if(addMode==="name") setTimeout(()=>q.focus(), 100);
     pg.addEventListener("scroll", ()=>{ if(addMemo) addMemo.scroll = pg.scrollTop; }, {passive:true});
   }
+  const dtA = $("#a-dt",pg); if(dtA) addMic(dtA, ()=>$("#a-find",pg).click(), true);
   $("#a-find",pg).onclick = async ()=>{
     const text = $("#a-dt",pg).value.trim(); if(text.length < 8){ toast("Add a few more details"); return; }
     res.innerHTML = `<div class="spinner"></div><div class="hint" id="a-step" style="padding-top:0">Thinking…</div>`;
@@ -2723,6 +2758,7 @@ function renderDetail(id){
       <div id="d-release"></div>
       ${(c.vols||c.own||isOnce(it)||it.cat==="anime"||it.cat==="tv") ? `<div class="sec" id="d-own"></div>` : ""}
       <div class="sec" id="d-units"></div>
+      <div class="sec hidden" id="d-movies"></div>
       ${facts.length?`<div class="sec"><h3>Details</h3><div class="facts">${facts.map(f=>`<div><span>${f[0]}</span>${esc(f[1])}</div>`).join("")}</div></div>`:""}
       <div id="d-like"></div>
       <div class="sec mytake"><h3>My rating &amp; notes <span class="r" id="d-rnum"></span></h3>
@@ -2943,8 +2979,12 @@ function renderUnits(pg, it, after){
   const U = c.unit==="episode" ? "Episodes" : "Chapters";
   let group = null;
   const draw = ()=>{
-    const L = units[it.id];
-    if(!L){ return; }
+    const ALL = units[it.id];
+    if(!ALL){ return; }
+    drawMovies(pg, it, ALL, after);
+    if(it.franchise && it.unitsTotal !== epCount(ALL)){ it.unitsTotal = epCount(ALL); save(); }
+    const L = ALL.filter(x=>x.kind!=="movie");
+    if(!L.length){ box.classList.add("hidden"); return; } box.classList.remove("hidden");
     // groups: seasons for TV, blocks of 100 otherwise
     const groups = [];
     if(L.some(x=>x.g)){ const order = []; L.forEach(x=>{ if(!order.includes(x.g)) order.push(x.g); });
@@ -2958,7 +2998,7 @@ function renderUnits(pg, it, after){
     if(!group || !groups.find(g=>g.id===group)){ const n = L.findIndex(x=>!it.my.done[x.k]); const gi = groups.findIndex(g=>g.list.includes(L[n<0?L.length-1:n])); group = groups[Math.max(0,gi)].id; }
     const G = groups.find(g=>g.id===group);
     const gDone = G.list.filter(x=>it.my.done[x.k]).length;
-    box.innerHTML = `<h3>${U} <span class="r">${Object.keys(it.my.done).length}/${L.length} · hold to mark all before</span></h3>
+    box.innerHTML = `<h3>${U} <span class="r">${doneEps(it)}/${L.length} · hold to mark all before</span></h3>
       ${groups.length>1?`<div class="seasons">${groups.map(g=>{const dn=g.list.every(x=>it.my.done[x.k]);return `<button data-g="${g.id}" class="${g.id===group?"on":""}">${g.label}${dn?" ✓":""}</button>`}).join("")}</div>`:""}
       ${G.head||""}<div id="u-list">${G.list.map(x=>`<div class="ep ${it.my.done[x.k]?"done":""} ${x.kind==="movie"?"movie":""}" data-k="${esc(x.k)}"><span class="ck"></span>${unitThumb(it,x)}<span class="no">${x.kind==="movie"?"🎬":x.season!=null||x.g?"E"+x.no:"#"+x.no}</span><span class="et">${x.title?esc(x.title):`<span style="color:var(--dim)">${x.kind==="special"&&x.ptitle?esc(x.ptitle)+" · ":""}${c.unit==="episode"?"Episode":"Chapter"} ${x.no}</span>`}${x.filler?`<span class="fl">FILLER</span>`:""}${x.recap?`<span class="fl">RECAP</span>`:""}${x.date?`<span class="ed">${x.date>today()?"Airs ":""}${fmtDate(x.date)}${x.vol?" · Vol. "+esc(x.vol):""}</span>`:""}${(it.my.unotes||{})[x.k]?`<span class="un">${esc(it.my.unotes[x.k])}</span>`:""}</span><button class="nb ${(it.my.unotes||{})[x.k]?"has":""}" aria-label="Note">${IC.note}</button></div>`).join("")}</div>
       <div class="row-btns"><button class="btn" id="u-all">${gDone===G.list.length?"Uncheck":"Check"} all in ${groups.length>1?G.label:"list"}</button><button class="btn" id="u-ref">Reload list</button></div>`;
@@ -2992,7 +3032,7 @@ function renderUnits(pg, it, after){
     bs.onclick = ()=>{ const v = ta.value.trim(); it.my.unotes ||= {}; if(v) it.my.unotes[k]=v; else delete it.my.unotes[k]; touch(it); draw(); toast(v?"Note saved":"Note removed"); };
     if(b3){ b2.onclick = ()=>{ delete it.my.unotes[k]; touch(it); draw(); toast("Note removed"); }; b3.onclick = ()=>ed.remove(); } else b2.onclick = ()=>ed.remove();
   };
-  const updateHead = ()=>{ const L=units[it.id]; const r=$("h3 .r",box); if(r) r.textContent = `${Object.keys(it.my.done).length}/${L.length} · hold to mark all before`; };
+  const updateHead = ()=>{ const L=units[it.id]; const r=$("h3 .r",box); if(r) r.textContent = `${doneEps(it)}/${epCount(L)} · hold to mark all before`; };
   const markUpTo = k=>{
     const L = units[it.id]; const idx = L.findIndex(x=>x.k===k); const before = {...it.my.done};
     for(let i=0;i<=idx;i++){ if(L[idx].kind && L[i].kind !== L[idx].kind) continue; if(L[idx].kind==="special" && L[i].part!==L[idx].part) continue; it.my.done[L[i].k]=1; }
@@ -3005,7 +3045,7 @@ function renderUnits(pg, it, after){
     try{
       const L = await fetchUnits(it, (a,b)=>{ const m=$("#u-msg",box); if(m) m.textContent = `Getting the ${U.toLowerCase()} list… (${a} of ${b})`; });
       if(!L || !L.length) throw new Error("empty");
-      units[it.id] = L; it.unitsTotal = L.length; await DB.set("units:"+it.id, {at:Date.now(), list:L});
+      units[it.id] = L; it.unitsTotal = epCount(L); await DB.set("units:"+it.id, {at:Date.now(), list:L});
       // carry over a number-only count into checkmarks
       if(it.my.count && !Object.keys(it.my.done).length && !it.franchise){ L.slice(0,it.my.count).forEach(x=>it.my.done[x.k]=1); }
       applyPending(it, L);
@@ -3082,12 +3122,12 @@ const SET_MENU = [
   ["look:shelf","📚","Shelf display","Layout, cover size, descriptions, character ring"],
   ["search","🔎","Search & content","AI helper and 18+ content"],
   ["alerts","🔔","Alerts","New episode and chapter notifications, authors you follow"],
-  ["backup","💾","Backup & restore","Save your shelf or move it to a new phone"],
+  ["backup","🔄","Transfer & backup","Send your shelf to your computer with a code, or save a backup"],
   ["about","ℹ️","About","Where the info comes from"],
 ];
 function renderSettings(sub){
   const p = prof(); const sel = [];
-  const SUBT = {profile:"Profile", cats:"Categories", search:"Search & content", alerts:"Alerts", backup:"Backup & restore", about:"About"};
+  const SUBT = {profile:"Profile", cats:"Categories", search:"Search & content", alerts:"Alerts", backup:"Transfer & backup", about:"About"};
   if(sub && !SUBT[sub]) sub = "";
   const want = id => !sub ? false : sub === id;
   const pg = page(`<div class="page-head"><button class="icon-btn" id="s-back">${IC.back}</button><h2 class="display">${sub ? SUBT[sub] : "Settings"}</h2></div>
@@ -3120,7 +3160,10 @@ function renderSettings(sub){
       ${data.profiles.map(x=>`<div class="prof"><div class="avatar">${esc(x.name[0]||"?").toUpperCase()}</div><div style="flex:1"><b>${esc(x.name)}</b><div style="font-size:12px;color:var(--mut)">${Object.keys(data.items[x.id]||{}).length} titles</div></div>
         ${x.id===data.active?`<span style="font-size:12px;color:var(--good);font-weight:700">ACTIVE</span>`:`<button class="btn" data-sw="${x.id}">Switch</button><button class="btn danger" data-rm="${x.id}">Delete</button>`}</div>`).join("")}
       <div class="row-btns"><button class="btn" id="s-newp">+ Add a profile</button></div></div>` : ""}
-    ${want("backup") ? `<div class="sec"><h3>Backup &amp; restore</h3>
+    ${want("backup") ? `<div class="sec"><h3>Transfer with a code</h3>
+      <div style="color:var(--mut);font-size:13px;margin-bottom:10px">Make your phone and computer match. Open Shelf Life on both, tap <b>Send</b> on the one that has the shelf you want, then type the code on the other. Nothing is uploaded anywhere. It goes straight from one device to the other.</div>
+      <div class="row-btns"><button class="btn pri" id="s-send">📤 Send my shelf</button><button class="btn pri" id="s-recv">📥 Get a shelf</button></div></div>
+    <div class="sec"><h3>Backup &amp; restore</h3>
       <div style="color:var(--mut);font-size:13px;margin-bottom:8px">Your shelf lives on this phone. Save a backup every so often so you never lose it, or use one to move your shelf to a new phone.</div>
       <div class="row-btns"><button class="btn pri" id="s-bk">Download backup</button><button class="btn" id="s-rs">Restore backup</button></div>
       <input type="file" id="s-file" accept=".json,application/json" hidden></div>` : ""}
@@ -3165,6 +3208,8 @@ function renderSettings(sub){
     $("#n-go",pp).onclick = ()=>{ const n=$("#n-name",pp).value.trim(); if(!n){ toast("Add a name"); return; } const np={id:uid(),name:n,cats:s2.slice(),catNames:{},catColors:{},custom:{}}; data.profiles.push(np); data.items[np.id]={}; data.active=np.id; view.cat="all"; saveNow(); go(""); };
   };
   $$("#s-bk", el=>el.onclick = downloadBackup);
+  $$("#s-send", el=>el.onclick = ()=>openTransfer("send"));
+  $$("#s-recv", el=>el.onclick = ()=>openTransfer("recv"));
   $$("#s-rs", el=>el.onclick = ()=>$("#s-file",pg).click());
   $$("#s-file", el=>el.onchange = e=>restoreFile(e.target.files[0]));
 }
@@ -3429,7 +3474,7 @@ async function extendUnits(it, upto){
     const tpl = mine[0] || {g:"s"+al, gl:"Season "+((it.parts||[]).find(p=>p.al===al)?.n||""), kind:"season"};
     const add = Array.from({length: upto-mx}, (_,i)=>({k:`${al}:${mx+i+1}`, no:mx+i+1, title:"", date:"", g:tpl.g, gl:tpl.gl, kind:"season", part:al}));
     const at = mine.length ? L.indexOf(mine[mine.length-1]) + 1 : L.findIndex(x=>x.kind!=="season"); const pos = at < 0 ? L.length : at;
-    L = [...L.slice(0,pos), ...add, ...L.slice(pos)]; units[it.id] = L; it.unitsTotal = L.length; await DB.set("units:"+it.id, {at:Date.now(), list:L}); return; }
+    L = [...L.slice(0,pos), ...add, ...L.slice(pos)]; units[it.id] = L; it.unitsTotal = epCount(L); await DB.set("units:"+it.id, {at:Date.now(), list:L}); return; }
   const max = L.length ? Math.max(...L.map(x=>x.no)) : 0;
   if(upto <= max) return;
   L = L.concat(Array.from({length: upto-max}, (_,i)=>({k:String(max+i+1), no:max+i+1, title:"", date:""})));
@@ -3678,7 +3723,7 @@ function drawCatManager(pg, p){
   box.querySelectorAll(".catrow").forEach(row=>{
     const k = row.dataset.k;
     row.querySelector(".cname").onchange = e=>{ const v = e.target.value.trim(); if(!v) return; if(p.custom?.[k]) p.custom[k].name = v; else (p.catNames ||= {})[k] = v; saveNow(); toast("Renamed"); };
-    row.querySelector("[data-color]").onclick = ()=>{ const cur = C(k).color; const nx = PALETTE[(PALETTE.indexOf(cur)+1) % PALETTE.length]; if(p.custom?.[k]) p.custom[k].color = nx; else (p.catColors ||= {})[k] = nx; saveNow(); drawCatManager(pg,p); };
+    row.querySelector("[data-color]").onclick = ()=>openCatSheet(k, ()=>drawCatManager(pg,p));
     const h = row.querySelector(".drag-h");
     h.onpointerdown = e=>{ e.preventDefault(); try{ box.setPointerCapture(e.pointerId); }catch(_){} row.classList.add("lifted"); if(navigator.vibrate) try{ navigator.vibrate(20); }catch(_){}
       const move = ev=>{ const y = ev.clientY; const rows = [...box.querySelectorAll(".catrow")]; for(const r of rows){ if(r===row) continue; const b = r.getBoundingClientRect(); if(y > b.top && y < b.bottom){ if(y < b.top + b.height/2) box.insertBefore(row, r); else box.insertBefore(row, r.nextSibling); break; } }
@@ -3704,7 +3749,7 @@ function renderNewCat(){
       <div id="n-form" class="hidden">
         <div class="field"><label>Name</label><input id="n-name" maxlength="24" placeholder="e.g. Light Novels, K-dramas, Video Games"></div>
         <div class="field" id="n-track-f"><label>How do you want to track progress?</label><div class="seg" id="n-track">${Object.entries(TRACK).map(([k,t])=>`<button data-t="${k}" class="${k===track?"on":""}">${t.label}</button>`).join("")}</div></div>
-        <div class="field"><label>Color</label><div class="swatches" id="n-col">${PALETTE.map(c=>`<button data-c="${c}" style="background:${c}" class="${c===color?"on":""}"></button>`).join("")}</div></div>
+        <div class="field"><label>Color</label><div id="n-col"></div></div>
         <button class="big-btn" id="n-go">Add category</button>
       </div>
     </div>`);
@@ -3713,11 +3758,11 @@ function renderNewCat(){
   pg.querySelectorAll(".cat-pick button[data-k]").forEach(b=>b.onclick=()=>{
     pg.querySelectorAll(".cat-pick button").forEach(x=>x.classList.toggle("on", x===b)); pick = b.dataset.k; form.classList.remove("hidden");
     const custom = pick==="__custom"; $("#n-track-f",pg).classList.toggle("hidden", !custom);
-    $("#n-name",pg).value = custom ? "" : CATS[pick].label; if(!custom){ color = CATS[pick].color; pg.querySelectorAll("#n-col button").forEach(x=>x.classList.toggle("on", x.dataset.c===color)); }
+    $("#n-name",pg).value = custom ? "" : CATS[pick].label; if(!custom){ color = CATS[pick].color; colorPicker($("#n-col",pg), color, v=>{ color = v; }); }
     $("#n-name",pg).focus();
   });
   pg.querySelectorAll("#n-track button").forEach(b=>b.onclick=()=>{ track=b.dataset.t; pg.querySelectorAll("#n-track button").forEach(x=>x.classList.toggle("on",x===b)); });
-  pg.querySelectorAll("#n-col button").forEach(b=>b.onclick=()=>{ color=b.dataset.c; pg.querySelectorAll("#n-col button").forEach(x=>x.classList.toggle("on",x===b)); });
+  colorPicker($("#n-col",pg), color, v=>{ color = v; });
   $("#n-go",pg).onclick = ()=>{
     const name = $("#n-name",pg).value.trim(); if(!name){ toast("Give it a name"); return; }
     let id;
@@ -4227,20 +4272,20 @@ function wireChipReorder(row){
   row.addEventListener("touchmove", e=>{ if(row.classList.contains("reordering")) e.preventDefault(); }, {passive:false});
 }
 function closeChipPop(){ document.querySelectorAll(".chip-pop").forEach(x=>x.remove()); }
-function openCatSheet(k){
+function openCatSheet(k, after){
   const p = prof(); const c = C(k); if(!c) return;
   const w = document.createElement("div"); w.className = "sheet-wrap";
   const n = Object.values(lib()).filter(x=>x.cat===k).length;
   w.innerHTML = `<div class="sheet"><div class="sh-grab"></div><h3 class="display" style="margin:0 0 4px">${esc(c.label)}</h3><div style="font-size:12.5px;color:var(--mut);margin-bottom:12px">${n} title${n===1?"":"s"}${c.custom?" · your own category":""}</div>
     <div class="field"><label>Name</label><input id="cs-n" value="${esc(c.label)}" maxlength="24"></div>
-    <div class="b-label">Color</div><div class="cs-cols">${PALETTE.map(col=>`<button data-col="${col}" class="${col===c.color?"on":""}" style="background:${col}" aria-label="${col}"></button>`).join("")}</div>
+    <div class="b-label">Color</div><div id="cs-pick"></div>
     <div class="b-label">Position</div><div class="row-btns" style="margin-top:6px"><button class="btn" id="cs-first">Move to front</button><button class="btn" id="cs-last">Move to end</button></div>
     <div class="row-btns" style="margin-top:16px"><button class="btn pri" id="cs-ok">Done</button><button class="btn danger" id="cs-rm">Remove category</button></div></div>`;
-  const close = ()=>{ w.classList.add("out"); setTimeout(()=>w.remove(), 180); renderHome(); };
+  const close = ()=>{ w.classList.add("out"); setTimeout(()=>w.remove(), 180); if(location.hash.slice(1)) after && after(); else renderHome(); };
   document.body.appendChild(w); w.onclick = e=>{ if(e.target===w) close(); };
+  colorPicker($("#cs-pick",w), c.color, col=>{ if(p.custom?.[k]) p.custom[k].color = col; else (p.catColors ||= {})[k] = col; save(); w.querySelector("h3").style.color = col; });
   const setName = v=>{ v = v.trim(); if(!v) return; if(p.custom?.[k]) p.custom[k].name = v; else (p.catNames ||= {})[k] = v; saveNow(); };
   $("#cs-n",w).onchange = e=>setName(e.target.value);
-  w.querySelectorAll("[data-col]").forEach(b=>b.onclick=()=>{ if(p.custom?.[k]) p.custom[k].color = b.dataset.col; else (p.catColors ||= {})[k] = b.dataset.col; saveNow(); w.querySelectorAll("[data-col]").forEach(x=>x.classList.toggle("on", x===b)); });
   $("#cs-first",w).onclick = ()=>{ p.cats = [k, ...p.cats.filter(x=>x!==k)]; saveNow(); toast("Moved to the front"); };
   $("#cs-last",w).onclick = ()=>{ p.cats = [...p.cats.filter(x=>x!==k), k]; saveNow(); toast("Moved to the end"); };
   $("#cs-ok",w).onclick = ()=>{ setName($("#cs-n",w).value); close(); };
@@ -4354,6 +4399,161 @@ function commonName(titles){
   if(!titles.length) return "My group"; const w = titles.map(t=>t.split(/\s+/)); let k = 0;
   while(w.every(x=>x[k] && x[k].toLowerCase().replace(/[^a-z0-9]/g,"")===w[0][k].toLowerCase().replace(/[^a-z0-9]/g,""))) k++;
   const c = w[0].slice(0,k).join(" ").replace(/[:\-–,]+$/,"").trim(); return c.length >= 3 ? c : (typeof frSeriesTitle==="function" ? frSeriesTitle(titles[0]) : titles[0]);
+}
+
+/* ============ VOICE SEARCH (free, uses the phone's own speech recognition) ============ */
+const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+function addMic(input, onDone, append){
+  if(!SpeechRec || !input || input.parentElement.querySelector(".mic")) return;
+  const b = document.createElement("button"); b.type = "button"; b.className = "mic"; b.setAttribute("aria-label", "Search by voice");
+  b.innerHTML = `<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>`;
+  if(input.tagName === "TEXTAREA"){ b.classList.add("mic-ta"); input.parentElement.style.position = "relative"; input.after(b); } else input.after(b);
+  let rec = null;
+  b.onclick = e=>{ e.preventDefault();
+    if(rec){ try{ rec.stop(); }catch(_){} return; }
+    rec = new SpeechRec(); rec.lang = navigator.language || "en-US"; rec.interimResults = true; rec.maxAlternatives = 1;
+    const base = append && input.value.trim() ? input.value.trim() + " " : "";
+    let final = "";
+    rec.onstart = ()=>{ b.classList.add("on"); toast("Listening… say a title"); };
+    rec.onresult = ev=>{ let txt = ""; for(let i=0;i<ev.results.length;i++){ txt += ev.results[i][0].transcript; if(ev.results[i].isFinal) final = txt; } input.value = base + txt; input.dispatchEvent(new Event("input")); };
+    rec.onerror = ev=>{ if(ev.error==="not-allowed" || ev.error==="service-not-allowed") toast("Microphone is blocked. Allow it for this site in Chrome's settings."); else if(ev.error==="no-speech") toast("Didn't hear anything. Tap the mic and try again."); };
+    rec.onend = ()=>{ b.classList.remove("on"); rec = null; document.querySelectorAll(".toast").forEach(t=>{ if(t.textContent.startsWith("Listening")) t.remove(); }); if(input.value.trim()) onDone && onDone(); };
+    try{ rec.start(); }catch(_){ rec = null; }
+  };
+}
+
+/* ============ COLOR PICKER: any color you want ============ */
+function hsv2hex(h, s, v){ const f = n=>{ const k = (n + h/60) % 6; return v - v*s*Math.max(0, Math.min(k, 4-k, 1)); }; return rgb2hex([f(5),f(3),f(1)].map(x=>x*255)); }
+function hex2hsv(hex){ const [r,g,b] = hex2rgb(hex).map(x=>x/255); const mx = Math.max(r,g,b), mn = Math.min(r,g,b), d = mx-mn; let h = 0;
+  if(d){ h = mx===r ? ((g-b)/d)%6 : mx===g ? (b-r)/d+2 : (r-g)/d+4; h *= 60; if(h<0) h += 360; } return [h, mx ? d/mx : 0, mx]; }
+function colorPicker(host, value, onChange){
+  if(!host) return;
+  let [h, sat, val] = hex2hsv(/^#[0-9a-f]{6}$/i.test(value||"") ? value : "#8b6cff");
+  const recent = () => { try{ return JSON.parse(localStorage.getItem("shelf:colors")||"[]"); }catch(e){ return []; } };
+  host.innerHTML = `<div class="cpk"><div class="cpk-sv"><i class="cpk-dot"></i></div><div class="cpk-hue"><i class="cpk-knob"></i></div>
+    <div class="cpk-row"><span class="cpk-prev"></span><input class="cpk-hex" maxlength="7" spellcheck="false" autocomplete="off"><button type="button" class="btn cpk-eye" ${window.EyeDropper?"":"hidden"}>Pick from screen</button></div>
+    <div class="cpk-sw">${PALETTE.map(c=>`<button type="button" data-c="${c}" style="background:${c}"></button>`).join("")}</div>
+    <div class="cpk-rec"></div></div>`;
+  const sv = host.querySelector(".cpk-sv"), dot = host.querySelector(".cpk-dot"), hue = host.querySelector(".cpk-hue"), knob = host.querySelector(".cpk-knob"), hexIn = host.querySelector(".cpk-hex"), prev = host.querySelector(".cpk-prev");
+  let saveT = null;
+  const paint = (fire = true) => { const hex = hsv2hex(h, sat, val);
+    sv.style.background = `linear-gradient(to top, #000, transparent), linear-gradient(to right, #fff, hsl(${h},100%,50%))`;
+    dot.style.left = (sat*100)+"%"; dot.style.top = ((1-val)*100)+"%"; dot.style.background = hex; knob.style.left = (h/360*100)+"%"; knob.style.background = `hsl(${h},100%,50%)`;
+    prev.style.background = hex; if(document.activeElement !== hexIn) hexIn.value = hex;
+    if(fire){ onChange(hex); clearTimeout(saveT); saveT = setTimeout(()=>{ const r = [hex, ...recent().filter(x=>x!==hex)].slice(0,10); try{ localStorage.setItem("shelf:colors", JSON.stringify(r)); }catch(e){} drawRec(); }, 900); } };
+  const drawRec = () => { const r = recent(); const box = host.querySelector(".cpk-rec"); box.innerHTML = r.length ? `<span>Recent</span>${r.map(c=>`<button type="button" data-c="${c}" style="background:${c}"></button>`).join("")}` : ""; box.querySelectorAll("button").forEach(b=>b.onclick=()=>setHex(b.dataset.c)); };
+  const setHex = hex => { [h, sat, val] = hex2hsv(hex); paint(); };
+  const drag = (el, fn) => { el.onpointerdown = e=>{ e.preventDefault(); try{ el.setPointerCapture(e.pointerId); }catch(_){} fn(e); el.onpointermove = fn; el.onpointerup = el.onpointercancel = ()=>{ el.onpointermove = null; }; }; el.style.touchAction = "none"; };
+  drag(sv, e=>{ const r = sv.getBoundingClientRect(); sat = Math.max(0, Math.min(1, (e.clientX-r.left)/r.width)); val = Math.max(0, Math.min(1, 1-(e.clientY-r.top)/r.height)); paint(); });
+  drag(hue, e=>{ const r = hue.getBoundingClientRect(); h = Math.max(0, Math.min(359.9, (e.clientX-r.left)/r.width*360)); paint(); });
+  hexIn.oninput = ()=>{ let v = hexIn.value.trim(); if(!v.startsWith("#")) v = "#"+v; if(/^#[0-9a-f]{6}$/i.test(v)) setHex(v.toLowerCase()); };
+  host.querySelectorAll(".cpk-sw button").forEach(b=>b.onclick=()=>setHex(b.dataset.c));
+  const eye = host.querySelector(".cpk-eye"); if(eye && window.EyeDropper) eye.onclick = async()=>{ try{ const r = await new EyeDropper().open(); setHex(r.sRGBHex); }catch(e){} };
+  paint(false); drawRec();
+}
+
+/* ============ MOVIES: their own checklist, separate from episodes ============ */
+function drawMovies(pg, it, ALL, after){
+  const box = $("#d-movies", pg); if(!box) return;
+  const mv = ALL.filter(x=>x.kind==="movie");
+  if(!mv.length){ box.classList.add("hidden"); return; }
+  box.classList.remove("hidden");
+  const n = mv.filter(x=>it.my.done[x.k]).length;
+  box.innerHTML = `<h3>🎬 Movies <span class="r">${n} of ${mv.length} watched</span></h3>
+    <div class="prog"><i style="width:${Math.round(n/mv.length*100)}%"></i></div>
+    <div class="mv-list">${mv.map(x=>{ const part = (it.parts||[]).find(p=>p.al===x.part)||{}; const on = !!it.my.done[x.k];
+      return `<button class="mv ${on?"done":""}" data-k="${esc(x.k)}"><div class="cover">${part.cover?`<img src="${esc(part.cover)}" referrerpolicy="no-referrer" alt="" onerror="this.remove()">`:""}<span class="mv-ck">${on?"✓":""}</span></div><div class="mv-t">${esc(part.title||x.title)}</div><div class="mv-s">${[part.year, part.duration?part.duration+" min":null].filter(Boolean).join(" · ")}${on?" · Watched":""}</div></button>`; }).join("")}</div>
+    <div style="font-size:12px;color:var(--dim);margin-top:8px">Movies are tracked on their own, so they don't change your episode progress.</div>`;
+  box.querySelectorAll(".mv").forEach(b=>b.onclick=()=>{ const k = b.dataset.k; if(it.my.done[k]) delete it.my.done[k]; else it.my.done[k] = 1; touch(it); drawMovies(pg, it, ALL, after); after && after(); });
+}
+
+/* ============ TRANSFER WITH A CODE (device to device, no account) ============ */
+function loadPeer(){ return new Promise((res, rej)=>{ if(window.Peer) return res(window.Peer); const sc = document.createElement("script"); sc.src = "peerjs.min.js"; sc.onload = ()=>window.Peer ? res(window.Peer) : rej(new Error("load")); sc.onerror = ()=>rej(new Error("load")); document.head.appendChild(sc); }); }
+async function shelfPackage(){ const u = {}; for(const k of await DB.keys()) if(String(k).startsWith("units:")) u[k] = await DB.get(k); return {app:"shelf", v:1, at:Date.now(), data:JSON.parse(JSON.stringify(data)), units:u}; }
+function openTransfer(mode){
+  document.querySelectorAll(".xfer").forEach(x=>x.remove());
+  const w = document.createElement("div"); w.className = "sheet-wrap xfer";
+  let peer = null, conn = null, timer = null, done = false;
+  const cleanup = ()=>{ clearTimeout(timer); try{ conn && conn.close(); }catch(e){} try{ peer && peer.destroy(); }catch(e){} };
+  const close = ()=>{ cleanup(); w.classList.add("out"); setTimeout(()=>w.remove(), 180); };
+  const body = html => { w.innerHTML = `<div class="sheet"><div class="sh-grab"></div>${html}<div class="row-btns" style="margin-top:16px"><button class="btn" id="x-close">${done?"Done":"Cancel"}</button></div></div>`; $("#x-close",w).onclick = close; };
+  const fail = msg => body(`<h3 class="display" style="margin:0 0 6px">Couldn't connect</h3><div style="color:var(--mut);font-size:13.5px">${msg}</div><div style="color:var(--dim);font-size:12.5px;margin-top:10px">Tips: make sure both devices are online and the app is open on both. Some school or work Wi-Fi blocks direct connections, so switching one device to mobile data can help. A backup file always works too.</div>`);
+  document.body.appendChild(w); w.onclick = e=>{ if(e.target===w) close(); };
+  body(`<div class="spinner" style="margin:20px auto"></div><div class="hint">Getting ready…</div>`);
+  const code = () => String(Math.floor(100000 + Math.random()*900000));
+  loadPeer().then(Peer=>{
+    if(mode === "send"){
+      const start = (tries) => {
+        const c = code(); peer = new Peer("shelflife-x-" + c, {debug:0});
+        peer.on("open", ()=>{
+          body(`<h3 class="display" style="margin:0 0 6px">Your code</h3><div style="color:var(--mut);font-size:13.5px">On your other device, open Shelf Life, go to <b>Settings → Transfer & backup → Get a shelf</b> and type this code.</div>
+            <div class="x-code">${c.slice(0,3)} ${c.slice(3)}</div><div class="hint" id="x-st">Waiting for your other device… keep this screen open.</div>`);
+          timer = setTimeout(()=>fail("The code expired after 10 minutes. Tap Send again to get a new one."), 600000);
+        });
+        peer.on("connection", async cn=>{ conn = cn; const st = $("#x-st",w); if(st) st.textContent = "Connected! Sending your shelf…";
+          cn.on("open", async ()=>{ const pkg = await shelfPackage(); const n = Object.values(pkg.data.items||{}).reduce((s,x)=>s+Object.keys(x).length,0);
+            cn.send({t:"shelf", pkg}); cn.on("data", d=>{ if(d && d.t==="got"){ done = true; body(`<h3 class="display" style="margin:0 0 6px">Sent! 🎉</h3><div style="color:var(--mut);font-size:13.5px">${n} title${n===1?"":"s"} went to your other device.</div>`); setTimeout(cleanup, 1500); } }); });
+        });
+        peer.on("error", err=>{ if(err.type==="unavailable-id" && tries < 4){ try{ peer.destroy(); }catch(e){} start(tries+1); } else fail(err.type==="network" || err.type==="server-error" || err.type==="socket-error" ? "Couldn't reach the connection service. Check your internet and try again." : "Something went wrong (" + (err.type||"error") + "). Try again."); });
+      };
+      start(0);
+    } else {
+      body(`<h3 class="display" style="margin:0 0 6px">Get a shelf</h3><div style="color:var(--mut);font-size:13.5px">On the device that has your shelf, tap <b>Send my shelf</b>, then type the code it shows.</div>
+        <input class="x-in" id="x-code" inputmode="numeric" maxlength="7" placeholder="123 456" autocomplete="off"><button class="btn pri" id="x-go" style="width:100%;margin-top:10px;padding:12px">Connect</button>`);
+      const inp = $("#x-code",w); setTimeout(()=>inp.focus(), 100);
+      inp.oninput = ()=>{ const d = inp.value.replace(/\D/g,"").slice(0,6); inp.value = d.length > 3 ? d.slice(0,3)+" "+d.slice(3) : d; };
+      $("#x-go",w).onclick = ()=>{ const c = inp.value.replace(/\D/g,""); if(c.length !== 6){ toast("The code has 6 numbers"); return; }
+        body(`<div class="spinner" style="margin:20px auto"></div><div class="hint" id="x-st">Connecting…</div>`);
+        peer = new Peer(undefined, {debug:0});
+        peer.on("open", ()=>{ conn = peer.connect("shelflife-x-" + c, {reliable:true});
+          timer = setTimeout(()=>fail("Couldn't find that code. Double-check the numbers, and make sure the other device is still showing it."), 25000);
+          conn.on("open", ()=>{ const st = $("#x-st",w); if(st) st.textContent = "Connected! Receiving your shelf…"; });
+          conn.on("data", d=>{ if(!d || d.t!=="shelf") return; clearTimeout(timer); try{ conn.send({t:"got"}); }catch(e){} askApply(d.pkg); });
+          conn.on("error", ()=>fail("The connection dropped. Try again."));
+        });
+        peer.on("error", err=>{ clearTimeout(timer); fail(err.type==="peer-unavailable" ? "Couldn't find that code. Double-check the numbers, and make sure the other device is still showing it." : "Couldn't reach the connection service. Check your internet and try again."); });
+      };
+      inp.onkeydown = e=>{ if(e.key==="Enter") $("#x-go",w).click(); };
+    }
+  }).catch(()=>fail("Couldn't load the transfer tool. Check your internet and try again."));
+  function askApply(pkg){
+    const inc = pkg.data, n = Object.values(inc.items||{}).reduce((s,x)=>s+Object.keys(x).length,0);
+    const mine = Object.values(data.items||{}).reduce((s,x)=>s+Object.keys(x).length,0);
+    body(`<h3 class="display" style="margin:0 0 6px">Got it! 📦</h3><div style="color:var(--mut);font-size:13.5px">${n} title${n===1?"":"s"} from your other device. This device has ${mine}.</div>
+      <div class="x-opt"><button class="btn pri" id="x-merge">Combine both</button><div>Adds anything new and keeps whichever copy was updated most recently. Nothing gets lost.</div></div>
+      <div class="x-opt"><button class="btn" id="x-replace">Replace this device's shelf</button><div>Makes this device an exact copy of the other one.</div></div>`);
+    $("#x-merge",w).onclick = async()=>{ const r = await mergeShelf(pkg); done = true; body(`<h3 class="display" style="margin:0 0 6px">All matched up 🎉</h3><div style="color:var(--mut);font-size:13.5px">Added ${r.added}, updated ${r.updated}${r.profiles?`, and ${r.profiles} new profile${r.profiles>1?"s":""}`:""}.</div>`); cleanup(); };
+    $("#x-replace",w).onclick = async()=>{ for(const k of await DB.keys()) if(String(k).startsWith("units:")) await DB.del(k);
+      for(const [k,v] of Object.entries(pkg.units||{})) await DB.set(k, v);
+      const keepAi = data.settings?.ai; data = inc; if(keepAi) (data.settings ||= {}).ai = keepAi; Object.keys(units).forEach(k=>delete units[k]);
+      if(!data.profiles.find(p=>p.id===data.active)) data.active = data.profiles[0]?.id; await saveNow(); applyTheme(); done = true;
+      body(`<h3 class="display" style="margin:0 0 6px">All matched up 🎉</h3><div style="color:var(--mut);font-size:13.5px">This device now has the same shelf as your other one.</div>`); cleanup(); };
+  }
+}
+async function mergeShelf(pkg){
+  const inc = pkg.data; let added = 0, updated = 0, profiles = 0;
+  for(const ip of inc.profiles||[]){
+    let lp = data.profiles.find(p=>p.name.trim().toLowerCase()===ip.name.trim().toLowerCase()) || (data.profiles.length===1 && inc.profiles.length===1 ? data.profiles[0] : null);
+    const its = (inc.items||{})[ip.id] || {};
+    if(!lp){ data.profiles.push(JSON.parse(JSON.stringify(ip))); data.items[ip.id] = its; profiles++; added += Object.keys(its).length; for(const id of Object.keys(its)){ const u = pkg.units?.["units:"+id]; if(u) await DB.set("units:"+id, u); } continue; }
+    const L = (data.items[lp.id] ||= {});
+    const same = (a, b) => a.cat===b.cat && ((a.src?.al && a.src.al===b.src?.al) || (a.src?.tvm && a.src.tvm===b.src?.tvm) || (a.src?.mal && a.src.mal===b.src?.mal) || (a.src?.wds && a.src.wds===b.src?.wds) || a.title.trim().toLowerCase()===b.title.trim().toLowerCase());
+    const idMap = {};
+    for(const [id, it] of Object.entries(its)){
+      const local = L[id] || Object.values(L).find(x=>same(x, it));
+      if(!local){ L[id] = it; idMap[id] = id; added++; const u = pkg.units?.["units:"+id]; if(u) await DB.set("units:"+id, u); continue; }
+      idMap[id] = local.id;
+      if((it.updated||0) > (local.updated||0)){ const keepId = local.id; Object.keys(local).forEach(k=>delete local[k]); Object.assign(local, JSON.parse(JSON.stringify(it)), {id:keepId}); updated++;
+        const u = pkg.units?.["units:"+id]; if(u){ await DB.set("units:"+keepId, u); delete units[keepId]; } }
+    }
+    ip.cats.forEach(k=>{ if(!lp.cats.includes(k)) lp.cats.push(k); });
+    lp.custom = {...(ip.custom||{}), ...(lp.custom||{})}; lp.catNames = {...(ip.catNames||{}), ...(lp.catNames||{})}; lp.catColors = {...(ip.catColors||{}), ...(lp.catColors||{})};
+    lp.groups ||= {}; Object.values(ip.groups||{}).forEach(G=>{ if(!lp.groups[G.id]) lp.groups[G.id] = {...G, members:G.members.map(m=>idMap[m]||m)}; });
+    if(ip.plantState?.days && (!lp.plantState?.days || ip.plantState.days.length > lp.plantState.days.length)) lp.plantState = ip.plantState;
+    if(!lp.look && ip.look) lp.look = ip.look;
+  }
+  await saveNow(); applyTheme(); route();
+  return {added, updated, profiles};
 }
 
 /* ================= DECOR: THEMES, FRAMES, EFFECTS, BUDDIES, PLANT ================= */
@@ -5026,13 +5226,10 @@ Object.assign(BUDDY_SPECIES, {
 });
 
 /* accessories: only during their holidays */
-const ACC_HOLIDAY = {witchhat:"halloween", horns:"halloween", cape:"halloween", halo:"halloween", santahat:"christmas", beanie:"christmas", bell:"christmas", antlers:"christmas", scarf:"thanksgiving", pilgrim:"thanksgiving", leafcrown:"thanksgiving",
-  bow:"valentine", heartband:"valentine", flowercrown:"easter", bunnyears:"easter", flower:"easter", sprout:"easter", tophat:"stpatricks", shamrock:"stpatricks", starhat:"july4", bandana:"july4", sunglasses:"july4",
-  partyhat:"newyear", crown:"newyear", tiara:"newyear", bowtie:"newyear", monocle:"newyear"};
-Object.assign(BUDDY_ACC, {antlers:{n:"Reindeer antlers", c:"#a0704a"}, pilgrim:{n:"Pilgrim hat", c:"#2b2b2b"}, leafcrown:{n:"Leaf crown", c:"#d9622b"}, heartband:{n:"Heart headband", c:"#ff4d6d"}, bunnyears:{n:"Bunny ears", c:"#ffffff"}, tophat:{n:"Leprechaun hat", c:"#2f9e55"}, shamrock:{n:"Shamrock clip", c:"#5fbf6a"}, starhat:{n:"Stars & stripes hat", c:"#3b4fa8"}});
-delete BUDDY_ACC.glasses; delete BUDDY_ACC.headphones;
-Object.keys(BUDDY_ACC).forEach(k=>{ if(k!=="none") BUDDY_ACC[k].holiday = ACC_HOLIDAY[k] || "never"; });
-HOLIDAYS.never = {name:"", month:13};
+const ACC_HOLIDAY = {witchhat:"halloween", horns:"halloween", cape:"halloween", halo:"halloween", santahat:"christmas", antlers:"christmas", pilgrim:"thanksgiving", leafcrown:"thanksgiving",
+  heartband:"valentine", bunnyears:"easter", tophat:"stpatricks", shamrock:"stpatricks", starhat:"july4", partyhat:"newyear"};
+Object.assign(BUDDY_ACC, {collar:{n:"Collar", c:"#3b6fd1"}, starclip:{n:"Star clip", c:"#ffd34d"}, antlers:{n:"Reindeer antlers", c:"#a0704a"}, pilgrim:{n:"Pilgrim hat", c:"#2b2b2b"}, leafcrown:{n:"Leaf crown", c:"#d9622b"}, heartband:{n:"Heart headband", c:"#ff4d6d"}, bunnyears:{n:"Bunny ears", c:"#ffffff"}, tophat:{n:"Leprechaun hat", c:"#2f9e55"}, shamrock:{n:"Shamrock clip", c:"#5fbf6a"}, starhat:{n:"Stars & stripes hat", c:"#3b4fa8"}});
+Object.keys(BUDDY_ACC).forEach(k=>{ if(k!=="none" && ACC_HOLIDAY[k]) BUDDY_ACC[k].holiday = ACC_HOLIDAY[k]; });
 const _accSVG = accSVG;
 accSVG = function(kind, C, a){
   const k = a.hw/34, [tx, ty] = a.top, ol = shade(C,-.45), sw = `stroke="${ol}" stroke-width="${2/k}" stroke-linejoin="round" stroke-linecap="round"`;
@@ -5045,6 +5242,8 @@ accSVG = function(kind, C, a){
     case "bunnyears": return g(`<path d="M-26 10 Q-28 -8 0 -10 Q28 -8 26 10" stroke="#ff9ec4" stroke-width="3.4" fill="none"/>${[-1,1].map(s=>`<path d="M${s*12} -8 C${s*4} -20 ${s*6} -46 ${s*14} -48 C${s*22} -46 ${s*22} -20 ${s*16} -8Z" fill="${C}" ${sw}/><path d="M${s*13} -12 C${s*9} -22 ${s*10} -40 ${s*14} -42 C${s*18} -40 ${s*18} -22 ${s*15.5} -12Z" fill="#ffc2d9"/>`).join("")}`);
     case "tophat": case "starhat": { const band = kind==="starhat" ? `<rect x="-14" y="-12" width="28" height="9" fill="#ffffff"/><path d="M-14 -9 H14 M-14 -5.5 H14" stroke="#e0343c" stroke-width="2"/>${[-8,0,8].map(x=>`<path d="M${x} -24 l1.2 2.6 2.8 .3 -2.1 1.9 .6 2.8 -2.5 -1.4 -2.5 1.4 .6 -2.8 -2.1 -1.9 2.8 -.3Z" fill="#fff"/>`).join("")}` : `<rect x="-14" y="-10" width="28" height="7" fill="#2b2b2b"/><rect x="-5" y="-11.5" width="10" height="10" rx="1" fill="none" stroke="#f2c14e" stroke-width="2.4"/>`;
       return g(`<g transform="translate(6 2) rotate(10)"><ellipse cx="0" cy="0" rx="26" ry="5.5" fill="${C}" ${sw}/><path d="M-14 -2 L-15 -34 L15 -34 L14 -2Z" fill="${C}" ${sw}/><ellipse cx="0" cy="-34" rx="15" ry="3.5" fill="${shade(C,.12)}" ${sw}/>${band}${kind==="tophat"?`<path d="M14 -20 C22 -26 28 -18 22 -14 C26 -10 18 -6 16 -12" fill="#5fbf6a" stroke="#2f6b35" stroke-width=".8"/>`:""}</g>`); }
+    case "collar": return `<g class="bd-acc" transform="translate(${a.cx||60} ${a.neck}) scale(${k})"><path d="M-24 -4 Q0 6 24 -4" stroke="${shade(C,-.35)}" stroke-width="7" fill="none" stroke-linecap="round"/><path d="M-24 -4 Q0 6 24 -4" stroke="${C}" stroke-width="4.5" fill="none" stroke-linecap="round"/><circle cx="0" cy="8" r="5" fill="#f2c14e" stroke="#9a7020" stroke-width="1.3"/><path d="M-1.5 6.5 l3 3 M1.5 6.5 l-3 3" stroke="#9a7020" stroke-width=".8"/></g>`;
+    case "starclip": return g(`<g transform="translate(22 6) rotate(12)"><path d="M0 -9 L2.6 -2.8 L9 -2.6 L4 1.6 L5.6 8 L0 4.4 L-5.6 8 L-4 1.6 L-9 -2.6 L-2.6 -2.8Z" fill="${C}" ${sw}/><circle cx="-1.5" cy="-2" r="1.3" fill="#fff" opacity=".8"/></g>`);
     case "shamrock": return g(`<g transform="translate(22 8)">${[0,120,240].map(r=>`<path d="M0 0 C-6 -4 -8 -10 -4 -12 C-1 -13 0 -10 0 -9 C0 -10 1 -13 4 -12 C8 -10 6 -4 0 0Z" transform="rotate(${r})" fill="${C}" ${sw}/>`).join("")}<path d="M0 0 Q2 6 6 9" stroke="${ol}" stroke-width="1.4" fill="none"/></g>`);
   }
   return _accSVG(kind, C, a);
@@ -5056,7 +5255,7 @@ buddyOpts = function(L){
   let LL = L; const sp = BUDDY_SPECIES[L.buddy];
   if(sp && !availNow(sp)){ const base = L.budBase || {}; LL = {...L, buddy: BUDDY_SPECIES[base.buddy] && availNow(BUDDY_SPECIES[base.buddy]) ? base.buddy : "cat", bud:{...(base.bud||{}), acc:(L.bud||{}).acc, accC:(L.bud||{}).accC}}; }
   const O = _buddyOpts(LL);
-  if(O.acc !== "none" && (!BUDDY_ACC[O.acc] || !holidayOn(BUDDY_ACC[O.acc].holiday))) O.acc = "none";
+  if(O.acc !== "none" && (!BUDDY_ACC[O.acc] || (BUDDY_ACC[O.acc].holiday && !holidayOn(BUDDY_ACC[O.acc].holiday)))) O.acc = "none";
   O.species = LL.buddy; return O;
 };
 function effBuddy(L){ const sp = BUDDY_SPECIES[L.buddy]; if(!L.buddy || L.buddy==="none" || !sp) return L.buddy; if(availNow(sp)) return L.buddy; const b = (L.budBase||{}).buddy; return b && BUDDY_SPECIES[b] && availNow(BUDDY_SPECIES[b]) ? b : "cat"; }
@@ -5099,6 +5298,211 @@ const FX_HOLIDAY = {bats:"halloween", ghosts:"halloween", pumpkins:"halloween", 
 const PAT_HOLIDAY = {bats:"halloween", cobweb:"halloween"};
 const FRAME_HOLIDAY = {cobweb:"halloween"};
 const onAny = h => !h || (Array.isArray(h) ? h.some(x=>holidayOn(x)) : holidayOn(h));
+/* ---------- MORE HOLIDAY CRITTERS, ACCESSORIES AND THINGS TO HOLD ---------- */
+Object.assign(CUSTOM, {
+  santa:(c,o,id)=>`<defs>${grad("h"+id,c.main,.15)}${grad("f"+id,c.skin||"#ffd9c2",.15)}</defs><ellipse cx="60" cy="116" rx="30" ry="4.5" fill="#000" opacity=".16"/>
+    <ellipse cx="48" cy="112" rx="9" ry="5" fill="#2b2b2b" ${c.sw}/><ellipse cx="72" cy="112" rx="9" ry="5" fill="#2b2b2b" ${c.sw}/>
+    <ellipse cx="60" cy="92" rx="28" ry="22" fill="url(#h${id})" ${c.sw}/><rect x="33" y="92" width="54" height="7" fill="#2b2b2b"/><rect x="54" y="90.5" width="12" height="10" rx="2" fill="none" stroke="#f2c14e" stroke-width="2.4"/>
+    <path d="M60 72 V112" stroke="#fff" stroke-width="5" opacity=".95"/>
+    <g class="bd-arm"><ellipse cx="34" cy="92" rx="7" ry="10" fill="url(#h${id})" ${c.sw}/><ellipse cx="86" cy="92" rx="7" ry="10" fill="url(#h${id})" ${c.sw}/><circle cx="33" cy="101" r="5" fill="#fff" ${c.sw}/><circle cx="87" cy="101" r="5" fill="#fff" ${c.sw}/></g>
+    <circle cx="60" cy="54" r="24" fill="url(#f${id})" ${c.sw}/>
+    <path d="M38 58 C36 76 46 88 60 88 C74 88 84 76 82 58 C76 66 70 66 66 62 C62 66 58 66 54 62 C50 66 44 66 38 58Z" fill="#fff" ${c.sw}/>
+    <path d="M52 64 Q56 60 60 64 Q64 60 68 64" stroke="${c.ol}" stroke-width="1.2" fill="#fff"/>
+    <path d="M34 40 Q36 18 60 16 Q82 18 92 36 Q96 40 94 46 Q88 36 84 36 L86 42 L34 42Z" fill="${c.main}" ${c.sw}/><circle cx="96" cy="48" r="6" fill="#fff" ${c.sw}/>
+    <rect x="31" y="38" width="58" height="9" rx="4.5" fill="#fff" ${c.sw}/>
+    ${eyePair(51,69,54,4.2,c,o)}<circle cx="60" cy="60" r="3" fill="#ff8a80"/>${blush(45,75,59,4,o)}`,
+  xmastree:(c,o,id)=>`<defs>${grad("h"+id,c.main,.15)}</defs><ellipse cx="60" cy="116" rx="30" ry="4" fill="#000" opacity=".16"/>
+    <rect x="52" y="100" width="16" height="14" rx="2" fill="#7a4a24" ${c.sw}/>
+    <path d="M60 52 L96 100 L24 100Z" fill="url(#h${id})" ${c.sw} stroke-linejoin="round"/><path d="M60 34 L88 74 L32 74Z" fill="url(#h${id})" ${c.sw} stroke-linejoin="round"/><path d="M60 18 L80 50 L40 50Z" fill="url(#h${id})" ${c.sw} stroke-linejoin="round"/>
+    <path d="M36 92 Q60 82 86 94 M42 66 Q60 58 78 68" stroke="${c.garland||"#f2c14e"}" stroke-width="2.2" fill="none" stroke-dasharray="1 4" stroke-linecap="round"/>
+    ${[[36,96,"#e0343c"],[84,96,"#4fc3f7"],[46,70,"#ffd34d"],[74,70,"#ff7eb3"],[52,44,"#e0343c"],[68,44,"#4fc3f7"]].map(([x,y,col])=>`<circle cx="${x}" cy="${y}" r="3.2" fill="${col}" stroke="${c.ol}" stroke-width=".8"/>`).join("")}
+    <path d="M60 4 L63 12 L71 12 L65 17 L67 25 L60 20 L53 25 L55 17 L49 12 L57 12Z" fill="#ffd34d" ${c.sw}/>
+    ${eyePair(53,67,82,4.4,c,o)}<path d="M56 89 Q60 92 64 89" stroke="${c.ol}" stroke-width="1.6" fill="none" stroke-linecap="round"/>${blush(47,73,88,3.6,o)}`,
+  present:(c,o,id)=>`<defs>${grad("h"+id,c.main,.15)}</defs><ellipse cx="60" cy="117" rx="32" ry="4" fill="#000" opacity=".16"/>
+    <rect x="26" y="56" width="68" height="56" rx="5" fill="url(#h${id})" ${c.sw}/><rect x="22" y="46" width="76" height="14" rx="4" fill="${shade(c.main,.08)}" ${c.sw}/>
+    <rect x="54" y="46" width="12" height="66" fill="${c.ribbon||"#ffd34d"}" ${c.sw}/>
+    <path d="M60 46 C46 30 34 36 40 44 C44 48 52 48 60 46Z M60 46 C74 30 86 36 80 44 C76 48 68 48 60 46Z" fill="${c.ribbon||"#ffd34d"}" ${c.sw}/><circle cx="60" cy="45" r="4" fill="${shade(c.ribbon||"#ffd34d",-.1)}" ${c.sw}/>
+    ${eyePair(44,76,82,4.6,c,o)}<path d="M41 92 Q44 95 47 92 M73 92 Q76 95 79 92" stroke="${c.ol}" stroke-width="1.4" fill="none" stroke-linecap="round" opacity="0"/><path d="M38 94 Q44 99 50 94" stroke="${c.ol}" stroke-width="1.8" fill="none" stroke-linecap="round"/>${blush(36,84,90,4,o)}`,
+  ornament:(c,o,id)=>`<defs>${grad("h"+id,c.main,.3)}<clipPath id="oc${id}"><circle cx="60" cy="72" r="34"/></clipPath></defs><ellipse cx="60" cy="116" rx="22" ry="4" fill="#000" opacity=".16"/>
+    <path d="M60 22 Q52 14 58 10 Q64 8 62 16" stroke="#9a9aa8" stroke-width="2" fill="none"/><rect x="50" y="24" width="20" height="14" rx="3" fill="#d4a73c" ${c.sw}/>
+    <circle cx="60" cy="72" r="34" fill="url(#h${id})"/><g clip-path="url(#oc${id})"><path d="M20 58 Q60 50 100 58 L100 64 Q60 56 20 64Z M20 84 Q60 92 100 84 L100 90 Q60 98 20 90Z" fill="${c.stripe||"#ffffff"}" opacity=".85"/></g>
+    <circle cx="60" cy="72" r="34" fill="none" ${c.sw}/><ellipse cx="44" cy="56" rx="8" ry="5" transform="rotate(-35 44 56)" fill="#fff" opacity=".5"/>
+    ${eyePair(50,70,74,5,c,o)}<path d="M55 83 Q60 87 65 83" stroke="${c.ol}" stroke-width="1.8" fill="none" stroke-linecap="round"/>${blush(42,78,80,4.5,o)}`,
+  candycorn:(c,o,id)=>`<defs><clipPath id="cc${id}"><path d="M60 14 C66 14 98 92 96 104 C94 114 26 114 24 104 C22 92 54 14 60 14Z"/></clipPath></defs><ellipse cx="60" cy="116" rx="30" ry="4" fill="#000" opacity=".16"/>
+    <g clip-path="url(#cc${id})"><rect x="0" y="0" width="120" height="50" fill="#fff8ec"/><rect x="0" y="50" width="120" height="30" fill="#ff9a2e"/><rect x="0" y="80" width="120" height="40" fill="#ffd34d"/></g>
+    <path d="M60 14 C66 14 98 92 96 104 C94 114 26 114 24 104 C22 92 54 14 60 14Z" fill="none" stroke="#a8541c" stroke-width="2.2"/>
+    <ellipse cx="48" cy="40" rx="3" ry="9" transform="rotate(20 48 40)" fill="#fff" opacity=".6"/>
+    ${eyePair(51,69,72,4.8,{...c, ol:"#7a3a10"},o)}<path d="M55 82 Q60 86 65 82" stroke="#7a3a10" stroke-width="1.8" fill="none" stroke-linecap="round"/>${blush(43,77,79,4,o)}`,
+  cauldron:(c,o,id)=>`<defs>${grad("h"+id,c.main,.12)}</defs><ellipse cx="60" cy="117" rx="32" ry="4" fill="#000" opacity=".2"/>
+    <path d="M38 110 l-5 7 M82 110 l5 7" stroke="#1a1520" stroke-width="5" stroke-linecap="round"/>
+    <g class="bd-squish"><circle cx="46" cy="40" r="6" fill="${c.brew}" opacity=".8"/><circle cx="72" cy="32" r="4.5" fill="${c.brew}" opacity=".7"/><circle cx="62" cy="22" r="3" fill="${c.brew}" opacity=".6"/></g>
+    <path d="M22 56 C18 96 36 112 60 112 C84 112 102 96 98 56Z" fill="url(#h${id})" ${c.sw}/>
+    <ellipse cx="60" cy="55" rx="40" ry="9" fill="${shade(c.main,.15)}" ${c.sw}/><ellipse cx="60" cy="55" rx="33" ry="5.5" fill="${c.brew}"/>
+    <path d="M36 57 Q38 66 36 72 M78 57 Q80 62 78 66" stroke="${c.brew}" stroke-width="4" stroke-linecap="round"/>
+    ${eyePair(48,72,84,5.4,{...c, eyes:c.brew},o)}<path d="M54 95 Q60 99 66 95" stroke="${c.brew}" stroke-width="1.8" fill="none" stroke-linecap="round"/>${blush(40,80,92,5,o)}`,
+  franken:(c,o,id)=>`<defs>${grad("h"+id,c.main,.15)}</defs><ellipse cx="60" cy="116" rx="28" ry="4.5" fill="#000" opacity=".16"/>
+    <ellipse cx="48" cy="112" rx="9" ry="5" fill="#2b2b2b" ${c.sw}/><ellipse cx="72" cy="112" rx="9" ry="5" fill="#2b2b2b" ${c.sw}/>
+    <rect x="36" y="80" width="48" height="30" rx="8" fill="${c.suit||"#3b3046"}" ${c.sw}/>
+    <rect x="22" y="44" width="10" height="8" rx="2" fill="#9aa3b5" ${c.sw}/><rect x="88" y="44" width="10" height="8" rx="2" fill="#9aa3b5" ${c.sw}/>
+    <rect x="30" y="22" width="60" height="60" rx="14" fill="url(#h${id})" ${c.sw}/>
+    <path d="M30 36 Q30 20 46 20 L74 20 Q90 20 90 36 L90 30 L84 34 L78 28 L72 34 L66 28 L60 34 L54 28 L48 34 L42 28 L36 34 L30 30Z" fill="#2b2633" ${c.sw}/>
+    <path d="M66 40 L78 42 M68 37 L68 43 M72 38 L72 44 M76 39 L76 45" stroke="${shade(c.main,-.4)}" stroke-width="1.4" stroke-linecap="round"/>
+    ${eyePair(49,71,54,5.4,c,o)}<path d="M50 68 Q60 72 70 68" stroke="${c.ol}" stroke-width="2" fill="none" stroke-linecap="round"/>${blush(41,79,64,4.5,o)}`,
+  pie:(c,o,id)=>`<defs>${grad("h"+id,c.main,.15)}</defs><ellipse cx="60" cy="116" rx="34" ry="4" fill="#000" opacity=".16"/>
+    <path d="M14 96 L100 60 L106 76 L20 112Z" fill="#e8b46a" ${c.sw}/>
+    <path d="M14 96 L100 60 L100 42 C70 40 34 60 14 80Z" fill="url(#h${id})" ${c.sw}/>
+    <path d="M14 80 C34 60 70 40 100 42 C104 46 104 56 100 60" fill="none" stroke="#c8873a" stroke-width="7" stroke-linecap="round"/>
+    <path d="M58 46 C52 40 58 32 64 34 C70 28 78 34 74 40 C80 42 78 50 70 50 C66 54 58 52 58 46Z" fill="#fffaf0" ${c.sw}/>
+    ${eyePair(46,66,76,4.8,c,o)}<path d="M51 86 Q56 89 61 85" stroke="${c.ol}" stroke-width="1.8" fill="none" stroke-linecap="round"/>${blush(38,74,82,4,o)}`,
+  corn:(c,o,id)=>`<defs>${grad("h"+id,c.main,.2)}<clipPath id="cn${id}"><ellipse cx="60" cy="58" rx="20" ry="40"/></clipPath></defs><ellipse cx="60" cy="116" rx="26" ry="4" fill="#000" opacity=".16"/>
+    <ellipse cx="60" cy="58" rx="20" ry="40" fill="url(#h${id})" ${c.sw}/><g clip-path="url(#cn${id})" stroke="${shade(c.main,-.25)}" stroke-width="1" fill="none">${[26,34,42,50,58,66,74,82,90].map(y=>`<path d="M38 ${y} Q60 ${y+3} 82 ${y}"/>`).join("")}${[46,54,62,70].map(x=>`<path d="M${x} 16 V100"/>`).join("")}</g>
+    <path d="M60 112 C40 104 30 84 34 60 C42 78 50 92 60 96Z" fill="#7fb54b" ${c.sw}/><path d="M60 112 C80 104 90 84 86 60 C78 78 70 92 60 96Z" fill="#6aa83f" ${c.sw}/>
+    ${eyePair(53,67,52,4.4,c,o)}<path d="M56 61 Q60 64 64 61" stroke="${c.ol}" stroke-width="1.6" fill="none" stroke-linecap="round"/>${blush(47,73,58,3.5,o)}`,
+  letter:(c,o,id)=>`<defs>${grad("h"+id,c.main,.1)}</defs><ellipse cx="60" cy="116" rx="32" ry="4" fill="#000" opacity=".16"/>
+    <g class="bd-squish"><rect x="18" y="44" width="84" height="62" rx="6" fill="url(#h${id})" ${c.sw}/><path d="M18 50 L60 82 L102 50" fill="none" stroke="${shade(c.main,-.25)}" stroke-width="2"/>
+    <path d="M60 86 C50 78 50 70 55 69 C57 68 59 70 60 72 C61 70 63 68 65 69 C70 70 70 78 60 86Z" fill="${c.seal||"#e63962"}" ${c.sw}/>
+    ${eyePair(40,80,66,4.6,c,o)}<path d="M36 76 Q40 80 44 76 M76 76 Q80 80 84 76" stroke="${c.ol}" stroke-width="1.4" fill="none" stroke-linecap="round" opacity="0"/>${blush(32,88,72,4,o)}</g>`,
+  cupcake:(c,o,id)=>`<defs>${grad("h"+id,c.main,.2)}</defs><ellipse cx="60" cy="116" rx="26" ry="4" fill="#000" opacity=".16"/>
+    <path d="M32 74 L40 112 L80 112 L88 74Z" fill="${c.cup||"#ffd6e5"}" ${c.sw}/>${[40,48,56,64,72,80].map(x=>`<path d="M${x} 76 L${x+2} 110" stroke="${shade(c.cup||"#ffd6e5",-.2)}" stroke-width="1.4"/>`).join("")}
+    <path d="M28 76 C24 62 36 56 42 58 C40 46 54 40 60 46 C66 40 80 46 78 58 C84 56 96 62 92 76Z" fill="url(#h${id})" ${c.sw}/><path d="M60 46 C58 36 64 30 70 32" stroke="${c.ol}" stroke-width="2" fill="none"/><circle cx="70" cy="31" r="5" fill="#e0343c" ${c.sw}/>
+    ${[[42,64,"#ffffff"],[78,62,"#ffd34d"],[54,56,"#7fd6ff"],[68,68,"#ffffff"]].map(([x,y,col])=>`<rect x="${x}" y="${y}" width="5" height="2" rx="1" fill="${col}" transform="rotate(30 ${x} ${y})"/>`).join("")}
+    ${eyePair(50,70,90,4.6,c,o)}<path d="M56 99 Q60 102 64 99" stroke="${c.ol}" stroke-width="1.6" fill="none" stroke-linecap="round"/>${blush(43,77,96,3.6,o)}`,
+  rainbow:(c,o,id)=>`<ellipse cx="60" cy="116" rx="40" ry="4" fill="#000" opacity=".12"/>
+    ${["#ff5d73","#ffb347","#ffe066","#5ee08a","#4fc3f7","#9b7cff"].map((col,i)=>`<path d="M${14+i*5} 96 A${46-i*5} ${46-i*5} 0 0 1 ${106-i*5} 96" stroke="${col}" stroke-width="5.4" fill="none"/>`).join("")}
+    <g fill="#fff" ${c.sw}><circle cx="18" cy="98" r="11"/><circle cx="30" cy="102" r="10"/><circle cx="102" cy="98" r="11"/><circle cx="90" cy="102" r="10"/></g>
+    <g fill="#fff"><circle cx="18" cy="98" r="9.6"/><circle cx="30" cy="102" r="8.6"/><circle cx="102" cy="98" r="9.6"/><circle cx="90" cy="102" r="8.6"/><rect x="18" y="98" width="12" height="8"/><rect x="90" y="98" width="12" height="8"/></g>
+    ${eyePair(52,68,70,4.6,{...c,ol:"#5a5a6a"},o)}<path d="M56 79 Q60 82 64 79" stroke="#5a5a6a" stroke-width="1.6" fill="none" stroke-linecap="round"/>${blush(46,74,76,3.6,o)}`,
+  popsicle:(c,o,id)=>`<ellipse cx="60" cy="117" rx="20" ry="4" fill="#000" opacity=".16"/><rect x="55" y="92" width="10" height="24" rx="5" fill="#e8c69a" ${c.sw}/>
+    <path d="M36 92 L36 56 Q36 22 60 18 Q84 22 84 56 L84 92Z" fill="${c.c3||"#3b6fd1"}" ${c.sw}/><path d="M36 70 L84 70 L84 56 Q84 22 60 18 Q36 22 36 56Z" fill="#ffffff" ${c.sw}/><path d="M36 46 Q36 22 60 18 Q84 22 84 46Z" fill="${c.c1||"#e0343c"}" ${c.sw}/>
+    <ellipse cx="46" cy="36" rx="3.5" ry="8" fill="#fff" opacity=".5"/>
+    ${eyePair(52,68,62,4.6,c,o)}<path d="M56 74 Q60 77 64 74" stroke="${c.ol}" stroke-width="1.6" fill="none" stroke-linecap="round"/>${blush(45,75,68,3.8,o)}`,
+  clock:(c,o,id)=>`<defs>${grad("h"+id,c.main,.2)}</defs><ellipse cx="60" cy="117" rx="28" ry="4" fill="#000" opacity=".16"/>
+    <path d="M40 100 l-8 12 M80 100 l8 12" stroke="${shade(c.main,-.3)}" stroke-width="5" stroke-linecap="round"/>
+    <g class="bd-earL"><path d="M28 40 A14 14 0 0 1 48 24 Z" fill="${c.bell||"#d4a73c"}" ${c.sw}/></g><g class="bd-earR"><path d="M92 40 A14 14 0 0 0 72 24 Z" fill="${c.bell||"#d4a73c"}" ${c.sw}/></g>
+    <circle cx="60" cy="68" r="38" fill="url(#h${id})" ${c.sw}/><circle cx="60" cy="68" r="31" fill="#fffaf0" ${c.sw}/>
+    ${[...Array(12)].map((_,i)=>{ const a = i*30*Math.PI/180; return `<circle cx="${(60+Math.sin(a)*26).toFixed(1)}" cy="${(68-Math.cos(a)*26).toFixed(1)}" r="${i%3?1:2}" fill="${c.ol}"/>`; }).join("")}
+    <path d="M60 68 V48 M60 68 V52" stroke="${c.ol}" stroke-width="2.4" stroke-linecap="round"/>
+    ${eyePair(50,70,74,4.6,c,o)}<path d="M55 84 Q60 87 65 84" stroke="${c.ol}" stroke-width="1.6" fill="none" stroke-linecap="round"/>${blush(43,77,80,3.8,o)}`,
+});
+Object.assign(BUDDY_SPECIES, {
+  santa:{kind:"c", name:"Santa", g:"Holiday", holiday:"christmas", top:[60,16], eye:54, neck:84, dx:9, hw:28, hold:[60,100], coats:{classic:{n:"Santa", main:"#d6323a", eyes:"#2b2b3a"}, green:{n:"Green Santa", main:"#2f8f4e", eyes:"#2b2b3a"}}},
+  xmastree:{kind:"c", name:"Christmas tree", g:"Holiday", holiday:"christmas", top:[60,6], eye:82, neck:98, dx:7, hw:20, hold:[60,104], coats:{classic:{n:"Evergreen", main:"#2f9e55", eyes:"#1a2a1a"}, snowy:{n:"Snowy", main:"#cfeadf", eyes:"#1a3a2a", garland:"#e0343c"}, pink:{n:"Pink tinsel", main:"#ff9ec4", eyes:"#5a1a3a"}}},
+  present:{kind:"c", name:"Present", g:"Holiday", holiday:"christmas", top:[60,32], eye:82, neck:100, dx:16, hw:36, hold:[60,106], coats:{red:{n:"Red & gold", main:"#d6323a", eyes:"#2b1a1a", ribbon:"#ffd34d"}, green:{n:"Green & red", main:"#2f9e55", eyes:"#1a2a1a", ribbon:"#e0343c"}, blue:{n:"Blue & silver", main:"#3b6fd1", eyes:"#1a2a4a", ribbon:"#e8eef8"}}},
+  ornament:{kind:"c", name:"Ornament", g:"Holiday", holiday:"christmas", top:[60,24], eye:74, neck:100, dx:10, hw:30, hold:[60,104], coats:{red:{n:"Red", main:"#e0343c", eyes:"#3a0a14"}, gold:{n:"Gold", main:"#e3c06b", eyes:"#5a3a0a", stripe:"#d6323a"}, blue:{n:"Icy blue", main:"#7fb8ff", eyes:"#1a2a4a"}}},
+  chocbunny:M({name:"Chocolate bunny", g:"Holiday", holiday:"easter", ears:"bunny", tail:"puff", snout:"bunny", face:"muzzle", top:[60,27],
+    coats:{milk:{n:"Milk chocolate", main:"#8a5a3b", second:"#a8754e", accent:"#c99a6b", eyes:"#ffe8c9"}, dark:{n:"Dark chocolate", main:"#4a2b1c", second:"#6b3f28", accent:"#8a5a3b", eyes:"#ffd6a8"}, white:{n:"White chocolate", main:"#fbf1de", second:"#f3e2c3", accent:"#ffc8d6", eyes:"#8a5a3b"}}}),
+  lamb:M({name:"Spring lamb", g:"Holiday", holiday:"easter", ears:"sheep", tail:"wool", snout:"pony", face:"none", extras:["wool","woolbody"], top:[60,20],
+    coats:{pink:{n:"Pink lamb", main:"#ffe3ec", second:"#ffd0de", accent:"#ff9ec4", eyes:"#5a1a3a", wool:"#fff4f8"}, lilac:{n:"Lilac lamb", main:"#efe6ff", second:"#ddd0ff", accent:"#c9a3ff", eyes:"#3b2a4a", wool:"#f8f3ff"}, mint:{n:"Mint lamb", main:"#e6fff4", second:"#d0f5e6", accent:"#9be7c4", eyes:"#1a4a3a", wool:"#f3fffa"}}}),
+  easterbunny:M({name:"Easter bunny", g:"Holiday", holiday:"easter", ears:"bunny", tail:"puff", snout:"bunny", face:"muzzle", defProp:"basket", top:[60,27],
+    coats:{pastel:{n:"Pastel", main:"#f6eaff", second:"#fff7fb", accent:"#ffb8d9", eyes:"#8a5cd6"}, peach:{n:"Peach", main:"#ffe1cc", second:"#fff6ef", accent:"#ffb3a0", eyes:"#c45a2a"}, sky:{n:"Sky", main:"#dff0ff", second:"#f6fbff", accent:"#ffc2d9", eyes:"#3b6fd1"}}}),
+  candycorn:{kind:"c", name:"Candy corn", g:"Holiday", holiday:"halloween", top:[60,20], eye:72, neck:94, dx:9, hw:24, hold:[60,104], coats:{classic:{n:"Candy corn", main:"#ffd34d", eyes:"#3b1a0a"}}},
+  cauldron:{kind:"c", name:"Cauldron", g:"Holiday", holiday:"halloween", top:[60,46], eye:84, neck:104, dx:12, hw:40, hold:[60,108], coats:{green:{n:"Green brew", main:"#2b2433", eyes:"#7dff8a", brew:"#7dff8a"}, purple:{n:"Purple potion", main:"#2b2433", eyes:"#c79bff", brew:"#c79bff"}, pink:{n:"Love potion", main:"#3a2a40", eyes:"#ff8fc8", brew:"#ff8fc8"}}},
+  franken:{kind:"c", name:"Franken-friend", g:"Holiday", holiday:"halloween", top:[60,20], eye:54, neck:82, dx:11, hw:30, hold:[60,100], coats:{green:{n:"Classic green", main:"#9bd97a", eyes:"#2b2b2b"}, mint:{n:"Mint", main:"#bfeedd", eyes:"#1a3a2a"}, purple:{n:"Purple", main:"#c9b3ff", eyes:"#2b1a4a"}}},
+  pie:{kind:"c", name:"Pumpkin pie", g:"Holiday", holiday:"thanksgiving", top:[60,36], eye:76, neck:100, dx:10, hw:34, hold:[60,104], coats:{pumpkin:{n:"Pumpkin pie", main:"#e8823a", eyes:"#3b1a0a"}, apple:{n:"Apple pie", main:"#e8b46a", eyes:"#3b1a0a"}, pecan:{n:"Pecan pie", main:"#8a4a24", eyes:"#ffe0b0"}}},
+  corn:{kind:"c", name:"Corn", g:"Holiday", holiday:"thanksgiving", top:[60,18], eye:52, neck:84, dx:7, hw:20, hold:[60,96], coats:{yellow:{n:"Sweet corn", main:"#ffd34d", eyes:"#3b2a0a"}, flint:{n:"Flint corn", main:"#d9622b", eyes:"#3b1a0a"}}},
+  letter:{kind:"c", name:"Love letter", g:"Holiday", holiday:"valentine", top:[60,42], eye:66, neck:100, dx:20, hw:42, hold:[60,104], coats:{cream:{n:"Cream", main:"#fff8ec", eyes:"#5a1a2a", seal:"#e63962"}, pink:{n:"Pink", main:"#ffe0ea", eyes:"#5a1a3a", seal:"#b3122f"}, lilac:{n:"Lilac", main:"#efe6ff", eyes:"#3b2a4a", seal:"#ff5d8f"}}},
+  cupcake:{kind:"c", name:"Cupcake", g:"Holiday", holiday:"valentine", top:[60,40], eye:90, neck:104, dx:10, hw:32, hold:[60,108], coats:{pink:{n:"Strawberry", main:"#ffb3c9", eyes:"#5a1a3a", cup:"#fff0f5"}, choc:{n:"Chocolate", main:"#8a5a3b", eyes:"#ffe8c9", cup:"#ffd6e5"}, red:{n:"Red velvet", main:"#fff4ee", eyes:"#5a1a2a", cup:"#d6323a"}}},
+  rainbow:{kind:"c", name:"Rainbow", g:"Holiday", holiday:"stpatricks", top:[60,46], eye:70, neck:96, dx:8, hw:24, hold:[60,100], coats:{classic:{n:"Rainbow", main:"#ffffff", eyes:"#3b3a5a"}}},
+  popsicle:{kind:"c", name:"Rocket pop", g:"Holiday", holiday:"july4", top:[60,20], eye:62, neck:90, dx:8, hw:24, hold:[60,96], coats:{usa:{n:"Red, white & blue", main:"#ffffff", eyes:"#1a2a4a"}, berry:{n:"Berry", main:"#ffffff", eyes:"#5a1a3a", c1:"#ff5d8f", c3:"#9b7cff"}}},
+  clock:{kind:"c", name:"Midnight clock", g:"Holiday", holiday:"newyear", top:[60,30], eye:74, neck:104, dx:10, hw:36, hold:[60,104], coats:{gold:{n:"Gold", main:"#e3c06b", eyes:"#2b2b3a"}, silver:{n:"Silver", main:"#cfd8e6", eyes:"#2b2b3a", bell:"#9aa3b5"}, pink:{n:"Pink", main:"#ffb3d9", eyes:"#5a1a3a", bell:"#ffd34d"}}},
+});
+
+/* more holiday accessories */
+Object.assign(BUDDY_ACC, {
+  elfhat:{n:"Elf hat", c:"#2f9e55", holiday:"christmas"}, candyscarf:{n:"Candy cane scarf", c:"#e0343c", holiday:"christmas"}, rednose:{n:"Red nose", c:"#e0343c", holiday:"christmas"}, wreath:{n:"Wreath collar", c:"#2f8f4e", holiday:"christmas"},
+  catears:{n:"Cat ears headband", c:"#2b2232", holiday:"halloween"}, pumpkinhat:{n:"Pumpkin hat", c:"#ff8a1e", holiday:"halloween"}, stitch:{n:"Spooky bow", c:"#7b3fb8", holiday:"halloween"},
+  heartglasses:{n:"Heart glasses", c:"#ff4d6d", holiday:"valentine"}, cupidwings:{n:"Cupid wings", c:"#ffffff", holiday:"valentine"},
+  chickhat:{n:"Hatching egg hat", c:"#fff8ec", holiday:"easter"}, pastelbow:{n:"Pastel bow", c:"#c9a3ff", holiday:"easter"},
+  pilgrimcollar:{n:"Pilgrim collar", c:"#ffffff", holiday:"thanksgiving"}, turkeyhat:{n:"Turkey hat", c:"#8a5a3b", holiday:"thanksgiving"},
+  clovercrown:{n:"Clover crown", c:"#5fbf6a", holiday:"stpatricks"}, starglasses:{n:"Star glasses", c:"#3b4fa8", holiday:"july4"}, yearglasses:{n:"New year glasses", c:"#e3c06b", holiday:"newyear"},
+});
+const _accSVG2 = accSVG;
+accSVG = function(kind, C, a){
+  const k = a.hw/34, [tx, ty] = a.top, ol = shade(C,-.45), sw = `stroke="${ol}" stroke-width="${2/k}" stroke-linejoin="round" stroke-linecap="round"`;
+  const g = (inner, x=tx, y=ty, kk=k) => `<g class="bd-acc" transform="translate(${x} ${y}) scale(${kk})">${inner}</g>`;
+  const E = (inner) => g(inner, a.cx||60, a.eye, 1), N = (inner) => g(inner, a.cx||60, a.neck, k);
+  const dx = a.dx;
+  switch(kind){
+    case "elfhat": return g(`<g transform="translate(4 2) rotate(-8)"><path d="M-26 4 Q-16 -18 10 -30 Q30 -38 40 -20 Q30 -26 22 -18 Q20 -6 26 4Z" fill="${C}" ${sw}/><circle cx="40" cy="-19" r="5" fill="#ffd34d" ${sw}/><path d="M-28 4 h56 v-7 l-6 -4 l-6 4 l-6 -4 l-6 4 l-6 -4 l-6 4 l-6 -4 l-6 4 l-6 -4 l-2 3Z" fill="#e0343c" ${sw}/></g>`);
+    case "candyscarf": return N(`<path d="M-27 -5 Q0 7 27 -5 L27 4 Q0 16 -27 4Z" fill="#fff" ${sw}/><path d="M-22 -4 l4 9 M-12 -1 l4 10 M-2 0 l4 10 M8 -1 l4 10 M18 -4 l4 9" stroke="${C}" stroke-width="3.6"/><path d="M10 6 L15 27 L24 25 L20 4Z" fill="#fff" ${sw}/><path d="M12 10 L22 9 M13 16 L23 15 M14 22 L23 21" stroke="${C}" stroke-width="3"/>`);
+    case "rednose": return `<g class="bd-acc"><circle cx="${a.cx||60}" cy="${a.eye + 9}" r="${4.5*Math.max(.8,k)}" fill="${C}" stroke="${shade(C,-.4)}" stroke-width="1"/><circle cx="${(a.cx||60)-1.5}" cy="${a.eye+7.5}" r="1.4" fill="#fff" opacity=".8"/></g>`;
+    case "wreath": return N(`<path d="M-24 -4 Q0 8 24 -4" stroke="${C}" stroke-width="8" fill="none" stroke-linecap="round"/>${[-18,-9,0,9,18].map((x,i)=>`<path d="M${x} ${Math.abs(x)<10?2:-1} l-4 -3 l3 -2 Z" fill="${shade(C,.2)}"/>${i%2?`<circle cx="${x+2}" cy="${Math.abs(x)<10?3:0}" r="2" fill="#e0343c"/>`:""}`).join("")}<path d="M0 6 L-7 2 L-7 10Z M0 6 L7 2 L7 10Z" fill="#e0343c" ${sw}/>`);
+    case "catears": return g(`<path d="M-28 10 Q-30 -10 0 -12 Q30 -10 28 10" stroke="${C}" stroke-width="3.4" fill="none"/>${[-1,1].map(s=>`<path d="M${s*10} -11 L${s*20} -34 L${s*28} -9Z" fill="${C}" ${sw}/><path d="M${s*14} -12 L${s*20} -26 L${s*24} -12Z" fill="#ff9ec4"/>`).join("")}`);
+    case "pumpkinhat": return g(`<ellipse cx="0" cy="-2" rx="24" ry="14" fill="${C}" ${sw}/><path d="M-8 -14 Q-10 -2 -8 10 M8 -14 Q10 -2 8 10" stroke="${shade(C,-.25)}" stroke-width="1.4" fill="none"/><path d="M0 -14 Q-2 -24 4 -28" stroke="#6b8e3a" stroke-width="4" fill="none" stroke-linecap="round"/><path d="M3 -22 C10 -30 18 -26 16 -20 C10 -18 6 -19 3 -22Z" fill="#7fb54b"/>`);
+    case "stitch": return g(`<g transform="translate(20 8) rotate(18)"><path d="M0 0 L-13 -9 Q-15 0 -13 9Z M0 0 L13 -9 Q15 0 13 9Z" fill="${C}" ${sw}/><path d="M-11 -5 L-6 -2 M-11 5 L-6 2 M11 -5 L6 -2 M11 5 L6 2" stroke="#1a1020" stroke-width="1.2"/><circle r="4" fill="#1a1020"/><circle r="1.6" fill="${C}"/></g>`);
+    case "heartglasses": return E(`${[-1,1].map(s=>`<path d="M${s*dx} 8 C${s*dx-12} 0 ${s*dx-10} -10 ${s*dx-4} -9 C${s*dx-1} -9 ${s*dx} -7 ${s*dx} -5 C${s*dx} -7 ${s*dx+1} -9 ${s*dx+4} -9 C${s*dx+10} -10 ${s*dx+12} 0 ${s*dx} 8Z" fill="${C}" fill-opacity=".75" stroke="${shade(C,-.4)}" stroke-width="1.6"/>`).join("")}<path d="M${-dx*.4} -4 Q0 -7 ${dx*.4} -4" stroke="${shade(C,-.4)}" stroke-width="1.8" fill="none"/>`);
+    case "cupidwings": return `<g class="bd-acc"><g class="bd-wingL"><path d="M38 92 C24 80 10 82 8 70 C16 72 18 66 16 60 C26 64 34 74 40 86Z" fill="${C}" stroke="#e8c39e" stroke-width="1.4"/></g><g class="bd-wingR"><g ${MIRROR}><path d="M38 92 C24 80 10 82 8 70 C16 72 18 66 16 60 C26 64 34 74 40 86Z" fill="${C}" stroke="#e8c39e" stroke-width="1.4"/></g></g></g>`;
+    case "chickhat": return g(`<path d="M-24 6 C-26 -18 -12 -34 0 -34 C12 -34 26 -18 24 6 L18 0 L12 6 L6 0 L0 6 L-6 0 L-12 6 L-18 0Z" fill="${C}" ${sw}/><circle cx="0" cy="-34" r="7" fill="#ffe066" ${sw}/><circle cx="-2" cy="-35" r="1.2" fill="#2b2b2b"/><circle cx="3" cy="-35" r="1.2" fill="#2b2b2b"/><path d="M0 -32 l2 2 l-2 1Z" fill="#f4a261"/>`);
+    case "pastelbow": return g(`<g transform="translate(20 8) rotate(18)"><path d="M0 0 L-13 -9 Q-15 0 -13 9Z" fill="${C}" ${sw}/><path d="M0 0 L13 -9 Q15 0 13 9Z" fill="#ffc2d9" ${sw}/><circle r="4" fill="#b5e8ff" ${sw}/><circle cx="-8" cy="-3" r="1.3" fill="#fff"/><circle cx="8" cy="3" r="1.3" fill="#fff"/></g>`);
+    case "pilgrimcollar": return N(`<path d="M-24 -6 Q0 4 24 -6 L20 10 Q0 18 -20 10Z" fill="${C}" ${sw}/><path d="M0 2 L0 14" stroke="${ol}" stroke-width="1.2"/>`);
+    case "turkeyhat": return g(`${[-3,-2,-1,0,1,2,3].map(i=>`<ellipse cx="0" cy="-20" rx="5" ry="14" transform="rotate(${i*22} 0 0)" fill="${["#b5523b","#e8823a","#f2c14e"][Math.abs(i)%3]}" ${sw}/>`).join("")}<ellipse cx="0" cy="0" rx="16" ry="10" fill="${C}" ${sw}/><circle cx="-4" cy="-2" r="1.6" fill="#2b2b2b"/><circle cx="4" cy="-2" r="1.6" fill="#2b2b2b"/><path d="M-2 1 L2 1 L0 5Z" fill="#f2c14e"/>`);
+    case "clovercrown": return g(`<path d="M-30 9 Q0 -1 30 9" stroke="#3f8a4a" stroke-width="2.4" fill="none"/>${[-24,-12,0,12,24].map(x=>{ const y = 8 - (1 - Math.abs(x)/30)*8; return `<g transform="translate(${x} ${y.toFixed(1)})">${[0,90,180,270].map(r=>`<path d="M0 0 C-5 -3 -6 -8 -3 -9 C-1 -10 0 -8 0 -7 C0 -8 1 -10 3 -9 C6 -8 5 -3 0 0Z" transform="rotate(${r})" fill="${C}" stroke="${shade(C,-.35)}" stroke-width=".8"/>`).join("")}</g>`; }).join("")}`);
+    case "starglasses": return E(`${[-1,1].map(s=>`<path d="M${s*dx} -10 L${s*dx+3} -3 L${s*dx+10} -3 L${s*dx+4} 2 L${s*dx+6} 9 L${s*dx} 5 L${s*dx-6} 9 L${s*dx-4} 2 L${s*dx-10} -3 L${s*dx-3} -3Z" fill="${s<0?"#e0343c":C}" fill-opacity=".85" stroke="#fff" stroke-width="1.4"/>`).join("")}<path d="M${-dx*.45} -3 Q0 -6 ${dx*.45} -3" stroke="#fff" stroke-width="1.8" fill="none"/>`);
+    case "yearglasses": { const y = String(today0().getMonth() >= 11 ? today0().getFullYear()+1 : today0().getFullYear()); return E(`<text x="0" y="5" text-anchor="middle" font-size="${dx*1.25}" font-weight="900" font-family="Arial Black,Arial,sans-serif" fill="${C}" stroke="${shade(C,-.45)}" stroke-width="1" letter-spacing="-1">${y}</text>`); }
+  }
+  return _accSVG2(kind, C, a);
+};
+
+/* things your buddy can hold */
+const BUDDY_PROPS = {
+  none:{n:"Nothing"}, book:{n:"Book", c:"#3b6fd1"}, boba:{n:"Boba tea", c:"#c9a27a"}, balloon:{n:"Balloon", c:"#ff5d8f"}, bouquet:{n:"Flowers", c:"#ff8fb8"}, coffee:{n:"Cocoa mug", c:"#e8e2d6"}, star:{n:"Little star", c:"#ffd34d"}, plush:{n:"Mini plushie", c:"#ffc2d9"},
+  egg:{n:"Easter egg", c:"#b5dcff", holiday:"easter"}, basket:{n:"Egg basket", c:"#d9a066", holiday:"easter"}, carrot:{n:"Carrot", c:"#ff8a3c", holiday:"easter"},
+  candycane:{n:"Candy cane", c:"#e0343c", holiday:"christmas"}, gift:{n:"Gift", c:"#2f9e55", holiday:"christmas"}, cookie:{n:"Cookie", c:"#c47a3e", holiday:"christmas"},
+  pail:{n:"Pumpkin pail", c:"#ff8a1e", holiday:"halloween"}, lollipop:{n:"Spooky lollipop", c:"#8a4fd0", holiday:"halloween"}, potion:{n:"Potion", c:"#7dff8a", holiday:"halloween"},
+  heartballoon:{n:"Heart balloon", c:"#ff4d6d", holiday:"valentine"}, rose:{n:"Rose", c:"#e0343c", holiday:"valentine"}, chocolates:{n:"Chocolates", c:"#e63962", holiday:"valentine"},
+  pieslice:{n:"Pie slice", c:"#e8823a", holiday:"thanksgiving"}, leaf:{n:"Autumn leaf", c:"#d9622b", holiday:"thanksgiving"},
+  goldcoin:{n:"Gold coin", c:"#f2c14e", holiday:"stpatricks"}, shamrockprop:{n:"Shamrock", c:"#5fbf6a", holiday:"stpatricks"},
+  flag:{n:"Little flag", c:"#3b4fa8", holiday:"july4"}, sparkler:{n:"Sparkler", c:"#ffd34d", holiday:["july4","newyear"]}, popper:{n:"Party popper", c:"#ff5fb7", holiday:"newyear"},
+};
+function propSVG(kind, C, a){
+  const [x, y] = a.hold || [60, 100], ol = shade(C,-.45), sw = `stroke="${ol}" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"`;
+  const g = inner => `<g class="bd-prop" transform="translate(${x} ${y})">${inner}</g>`;
+  const paws = `<ellipse cx="-11" cy="4" rx="5.5" ry="4.5" fill="var(--paw,#fff)" opacity="0"/>`;
+  switch(kind){
+    case "book": return g(`<path d="M-15 -8 L0 -4 L15 -8 L15 10 L0 14 L-15 10Z" fill="${C}" ${sw}/><path d="M-12 -6 L0 -2.5 L0 11 L-12 7.5Z M12 -6 L0 -2.5 L0 11 L12 7.5Z" fill="#fffaf0"/><path d="M-10 -2 L-2 0 M-10 2 L-2 4 M10 -2 L2 0 M10 2 L2 4" stroke="#c9bba4" stroke-width="1"/><path d="M0 -4 V14" stroke="${ol}" stroke-width="1.2"/>`);
+    case "boba": return g(`<path d="M-9 -12 L9 -12 L7 12 L-7 12Z" fill="${C}" fill-opacity=".85" ${sw}/><ellipse cx="0" cy="-12" rx="10" ry="3" fill="#fff" ${sw}/><path d="M3 -12 L7 -24" stroke="#ff7eb3" stroke-width="3" stroke-linecap="round"/>${[-4,0,4,-2,2].map((bx,i)=>`<circle cx="${bx}" cy="${8-(i>2?4:0)}" r="2" fill="#3b2a1a"/>`).join("")}`);
+    case "balloon": case "heartballoon": return `<g class="bd-prop" transform="translate(${x+16} ${y})"><g class="bd-float"><path d="M0 0 Q10 -30 18 -60" stroke="#9a9aa8" stroke-width="1" fill="none"/>${kind==="heartballoon" ? `<path d="M18 -60 C4 -70 6 -86 14 -86 C17 -86 18 -84 18 -82 C18 -84 19 -86 22 -86 C30 -86 32 -70 18 -60Z" fill="${C}" ${sw}/>` : `<ellipse cx="18" cy="-74" rx="12" ry="14" fill="${C}" ${sw}/><path d="M16 -60 l2 2 l2 -2Z" fill="${C}"/>`}<ellipse cx="13" cy="-78" rx="3" ry="5" fill="#fff" opacity=".45"/></g></g>`;
+    case "bouquet": case "rose": return g(`<path d="M-8 14 L0 -4 L8 14Z" fill="#7fb54b" ${sw}/>${(kind==="rose"?[[0,-8]]:[[-6,-8],[6,-8],[0,-13],[-3,-3],[4,-2]]).map(([fx,fy],i)=>`<circle cx="${fx}" cy="${fy}" r="${kind==="rose"?6:4.5}" fill="${i%2&&kind!=="rose"?"#ffd34d":C}" ${sw}/>${kind==="rose"?`<path d="M${fx-3} ${fy} A3 3 0 1 1 ${fx+2} ${fy+2}" stroke="${shade(C,-.3)}" stroke-width="1" fill="none"/>`:""}`).join("")}<path d="M-6 8 L6 8" stroke="#ff7eb3" stroke-width="3"/>`);
+    case "coffee": return g(`<rect x="-10" y="-10" width="18" height="20" rx="3" fill="${C}" ${sw}/><path d="M8 -5 C14 -5 14 5 8 5" stroke="${ol}" stroke-width="2.4" fill="none"/><ellipse cx="-1" cy="-10" rx="9" ry="2.5" fill="#8a5a3b"/><circle cx="-4" cy="-11" r="1.6" fill="#fff"/><circle cx="1" cy="-11" r="1.4" fill="#fff"/><path d="M-3 -16 q2 -3 0 -6 M2 -16 q2 -3 0 -6" stroke="#bbb" stroke-width="1.2" fill="none" opacity=".7"/>`);
+    case "star": return g(`<path d="M0 -12 L3.5 -4 L12 -3.5 L5.5 2 L7.5 10 L0 5.5 L-7.5 10 L-5.5 2 L-12 -3.5 L-3.5 -4Z" fill="${C}" ${sw}/><circle cx="-2.5" cy="-1" r="1" fill="#2b2b2b"/><circle cx="2.5" cy="-1" r="1" fill="#2b2b2b"/>`);
+    case "plush": return g(`<circle cx="-6" cy="-10" r="4" fill="${C}" ${sw}/><circle cx="6" cy="-10" r="4" fill="${C}" ${sw}/><circle cx="0" cy="-2" r="9" fill="${C}" ${sw}/><ellipse cx="0" cy="10" rx="8" ry="6" fill="${C}" ${sw}/><circle cx="-3" cy="-3" r="1.1" fill="#2b2b2b"/><circle cx="3" cy="-3" r="1.1" fill="#2b2b2b"/><ellipse cx="0" cy="0" rx="1.6" ry="1" fill="#2b2b2b"/>`);
+    case "egg": return g(`<path d="M0 -14 C8 -14 12 -2 12 4 C12 11 6 15 0 15 C-6 15 -12 11 -12 4 C-12 -2 -8 -14 0 -14Z" fill="${C}" ${sw}/><path d="M-11 -2 L-6 -5 L-2 -2 L2 -5 L6 -2 L11 -5" stroke="#fff" stroke-width="2" fill="none"/><path d="M-12 6 H12" stroke="#ffb3c9" stroke-width="2.4"/><circle cx="-5" cy="11" r="1.4" fill="#fff"/><circle cx="1" cy="12" r="1.4" fill="#fff"/><circle cx="6" cy="10" r="1.4" fill="#fff"/>`);
+    case "basket": return g(`<path d="M-16 -16 Q0 -34 16 -16" stroke="${shade(C,-.2)}" stroke-width="3" fill="none"/>${[["#ffc2d9",-8],["#b5dcff",0],["#fff3a8",8]].map(([col,ex])=>`<ellipse cx="${ex}" cy="-10" rx="5" ry="6.5" fill="${col}" stroke="${ol}" stroke-width="1"/>`).join("")}<path d="M-18 -8 L18 -8 L14 10 L-14 10Z" fill="${C}" ${sw}/><path d="M-17 -2 H17 M-16 4 H16" stroke="${shade(C,-.25)}" stroke-width="1.3"/><path d="M-16 -8 q4 -4 8 0 q4 -4 8 0 q4 -4 8 0 q4 -4 8 0" stroke="#7fb54b" stroke-width="2" fill="none"/>`);
+    case "carrot": return g(`<path d="M-4 -10 L4 -10 L0 16Z" fill="${C}" ${sw} transform="rotate(-20)"/><path d="M-2 -10 C-8 -20 -4 -24 0 -16 C2 -24 8 -22 2 -10" fill="#6cc070" stroke="#2f6b35" stroke-width="1" transform="rotate(-20)"/><path d="M-3 -2 l4 0 M-2 4 l3 0" stroke="${shade(C,-.3)}" stroke-width="1" transform="rotate(-20)"/>`);
+    case "candycane": return g(`<path d="M2 16 V-8 A7 7 0 0 0 -12 -8" stroke="${ol}" stroke-width="7" fill="none" stroke-linecap="round"/><path d="M2 16 V-8 A7 7 0 0 0 -12 -8" stroke="#fff" stroke-width="5" fill="none" stroke-linecap="round"/><path d="M2 16 V-8 A7 7 0 0 0 -12 -8" stroke="${C}" stroke-width="5" fill="none" stroke-dasharray="3 3"/>`);
+    case "gift": return g(`<rect x="-12" y="-6" width="24" height="18" rx="2" fill="${C}" ${sw}/><rect x="-14" y="-10" width="28" height="6" rx="2" fill="${shade(C,.1)}" ${sw}/><rect x="-2" y="-10" width="4" height="22" fill="#ffd34d"/><path d="M0 -10 C-6 -18 -12 -14 -8 -11Z M0 -10 C6 -18 12 -14 8 -11Z" fill="#ffd34d" stroke="#9a7020" stroke-width="1"/>`);
+    case "cookie": return g(`<path d="M0 -14 C5 -14 6 -8 4 -6 L12 -4 C15 -3 15 2 12 2 L5 2 L7 12 C8 15 4 16 2 13 L0 8 L-2 13 C-4 16 -8 15 -7 12 L-5 2 L-12 2 C-15 2 -15 -3 -12 -4 L-4 -6 C-6 -8 -5 -14 0 -14Z" fill="${C}" ${sw}/><circle cx="-2" cy="-9" r=".9" fill="#2b2b2b"/><circle cx="2" cy="-9" r=".9" fill="#2b2b2b"/><path d="M-2 -7 Q0 -5 2 -7" stroke="#fff" stroke-width=".9" fill="none"/><circle cx="0" cy="-1" r="1.2" fill="#e0343c"/><circle cx="0" cy="4" r="1.2" fill="#2f9e55"/>`);
+    case "pail": return g(`<path d="M-12 -12 Q0 -24 12 -12" stroke="#2b2232" stroke-width="2" fill="none"/><path d="M-13 -10 C-15 6 -8 14 0 14 C8 14 15 6 13 -10Z" fill="${C}" ${sw}/><ellipse cx="0" cy="-10" rx="13" ry="3.5" fill="#2b2232"/><path d="M-7 -2 L-4 -6 L-1 -2Z M7 -2 L4 -6 L1 -2Z" fill="#2b2232"/><path d="M-7 4 Q0 10 7 4 L4 4 L2 7 L0 4 L-2 7 L-4 4Z" fill="#2b2232"/><circle cx="-3" cy="-13" r="2.4" fill="#ff5d8f"/><circle cx="3" cy="-13" r="2.4" fill="#ffd34d"/>`);
+    case "lollipop": return g(`<path d="M0 16 V-2" stroke="#fff" stroke-width="2.4" stroke-linecap="round"/><circle cx="0" cy="-10" r="9" fill="${C}" ${sw}/><path d="M0 -10 m-6 0 a6 6 0 1 1 6 6 a4 4 0 1 1 -4 -4 a2 2 0 1 1 2 2" stroke="#fff" stroke-width="1.4" fill="none"/>`);
+    case "potion": return g(`<path d="M-4 -14 H4 V-8 C12 -4 12 12 0 12 C-12 12 -12 -4 -4 -8Z" fill="${C}" fill-opacity=".85" ${sw}/><rect x="-5" y="-18" width="10" height="5" rx="1.5" fill="#a0704a" ${sw}/><circle cx="-3" cy="2" r="2" fill="#fff" opacity=".6"/><circle cx="3" cy="6" r="1.2" fill="#fff" opacity=".6"/>`);
+    case "chocolates": return g(`<path d="M0 12 C-18 2 -16 -14 -6 -12 C-3 -12 -1 -10 0 -8 C1 -10 3 -12 6 -12 C16 -14 18 2 0 12Z" fill="${C}" ${sw}/><circle cx="-5" cy="-4" r="3" fill="#5a3a2a"/><circle cx="5" cy="-4" r="3" fill="#5a3a2a"/><circle cx="0" cy="3" r="3" fill="#5a3a2a"/>`);
+    case "pieslice": return g(`<path d="M-12 8 L14 -4 L14 2 L-10 14Z" fill="#e8b46a" ${sw}/><path d="M-12 8 L14 -4 L14 -10 C2 -10 -8 -2 -12 4Z" fill="${C}" ${sw}/><path d="M2 -9 C0 -13 4 -15 6 -13 C8 -15 11 -12 9 -10Z" fill="#fff"/>`);
+    case "leaf": return g(`<path d="M0 -14 L3 -7 L10 -9 L7 -2 L13 2 L5 4 L6 12 L0 7 L-6 12 L-5 4 L-13 2 L-7 -2 L-10 -9 L-3 -7Z" fill="${C}" ${sw}/><path d="M0 -10 V16" stroke="${ol}" stroke-width="1.2"/>`);
+    case "goldcoin": return g(`<circle r="11" fill="${C}" ${sw}/><circle r="8" fill="none" stroke="${shade(C,-.25)}" stroke-width="1.2"/>${[0,90,180,270].map(r=>`<path d="M0 0 C-3 -2 -4 -5 -2 -6 C-1 -6 0 -5 0 -4 C0 -5 1 -6 2 -6 C4 -5 3 -2 0 0Z" transform="rotate(${r})" fill="#3f9a4f"/>`).join("")}`);
+    case "shamrockprop": return g(`<path d="M0 0 Q2 10 6 16" stroke="#2f6b35" stroke-width="2" fill="none"/>${[0,120,240].map(r=>`<path d="M0 0 C-8 -5 -10 -13 -5 -15 C-1 -16 0 -13 0 -12 C0 -13 1 -16 5 -15 C10 -13 8 -5 0 0Z" transform="rotate(${r})" fill="${C}" ${sw}/>`).join("")}`);
+    case "flag": return g(`<path d="M-8 16 V-22" stroke="#7a5034" stroke-width="2.4" stroke-linecap="round"/><rect x="-8" y="-22" width="24" height="15" fill="#fff" stroke="${ol}" stroke-width="1"/>${[0,1,2,3,4].map(i=>i%2?"":`<rect x="-8" y="${-22+i*3}" width="24" height="3" fill="#d6323a"/>`).join("")}<rect x="-8" y="-22" width="10" height="8" fill="${C}"/><circle cx="-5" cy="-19" r=".9" fill="#fff"/><circle cx="-1" cy="-17" r=".9" fill="#fff"/>`);
+    case "sparkler": return g(`<path d="M-6 16 L4 -10" stroke="#9a9aa8" stroke-width="2" stroke-linecap="round"/><g class="spk-burst">${[...Array(8)].map((_,i)=>{ const an = i*45*Math.PI/180; return `<path d="M4 -10 L${(4+Math.cos(an)*9).toFixed(1)} ${(-10+Math.sin(an)*9).toFixed(1)}" stroke="${i%2?C:"#fff"}" stroke-width="1.6" stroke-linecap="round"/>`; }).join("")}</g><circle cx="4" cy="-10" r="2.6" fill="#fff"/>`);
+    case "popper": return g(`<path d="M-8 14 L4 -6 L10 -2Z" fill="${C}" ${sw}/><path d="M-4 8 L6 -2 M-6 11 L8 0" stroke="#fff" stroke-width="1.2"/>${[["#ffd34d",8,-14],["#7fd6ff",14,-8],["#9be15d",2,-18],["#ff5fb7",16,-16]].map(([col,cx,cy])=>`<rect x="${cx}" y="${cy}" width="3" height="5" rx="1" fill="${col}" transform="rotate(${cx*7} ${cx} ${cy})"/>`).join("")}`);
+  }
+  return "";
+}
+const _buddySVG2 = buddySVG;
+buddySVG = function(species, coatKey, opt = {}){
+  let out = _buddySVG2(species, coatKey, opt);
+  if(opt.acc === "cupidwings"){ const sp0 = BUDDY_SPECIES[species]; const a0 = {top:sp0?.top||[60,27], hw:sp0?.hw||34, eye:sp0?.eye||59, neck:sp0?.neck||82, dx:sp0?.dx||14, cx:species==="bookworm"?72:60}; const ws = accSVG("cupidwings", opt.accC || BUDDY_ACC.cupidwings.c, a0); if(out.includes(ws)){ out = out.replace(ws, ""); out = out.replace(/(<svg[^>]*>)/, "$1" + ws); } }
+  const pk = opt.prop; if(!pk || pk === "none" || !BUDDY_PROPS[pk]) return out;
+  const sp = BUDDY_SPECIES[species]; const a = {hold: sp?.hold || (sp?.kind==="m" ? [60,101] : [60,100])};
+  const p = propSVG(pk, opt.propC || BUDDY_PROPS[pk].c, a);
+  return out.replace(/<\/svg>$/, p + "</svg>");
+};
+const _buddyOpts2 = buddyOpts;
+buddyOpts = function(L){
+  const O = _buddyOpts2(L); const b = L.bud || {};
+  let pr = b.prop; const sp = BUDDY_SPECIES[O.species];
+  if(pr === undefined && sp?.defProp) pr = sp.defProp;
+  if(pr && pr !== "none" && (!BUDDY_PROPS[pr] || !onAny(BUDDY_PROPS[pr].holiday))) pr = "none";
+  O.prop = pr || "none"; O.propC = b.propC || BUDDY_PROPS[O.prop]?.c; return O;
+};
 /* ---------- THE SHELF PLANT: grows with the days you water it ---------- */
 const PLANT_STAGES = [["Seed",0],["Sprout",1],["Seedling",3],["Little plant",5],["Growing",8],["Leafy",12],["Bushy",16],["Budding",21],["First bloom",28],["Blooming",36],["Full bloom",45],["Bouquet",60],["Overflowing",80],["Legendary",100]];
 const PLANT_TYPES = {flower:"Daisies", rose:"Roses", tulip:"Tulips", sunflower:"Sunflowers", lavender:"Lavender", cherry:"Cherry blossom bonsai", succulent:"Succulent", cactus:"Cactus", fern:"Fern", monstera:"Monstera", moonflower:"Moonflower", pumpkin:"Pumpkin vine"};
@@ -5453,11 +5857,11 @@ function drawBuddy(L){
   if(!L.buddy || L.buddy === "none" || !BUDDY_SPECIES[L.buddy]){ if(el){ clearInterval(el._idle); el.remove(); } return; }
   const O = buddyOpts(L), size = BUD_SIZES[(L.bud||{}).size] || BUD_SIZES.m, SP = O.species;
   const mood = budState.mood || (budAsleep() ? "sleep" : "");
-  const sig = JSON.stringify([SP, O.coatKey, O.c, O.eyes, O.acc, O.accC, O.blush, size, mood]);
+  const sig = JSON.stringify([SP, O.coatKey, O.c, O.eyes, O.acc, O.accC, O.prop, O.propC, O.blush, size, mood]);
   if(!el){ el = document.createElement("div"); el.id = "buddy"; document.body.appendChild(el); el.innerHTML = `<div class="bud-say"></div><div class="bud-body"></div><div class="bud-name"></div>`; wireBuddy(el); }
   el.className = `buddy b-${SP} ${mood==="sleep"?"asleep":""}`; el.style.width = el.style.height = size + "px";
   el.querySelector(".bud-name").textContent = (L.bud||{}).showName ? budName() : "";
-  if(el.dataset.sig !== sig){ el.dataset.sig = sig; el.querySelector(".bud-body").innerHTML = buddySVG(SP, O.coatKey, {colors:(L.bud||{}).custom, eyes:O.eyes, acc:O.acc, accC:O.accC, blush:O.blush, mood}) + (mood==="sleep" ? `<span class="zzz">z<b>z</b><i>z</i></span>` : ""); }
+  if(el.dataset.sig !== sig){ el.dataset.sig = sig; el.querySelector(".bud-body").innerHTML = buddySVG(SP, O.coatKey, {colors:(L.bud||{}).custom, eyes:O.eyes, acc:O.acc, accC:O.accC, prop:O.prop, propC:O.propC, blush:O.blush, mood}) + (mood==="sleep" ? `<span class="zzz">z<b>z</b><i>z</i></span>` : ""); }
   const pos = (()=>{ try{ return JSON.parse(localStorage.getItem("shelf:buddy")||"null"); }catch(e){ return null; } })();
   if(pos){ el.style.left = Math.min(innerWidth-size, pos.x)+"px"; el.style.top = Math.min(innerHeight-size-20, pos.y)+"px"; el.style.right = "auto"; el.style.bottom = "auto"; }
   clearInterval(el._idle);
@@ -5585,7 +5989,8 @@ function renderLook(view0){
   const okP = x => availNow(x);
   const avail = (obj, map) => Object.fromEntries(Object.entries(obj).filter(([k])=>onAny(map[k])));
   const FXA = avail(EFFECTS, FX_HOLIDAY), PATA = avail(PATTERNS, PAT_HOLIDAY), FRA = avail(FRAMES, FRAME_HOLIDAY);
-  const accA = Object.entries(BUDDY_ACC).filter(([k,a])=>k==="none" || holidayOn(a.holiday));
+  const accStd = Object.entries(BUDDY_ACC).filter(([k,a])=>!a.holiday);
+  const accHol = Object.entries(BUDDY_ACC).filter(([k,a])=>a.holiday && holidayOn(a.holiday));
 
   const pg = page(`<div class="page-head"><button class="icon-btn" id="lk-back">${IC.back}</button><h2 class="display">${LOOK_TITLES[VIEW]}</h2></div>
   <div class="wrap lk">
@@ -5649,7 +6054,7 @@ function renderLook(view0){
     <div style="color:var(--dim);font-size:12px;margin-top:8px">Effects float in the background and never get in the way of tapping.</div>`, [EFFECTS[L.fx], L.fx2!=="none"?EFFECTS[L.fx2]:""].filter(x=>x&&x!=="None").join(" + ") || "None")}
 
   ${grp("buddy", "Shelf buddy", ()=>`
-    ${sp ? `<div class="bud-hero"><div class="bud-hero-art">${buddySVG(SPK, O.coatKey, {colors:B.custom, eyes:O.eyes, acc:O.acc, accC:O.accC, blush:O.blush})}</div><div><div class="bud-hero-n">${esc(B.name || sp.name)}</div><div style="font-size:12px;color:var(--dim)">${esc(sp.name)} · ${esc(sp.coats[O.coatKey].n)}</div><div style="font-size:12px;color:var(--mut);margin-top:6px">Tap to say hi, double tap to spin, hold for a pat, drag to move.</div></div></div>` : ""}
+    ${sp ? `<div class="bud-hero"><div class="bud-hero-art">${buddySVG(SPK, O.coatKey, {colors:B.custom, eyes:O.eyes, acc:O.acc, accC:O.accC, prop:O.prop, propC:O.propC, blush:O.blush})}</div><div><div class="bud-hero-n">${esc(B.name || sp.name)}</div><div style="font-size:12px;color:var(--dim)">${esc(sp.name)} · ${esc(sp.coats[O.coatKey].n)}</div><div style="font-size:12px;color:var(--mut);margin-top:6px">Tap to say hi, double tap to spin, hold for a pat, drag to move.</div></div></div>` : ""}
     ${Object.values(BUDDY_SPECIES).some(s=>s.holiday && availNow(s)) ? `<div class="b-label">${holLabel} friends <span style="font-weight:500;text-transform:none;letter-spacing:0">· here until ${holidayUntil(hol[hol.length-1])}</span></div><div class="buddy-grid hol">${Object.entries(BUDDY_SPECIES).filter(([,s])=>s.holiday && availNow(s)).map(([k,s])=>`<button class="buddy-opt ${SPK===k?"on":""}" data-v="${k}">${buddySVG(k, Object.keys(s.coats)[0])}<span>${s.name}</span></button>`).join("")}</div><div class="b-label">Everyday friends</div>` : ""}
     <div class="chips lk-filter">${["All", ...BUDDY_GROUPS].map(g=>`<button class="chip ${budFilter===g?"on":""}" data-bf="${g}">${g}</button>`).join("")}</div>
     <div class="buddy-grid"><button class="buddy-opt ${L.buddy==="none"?"on":""}" data-v="none"><span class="bo-none">—</span><span>None</span></button>${Object.entries(BUDDY_SPECIES).filter(([,s])=>!s.holiday && (budFilter==="All"||s.g===budFilter)).map(([k,s])=>`<button class="buddy-opt ${SPK===k?"on":""}" data-v="${k}">${buddySVG(k, Object.keys(s.coats)[0])}<span>${s.name}</span></button>`).join("")}</div>
@@ -5659,8 +6064,13 @@ function renderLook(view0){
     <div class="color-row"><label>Main<input type="color" data-cc="main" value="${O.c.main}"></label><label>Second<input type="color" data-cc="second" value="${O.c.second||"#ffffff"}"></label><label>Details<input type="color" data-cc="accent" value="${O.c.accent||"#ffb3c7"}"></label><label>Eyes<input type="color" data-cc="eyes" value="${O.c.eyes||"#3a2a4a"}"></label></div>
     ${B.custom?`<div class="row-btns"><button class="btn" id="bd-cc-x">Back to the original colors</button></div>`:""}
     <div class="b-label">Eyes</div>${seg("bd-eyes", {round:"Round", sparkle:"Sparkly", lashes:"Lashes", sleepy:"Sleepy", dot:"Tiny dots", happy:"Smiley"}, O.eyes)}
-    ${accA.length > 1 ? `<div class="b-label">${holLabel} accessories</div><div class="acc-grid">${accA.map(([k,a])=>`<button class="acc-opt ${O.acc===k?"on":""}" data-acc="${k}">${k==="none"?`<span class="bo-none">—</span>`:buddySVG(SPK, O.coatKey, {colors:B.custom, acc:k, accC: O.acc===k ? O.accC : a.c})}<span>${a.n}</span></button>`).join("")}</div><div style="color:var(--dim);font-size:12px;margin-top:6px">Holiday accessories only stay for the holiday, then your buddy goes back to normal.</div>` : `<div style="color:var(--dim);font-size:12px;margin-top:10px">Holiday accessories show up on their own during holidays, like a witch hat in October or a Santa hat in December.</div>`}
+    ${accHol.length ? `<div class="b-label">${holLabel} accessories <span style="font-weight:500;text-transform:none;letter-spacing:0">· here until ${holidayUntil(hol[hol.length-1])}</span></div><div class="acc-grid hol">${accHol.map(([k,a])=>`<button class="acc-opt ${O.acc===k?"on":""}" data-acc="${k}">${buddySVG(SPK, O.coatKey, {colors:B.custom, acc:k, accC: O.acc===k ? O.accC : a.c})}<span>${a.n}</span></button>`).join("")}</div>` : ""}
+    <div class="b-label">Accessories</div><div class="acc-grid">${accStd.map(([k,a])=>`<button class="acc-opt ${O.acc===k?"on":""}" data-acc="${k}">${k==="none"?`<span class="bo-none">—</span>`:buddySVG(SPK, O.coatKey, {colors:B.custom, acc:k, accC: O.acc===k ? O.accC : a.c})}<span>${a.n}</span></button>`).join("")}</div>
+    <div style="color:var(--dim);font-size:12px;margin-top:6px">Holiday accessories pop up during their holiday, like a witch hat in October. If your buddy is wearing one when the holiday ends, it simply comes off.</div>
     ${O.acc!=="none"?`<div class="color-row"><label>Accessory color<input type="color" id="bd-accC" value="${O.accC}"></label></div>`:""}
+    ${(()=>{ const ph = Object.entries(BUDDY_PROPS).filter(([k,x])=>x.holiday && onAny(x.holiday)), ps = Object.entries(BUDDY_PROPS).filter(([k,x])=>!x.holiday);
+      const card = ([k,x]) => `<button class="acc-opt ${O.prop===k?"on":""}" data-prop="${k}">${k==="none"?`<span class="bo-none">—</span>`:buddySVG(SPK, O.coatKey, {colors:B.custom, prop:k, propC: O.prop===k ? O.propC : x.c})}<span>${x.n}</span></button>`;
+      return `${ph.length ? `<div class="b-label">${holLabel} things to hold</div><div class="acc-grid hol">${ph.map(card).join("")}</div>` : ""}<div class="b-label">Something to hold</div><div class="acc-grid">${ps.map(card).join("")}</div>${O.prop!=="none"?`<div class="color-row"><label>Color<input type="color" id="bd-propC" value="${O.propC}"></label></div>`:""}`; })()}
     <div class="b-label">Name</div><input class="lk-input" id="bd-name" value="${esc(B.name||"")}" placeholder="Give your buddy a name" maxlength="20">
     <label class="lk-check"><input type="checkbox" id="bd-showName" ${B.showName?"checked":""}> Show the name under your buddy</label>
     <label class="lk-check"><input type="checkbox" id="bd-blush" ${B.blush!==false?"checked":""}> Rosy cheeks</label>
@@ -5758,7 +6168,9 @@ function renderLook(view0){
   Q("[data-cc]").forEach(inp=>{ inp.oninput = e=>{ const B2 = look().bud||{}; setBud("custom", {...(B2.custom||{}), [inp.dataset.cc]:e.target.value}); const art = pg.querySelector(".bud-hero-art"); const O2 = buddyOpts(look()); if(art) art.innerHTML = buddySVG(O2.species, O2.coatKey, {colors:(look().bud||{}).custom, eyes:O2.eyes, acc:O2.acc, accC:O2.accC, blush:O2.blush}); }; inp.onchange = redo; });
   const ccx = $("#bd-cc-x",pg); if(ccx) ccx.onclick = ()=>{ setBud("custom", null); redo(); };
   Q("#bd-eyes button").forEach(b=>b.onclick=()=>{ setBud("eyes", b.dataset.v); redo(); });
-  Q(".acc-opt").forEach(b=>b.onclick=()=>{ const k = b.dataset.acc; p.look = {...look(), bud:{...(look().bud||{}), acc:k, accC:BUDDY_ACC[k].c}}; saveNow(); applyTheme(); redo(); });
+  Q(".acc-opt[data-acc]").forEach(b=>b.onclick=()=>{ const k = b.dataset.acc; p.look = {...look(), bud:{...(look().bud||{}), acc:k, accC:BUDDY_ACC[k].c}}; saveNow(); applyTheme(); redo(); });
+  Q(".acc-opt[data-prop]").forEach(b=>b.onclick=()=>{ const k = b.dataset.prop; p.look = {...look(), bud:{...(look().bud||{}), prop:k, propC:BUDDY_PROPS[k].c}}; saveNow(); applyTheme(); redo(); });
+  const pc2 = $("#bd-propC",pg); if(pc2){ pc2.oninput = e=>setBud("propC", e.target.value); pc2.onchange = redo; }
   const ac = $("#bd-accC",pg); if(ac){ ac.oninput = e=>setBud("accC", e.target.value); ac.onchange = redo; }
   const bn = $("#bd-name",pg); if(bn) bn.onchange = e=>{ setBud("name", e.target.value.trim()); redo(); };
   const bsn = $("#bd-showName",pg); if(bsn) bsn.onchange = e=>setBud("showName", e.target.checked);
